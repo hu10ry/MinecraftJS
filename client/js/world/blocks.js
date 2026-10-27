@@ -3,8 +3,15 @@
 // Worker-safe (no DOM). Call initBlocks(blocksJson, shapesJson) once.
 
 export const DIR = { DOWN: 0, UP: 1, NORTH: 2, SOUTH: 3, WEST: 4, EAST: 5 };
-export const DIR_OFFSETS = [[0, -1, 0], [0, 1, 0], [0, 0, -1], [0, 0, 1], [-1, 0, 0], [1, 0, 0]];
-export const DIR_NAMES = ['down', 'up', 'north', 'south', 'west', 'east'];
+export const DIR_OFFSETS = [
+  [0, -1, 0],
+  [0, 1, 0],
+  [0, 0, -1],
+  [0, 0, 1],
+  [-1, 0, 0],
+  [1, 0, 0],
+];
+export const DIR_NAMES = ["down", "up", "north", "south", "west", "east"];
 export const OPPOSITE = [1, 0, 3, 2, 5, 4];
 
 export const blocks = [];
@@ -13,45 +20,189 @@ export const states = [];
 const renderBlocks = [];
 export const stateById = states;
 
-const STAIRS = (name) => name.endsWith('_stairs');
+const STAIRS = (name) => name.endsWith("_stairs");
 
-const HEAD_BLOCKS = new Set(['skeleton_skull','wither_skeleton_skull','zombie_head','player_head','creeper_head','dragon_head'].flatMap(name=>[name,name.replace(/_(head|skull)$/,'_wall_$1')]));
+const HEAD_BLOCKS = new Set(
+  [
+    "skeleton_skull",
+    "wither_skeleton_skull",
+    "zombie_head",
+    "player_head",
+    "creeper_head",
+    "dragon_head",
+  ].flatMap((name) => [name, name.replace(/_(head|skull)$/, "_wall_$1")]),
+);
 
-const SHULKER_BOXES = new Set(['white', 'orange', 'magenta', 'light_blue', 'yellow', 'lime', 'pink', 'gray', 'light_gray',
-  'cyan', 'purple', 'blue', 'brown', 'green', 'red', 'black'].map((c) => c + '_shulker_box'));
+const SHULKER_BOXES = new Set(
+  [
+    "white",
+    "orange",
+    "magenta",
+    "light_blue",
+    "yellow",
+    "lime",
+    "pink",
+    "gray",
+    "light_gray",
+    "cyan",
+    "purple",
+    "blue",
+    "brown",
+    "green",
+    "red",
+    "black",
+  ].map((c) => c + "_shulker_box"),
+);
 
 // Blocks with a full "block" bounding box that are NOT opaque cubes in vanilla
 const NOT_OPAQUE = new Set([
-  'glass', 'ice', 'chest', 'trapped_chest', 'ender_chest', 'cactus', 'cake', 'snow', 'farmland', 'enchanting_table',
-  'end_portal_frame', 'brewing_stand', 'cauldron', 'hopper', 'anvil', 'daylight_detector', 'carpet', 'skull', 'flower_pot',
-  'trapdoor', 'iron_trapdoor', 'ladder', 'piston_head', 'dragon_egg', 'cocoa', 'repeater', 'comparator', 'waterlily',
-  'cobweb', 'end_portal', 'nether_portal', 'tripwire', 'tripwire_hook', 'vine', 'redstone_wire', 'piston', 'sticky_piston',
-  'end_rod', 'chorus_plant', 'chorus_flower', 'grass_path', 'frosted_ice', 'structure_void', 'end_gateway', 'slime_block',
-  'barrier', 'beacon', 'mob_spawner', 'redstone_torch', 'torch', 'fire', 'kelp', 'kelp_plant', 'seagrass', 'tall_seagrass',
-  'dead_bush', 'dandelion', 'poppy', 'brown_mushroom', 'red_mushroom', 'sunflower', 'lilac', 'rose_bush', 'peony', 'tall_grass',
-  'large_fern', 'turtle_egg', 'snow', 'white_bed', 'white_banner', 'white_wall_banner',
+  "glass",
+  "ice",
+  "chest",
+  "trapped_chest",
+  "ender_chest",
+  "cactus",
+  "cake",
+  "snow",
+  "farmland",
+  "enchanting_table",
+  "end_portal_frame",
+  "brewing_stand",
+  "cauldron",
+  "hopper",
+  "anvil",
+  "daylight_detector",
+  "carpet",
+  "skull",
+  "flower_pot",
+  "trapdoor",
+  "iron_trapdoor",
+  "ladder",
+  "piston_head",
+  "dragon_egg",
+  "cocoa",
+  "repeater",
+  "comparator",
+  "waterlily",
+  "cobweb",
+  "end_portal",
+  "nether_portal",
+  "tripwire",
+  "tripwire_hook",
+  "vine",
+  "redstone_wire",
+  "piston",
+  "sticky_piston",
+  "end_rod",
+  "chorus_plant",
+  "chorus_flower",
+  "grass_path",
+  "frosted_ice",
+  "structure_void",
+  "end_gateway",
+  "slime_block",
+  "barrier",
+  "beacon",
+  "mob_spawner",
+  "redstone_torch",
+  "torch",
+  "fire",
+  "kelp",
+  "kelp_plant",
+  "seagrass",
+  "tall_seagrass",
+  "dead_bush",
+  "dandelion",
+  "poppy",
+  "brown_mushroom",
+  "red_mushroom",
+  "sunflower",
+  "lilac",
+  "rose_bush",
+  "peony",
+  "tall_grass",
+  "large_fern",
+  "turtle_egg",
+  "snow",
+  "white_bed",
+  "white_banner",
+  "white_wall_banner",
 ]);
 
 // Clear glass uses binary texture alpha (cutout); stained glass needs blending.
-const TRANSLUCENT = new Set(['water', 'lava', 'ice', 'frosted_ice', 'slime_block', 'nether_portal']);
+const TRANSLUCENT = new Set([
+  "water",
+  "lava",
+  "ice",
+  "frosted_ice",
+  "slime_block",
+  "nether_portal",
+]);
 
 // Blocks without a block model (rendered by special renderers or invisible)
 const NO_MODEL = new Set([
-  'air', 'water', 'lava', 'chest', 'trapped_chest', 'ender_chest', 'sign', 'wall_sign', 'skull', 'white_bed',
-  'white_banner', 'white_wall_banner', 'moving_piston', 'barrier', 'end_portal', 'structure_void',
-  'end_gateway', ...SHULKER_BOXES,
+  "air",
+  "water",
+  "lava",
+  "chest",
+  "trapped_chest",
+  "ender_chest",
+  "sign",
+  "wall_sign",
+  "skull",
+  "white_bed",
+  "white_banner",
+  "white_wall_banner",
+  "moving_piston",
+  "barrier",
+  "end_portal",
+  "structure_void",
+  "end_gateway",
+  ...SHULKER_BOXES,
 ]);
 
-const FENCES = (name) => name.endsWith('_fence');
-const FENCE_GATES = (name) => name.endsWith('_fence_gate');
-const PANES = (name) => name.endsWith('_pane') || name === 'iron_bars';
-const DOORS = (name) => name.endsWith('_door');
+const FENCES = (name) => name.endsWith("_fence");
+const FENCE_GATES = (name) => name.endsWith("_fence_gate");
+const PANES = (name) => name.endsWith("_pane") || name === "iron_bars";
+const DOORS = (name) => name.endsWith("_door");
 
 // Blocks that can be replaced by placing a block into them
-const REPLACEABLE = new Set(['air', 'water', 'lava', 'tall_grass', 'dead_bush', 'vine', 'fire', 'snow', 'kelp', 'kelp_plant',
-  'seagrass', 'tall_seagrass', 'dandelion', 'poppy', 'blue_orchid', 'allium', 'azure_bluet', 'red_tulip', 'orange_tulip',
-  'white_tulip', 'pink_tulip', 'oxeye_daisy', 'brown_mushroom', 'red_mushroom', 'sunflower', 'lilac', 'rose_bush', 'peony',
-  'large_fern', 'wheat', 'carrots', 'potatoes', 'beetroots', 'sweet_berry_bush']);
+const REPLACEABLE = new Set([
+  "air",
+  "water",
+  "lava",
+  "tall_grass",
+  "dead_bush",
+  "vine",
+  "fire",
+  "snow",
+  "kelp",
+  "kelp_plant",
+  "seagrass",
+  "tall_seagrass",
+  "dandelion",
+  "poppy",
+  "blue_orchid",
+  "allium",
+  "azure_bluet",
+  "red_tulip",
+  "orange_tulip",
+  "white_tulip",
+  "pink_tulip",
+  "oxeye_daisy",
+  "brown_mushroom",
+  "red_mushroom",
+  "sunflower",
+  "lilac",
+  "rose_bush",
+  "peony",
+  "large_fern",
+  "wheat",
+  "carrots",
+  "potatoes",
+  "beetroots",
+  "sweet_berry_bush",
+]);
 
 let shapesData = null;
 
@@ -67,9 +218,10 @@ export function initBlocks(blocksJson, shapesJson) {
     const def = {
       id: b.id,
       name,
-      isAir: name === 'air' || name === 'cave_air' || name === 'void_air',
+      isAir: name === "air" || name === "cave_air" || name === "void_air",
       displayName: b.displayName,
-      hardness: b.hardness === null || b.hardness === undefined ? -1 : b.hardness,
+      hardness:
+        b.hardness === null || b.hardness === undefined ? -1 : b.hardness,
       material: b.material || null,
       harvestTools: b.harvestTools || null,
       variations: b.variations || null,
@@ -80,23 +232,50 @@ export function initBlocks(blocksJson, shapesJson) {
       emitLight: b.emitLight || 0,
       filterLight: b.filterLight === undefined ? 15 : b.filterLight,
       boundingBox: b.boundingBox,
-      opaque: b.boundingBox === 'block' && !b.transparent && !NOT_OPAQUE.has(name) && b.id !== 0,
-      translucent: TRANSLUCENT.has(name) || name.endsWith('_stained_glass') || name.endsWith('_stained_glass_pane'),
-      hasModel: !NO_MODEL.has(name) && !name.endsWith('_bed') && !name.endsWith('_banner') && !name.endsWith('_wall_banner') &&
+      opaque:
+        b.boundingBox === "block" &&
+        !b.transparent &&
+        !NOT_OPAQUE.has(name) &&
+        b.id !== 0,
+      translucent:
+        TRANSLUCENT.has(name) ||
+        name.endsWith("_stained_glass") ||
+        name.endsWith("_stained_glass_pane"),
+      hasModel:
+        !NO_MODEL.has(name) &&
+        !name.endsWith("_bed") &&
+        !name.endsWith("_banner") &&
+        !name.endsWith("_wall_banner") &&
         !HEAD_BLOCKS.has(name) &&
-        !name.endsWith('_shulker_box') && name !== 'conduit' &&
-        name !== 'bubble_column' && name !== 'void_air' && name !== 'cave_air',
+        !name.endsWith("_shulker_box") &&
+        name !== "conduit" &&
+        name !== "bubble_column" &&
+        name !== "void_air" &&
+        name !== "cave_air",
       isStairs: stairs,
       isFence: FENCES(name),
       isFenceGate: FENCE_GATES(name),
       isPane: PANES(name),
-      isWall: name === 'cobblestone_wall',
+      isWall: name === "cobblestone_wall",
       isDoor: DOORS(name),
-      isLiquid: name === 'water' || name === 'lava' || name === 'bubble_column',
-      isWater: name === 'water' || name === 'bubble_column',
-      isLava: name === 'lava',
-      replaceable: REPLACEABLE.has(name) || (b.material === 'plant' && b.boundingBox === 'empty' && !/sapling|wheat|carrots|potatoes|stem|wart|flower|mushroom/.test(name)),
-      slipperiness: name === 'blue_ice' ? 0.989 : name === 'ice' || name === 'packed_ice' || name === 'frosted_ice' ? 0.98 : name === 'slime_block' ? 0.8 : 0.6,
+      isLiquid: name === "water" || name === "lava" || name === "bubble_column",
+      isWater: name === "water" || name === "bubble_column",
+      isLava: name === "lava",
+      replaceable:
+        REPLACEABLE.has(name) ||
+        (b.material === "plant" &&
+          b.boundingBox === "empty" &&
+          !/sapling|wheat|carrots|potatoes|stem|wart|flower|mushroom/.test(
+            name,
+          )),
+      slipperiness:
+        name === "blue_ice"
+          ? 0.989
+          : name === "ice" || name === "packed_ice" || name === "frosted_ice"
+            ? 0.98
+            : name === "slime_block"
+              ? 0.8
+              : 0.6,
       shapes: shapesJson ? shapesJson.blocks[name] : null,
       // AO: opaque full cubes darken neighbours
       aoLight: 0,
@@ -106,45 +285,75 @@ export function initBlocks(blocksJson, shapesJson) {
     blocks[b.id] = def;
     blocksByName[name] = def;
     for (let state = def.minStateId; state <= def.maxStateId; state++) {
-      states[state] = { id: state, blockId: b.id, name, properties: decodeProperties(def, state) };
+      states[state] = {
+        id: state,
+        blockId: b.id,
+        name,
+        properties: decodeProperties(def, state),
+      };
     }
   }
   // Light opacity as in vanilla 1.8 (the data file disagrees for several blocks)
   for (const def of Object.values(blocksByName)) {
     // Non-solid plants, crops, portals, piston heads...: Block default opacity is 0 unless it is an opaque cube
-    if (!def.opaque && def.boundingBox === 'empty' && !def.isLiquid) def.filterLight = 0;
+    if (!def.opaque && def.boundingBox === "empty" && !def.isLiquid)
+      def.filterLight = 0;
   }
-  for (const b of Object.values(blocksByName)) if (b.name.endsWith('_leaves') || b.name === 'cobweb') b.filterLight = 1;
-  for (const n of ['water', 'bubble_column', 'ice']) if (blocksByName[n]) blocksByName[n].filterLight = 3;
+  for (const b of Object.values(blocksByName))
+    if (b.name.endsWith("_leaves") || b.name === "cobweb") b.filterLight = 1;
+  for (const n of ["water", "bubble_column", "ice"])
+    if (blocksByName[n]) blocksByName[n].filterLight = 3;
   // Turtle eggs are collision shapes, not light blockers (BlockTurtleEgg in the pinned jar).
-  if(blocksByName.turtle_egg)blocksByName.turtle_egg.filterLight=0;
+  if (blocksByName.turtle_egg) blocksByName.turtle_egg.filterLight = 0;
   // Slabs, stairs and farmland block light completely in 1.8 but render with their neighbours' brightness
   for (const b of Object.values(blocksByName)) {
-    if (b.name.endsWith('_slab') || b.isStairs || b.name === 'farmland') { b.filterLight = 15; b.useNeighborBrightness = true; }
+    if (b.name.endsWith("_slab") || b.isStairs || b.name === "farmland") {
+      b.filterLight = 15;
+      b.useNeighborBrightness = true;
+    }
   }
-  if(blocksByName.grass_path){blocksByName.grass_path.filterLight=15;blocksByName.grass_path.useNeighborBrightness=true;}
+  if (blocksByName.grass_path) {
+    blocksByName.grass_path.filterLight = 15;
+    blocksByName.grass_path.useNeighborBrightness = true;
+  }
   // Registry metadata's broad "block" category is not an opaque/full-cube test.
   // Native state properties cover new and existing blocks without name lists.
   const rendering = shapesJson?.render;
   if (rendering) {
-    if (rendering.states.length !== states.length) throw new Error('Incomplete native block render properties; regenerate runtime data');
+    if (rendering.states.length !== states.length)
+      throw new Error(
+        "Incomplete native block render properties; regenerate runtime data",
+      );
     for (const info of states) {
       const value = rendering.values[rendering.states[info.id]];
-      if (!value) throw new Error('Missing block render properties for state '+info.id);
+      if (!value)
+        throw new Error("Missing block render properties for state " + info.id);
       const def = blocks[info.blockId];
-      const overrides = {hasModel:value.renderType===2,renderType:value.renderType,opaque:value.solid,suffocates:value.suffocates??value.viewBlocking,canOcclude:value.occludes,aoLight:value.shade,filterLight:value.lightBlock,
-        emitLight:value.emission,collisionFull:value.collisionFull,occlusionBoxes:value.occlusion,soundType:value.sound,
-        useNeighborBrightness:!value.solid&&!value.collisionFull&&!def.isLiquid};
-      renderBlocks[info.id] = Object.assign(Object.create(def),overrides);
-      if(info.id===def.defaultState)Object.assign(def,overrides);
+      const overrides = {
+        hasModel: value.renderType === 2,
+        renderType: value.renderType,
+        opaque: value.solid,
+        suffocates: value.suffocates ?? value.viewBlocking,
+        canOcclude: value.occludes,
+        aoLight: value.shade,
+        filterLight: value.lightBlock,
+        emitLight: value.emission,
+        collisionFull: value.collisionFull,
+        occlusionBoxes: value.occlusion,
+        soundType: value.sound,
+        useNeighborBrightness:
+          !value.solid && !value.collisionFull && !def.isLiquid,
+      };
+      renderBlocks[info.id] = Object.assign(Object.create(def), overrides);
+      if (info.id === def.defaultState) Object.assign(def, overrides);
     }
   }
-
 }
 
 function propertyValues(prop) {
-  if (prop.type === 'bool') return ['true', 'false'];
-  if (prop.type === 'int') return Array.from({ length: prop.num_values }, (_, i) => String(i));
+  if (prop.type === "bool") return ["true", "false"];
+  if (prop.type === "int")
+    return Array.from({ length: prop.num_values }, (_, i) => String(i));
   return prop.values || [];
 }
 
@@ -161,17 +370,33 @@ function decodeProperties(def, state) {
   return props;
 }
 
-export function getBlockById(id) { return blocks[id] || blocks[0]; }
-export function getBlock(state) { const s = states[state]; return renderBlocks[state] || (s ? getBlockById(s.blockId) : blocks[0]); }
-export function getStateProperties(state) { return states[state] ? states[state].properties : {}; }
-export function getStateInfo(state) { return states[state] || states[0] || { id: 0, blockId: 0, name: 'air', properties: {} }; }
+export function getBlockById(id) {
+  return blocks[id] || blocks[0];
+}
+export function getBlock(state) {
+  const s = states[state];
+  return renderBlocks[state] || (s ? getBlockById(s.blockId) : blocks[0]);
+}
+export function getStateProperties(state) {
+  return states[state] ? states[state].properties : {};
+}
+export function getStateInfo(state) {
+  return (
+    states[state] ||
+    states[0] || { id: 0, blockId: 0, name: "air", properties: {} }
+  );
+}
 export function findState(name, properties = {}) {
   const b = blocksByName[name];
   if (!b) return 0;
   for (let state = b.minStateId; state <= b.maxStateId; state++) {
     const p = getStateProperties(state);
     let ok = true;
-    for (const [key, value] of Object.entries(properties)) if (String(p[key]) !== String(value)) { ok = false; break; }
+    for (const [key, value] of Object.entries(properties))
+      if (String(p[key]) !== String(value)) {
+        ok = false;
+        break;
+      }
     if (ok) return state;
   }
   return b.defaultState;
@@ -180,7 +405,7 @@ export function findState(name, properties = {}) {
 // Static collision boxes (relative 0..1) for a state, ignoring neighbour-dependent shapes.
 export function staticCollisionBoxes(state) {
   const b = getBlock(state);
-  if (!b || !b.shapes && b.shapes !== 0) return [];
+  if (!b || (!b.shapes && b.shapes !== 0)) return [];
   let shapeId = b.shapes;
   if (Array.isArray(shapeId)) {
     const meta = Math.max(0, state - b.minStateId);
@@ -196,6 +421,7 @@ export function isFullOpaque(state) {
 
 // Undefined means the shape needs the live-neighbour resolver; null means no selectable volume.
 export function jarSelectionBox(state) {
-  const selection = shapesData?.selection, index = selection?.states[state];
-  return typeof index === 'number' ? selection.boxes[index] : undefined;
+  const selection = shapesData?.selection,
+    index = selection?.states[state];
+  return typeof index === "number" ? selection.boxes[index] : undefined;
 }

@@ -41,8 +41,10 @@
 
 let current = null;
 
-export function setPlatform(p) { current = p; }
+export function setPlatform(p) {
+  current = p;
+}
 export function platform() {
-  if (!current) throw new Error('Platform not initialised');
+  if (!current) throw new Error("Platform not initialised");
   return current;
 }

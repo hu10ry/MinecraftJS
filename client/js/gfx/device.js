@@ -54,33 +54,104 @@ export const FORMAT = {
   //   uv   unorm16 x2: atlas uv * 65535
   //   col  unorm8 x4:  r g b (a unused)
   //   light unorm8 x2: sky / 15, block / 15
-  terrain: { name: 'terrain', packed: true, byteStride: 20, attrs: [['pos', 4, 0, 'unorm16'], ['uv', 2, 8, 'unorm16'], ['col', 4, 12, 'unorm8'], ['light', 2, 16, 'unorm8']] },
-  lit: { name: 'lit', stride: 11, attrs: [['pos', 3, 0], ['uv', 2, 3], ['col', 4, 5], ['light', 2, 9]] },
-  entity: { name: 'entity', stride: 11, attrs: [['pos', 3, 0], ['uv', 2, 3], ['nrm', 3, 5], ['col', 3, 8]] },
-  color: { name: 'color', stride: 9, attrs: [['pos', 3, 0], ['uv', 2, 3], ['col', 4, 5]] },
+  terrain: {
+    name: "terrain",
+    packed: true,
+    byteStride: 20,
+    attrs: [
+      ["pos", 4, 0, "unorm16"],
+      ["uv", 2, 8, "unorm16"],
+      ["col", 4, 12, "unorm8"],
+      ["light", 2, 16, "unorm8"],
+    ],
+  },
+  lit: {
+    name: "lit",
+    stride: 11,
+    attrs: [
+      ["pos", 3, 0],
+      ["uv", 2, 3],
+      ["col", 4, 5],
+      ["light", 2, 9],
+    ],
+  },
+  entity: {
+    name: "entity",
+    stride: 11,
+    attrs: [
+      ["pos", 3, 0],
+      ["uv", 2, 3],
+      ["nrm", 3, 5],
+      ["col", 3, 8],
+    ],
+  },
+  color: {
+    name: "color",
+    stride: 9,
+    attrs: [
+      ["pos", 3, 0],
+      ["uv", 2, 3],
+      ["col", 4, 5],
+    ],
+  },
 };
 
 // Per-attribute layout of any format: { byteStride, attrs: [{ size, byteOffset, type: 'f32'|'unorm16'|'unorm8' }] }
 export function vertexLayout(f) {
-  if (f.packed) return { byteStride: f.byteStride, attrs: f.attrs.map(([, size, byteOffset, type]) => ({ size, byteOffset, type })) };
-  return { byteStride: f.stride * 4, attrs: f.attrs.map(([, size, off]) => ({ size, byteOffset: off * 4, type: 'f32' })) };
+  if (f.packed)
+    return {
+      byteStride: f.byteStride,
+      attrs: f.attrs.map(([, size, byteOffset, type]) => ({
+        size,
+        byteOffset,
+        type,
+      })),
+    };
+  return {
+    byteStride: f.stride * 4,
+    attrs: f.attrs.map(([, size, off]) => ({
+      size,
+      byteOffset: off * 4,
+      type: "f32",
+    })),
+  };
 }
 
 // Packs terrain vertices (see FORMAT.terrain)
 export const TERRAIN_POS_SCALE = 2048;
 
-export const PIPELINE_FORMAT = { terrain: FORMAT.terrain, lit: FORMAT.lit, entity: FORMAT.entity, color: FORMAT.color, endportal: FORMAT.color, post: FORMAT.color };
+export const PIPELINE_FORMAT = {
+  terrain: FORMAT.terrain,
+  lit: FORMAT.lit,
+  entity: FORMAT.entity,
+  color: FORMAT.color,
+  endportal: FORMAT.color,
+  post: FORMAT.color,
+};
 
-export const DEFAULT_STATE = { blend: 'none', depthTest: true, depthWrite: true, cull: false, polygonOffset: false };
+export const DEFAULT_STATE = {
+  blend: "none",
+  depthTest: true,
+  depthWrite: true,
+  cull: false,
+  polygonOffset: false,
+};
 
 export function stateKey(s) {
-  return `${s.blend || 'none'}|${s.depthTest !== false ? 1 : 0}|${s.depthWrite !== false ? 1 : 0}|${s.cull ? 1 : 0}|${s.polygonOffset ? 1 : 0}`;
+  return `${s.blend || "none"}|${s.depthTest !== false ? 1 : 0}|${s.depthWrite !== false ? 1 : 0}|${s.cull ? 1 : 0}|${s.polygonOffset ? 1 : 0}`;
 }
 
 // Params helpers -----------------------------------------------------------
 
-export function terrainParams(alphaTest = 0, opacity = 1, out = new Float32Array(16), mipBias = 0) {
-  out[0] = alphaTest; out[1] = opacity; out[2] = mipBias;
+export function terrainParams(
+  alphaTest = 0,
+  opacity = 1,
+  out = new Float32Array(16),
+  mipBias = 0,
+) {
+  out[0] = alphaTest;
+  out[1] = opacity;
+  out[2] = mipBias;
   return out;
 }
 
@@ -89,9 +160,21 @@ export function litParams(alphaTest = 0.1, out = new Float32Array(16)) {
   return out;
 }
 
-export function colorParams(r = 1, g = 1, b = 1, a = 1, alphaTest = 0, useFog = 0, out = new Float32Array(16)) {
-  out[0] = r; out[1] = g; out[2] = b; out[3] = a;
-  out[4] = alphaTest; out[5] = useFog;
+export function colorParams(
+  r = 1,
+  g = 1,
+  b = 1,
+  a = 1,
+  alphaTest = 0,
+  useFog = 0,
+  out = new Float32Array(16),
+) {
+  out[0] = r;
+  out[1] = g;
+  out[2] = b;
+  out[3] = a;
+  out[4] = alphaTest;
+  out[5] = useFog;
   return out;
 }
 
@@ -102,14 +185,47 @@ export class EntityParams {
     this.setLight(15, 15);
     this.p[12] = 0.1;
   }
-  setTint(r, g, b, a = 1) { this.p[0] = r; this.p[1] = g; this.p[2] = b; this.p[3] = a; return this; }
-  setOverlay(r, g, b, a) { this.p[4] = r; this.p[5] = g; this.p[6] = b; this.p[7] = a; return this; }
-  setLight(sky, block) { this.p[8] = sky; this.p[9] = block; return this; }
-  setFullBright(v) { this.p[10] = v ? 1 : 0; return this; }
-  setNoLighting(v) { this.p[11] = v ? 1 : 0; return this; }
-  setGuiLighting(v) { this.p[11] = v ? 2 : 0; return this; } // RenderHelper.enableGUIStandardItemLighting
-  setAlphaTest(v) { this.p[12] = v; return this; }
-  setUvTransform(du, dv, scale = 0) { this.p[13] = du; this.p[14] = dv; this.p[15] = scale; return this; }
+  setTint(r, g, b, a = 1) {
+    this.p[0] = r;
+    this.p[1] = g;
+    this.p[2] = b;
+    this.p[3] = a;
+    return this;
+  }
+  setOverlay(r, g, b, a) {
+    this.p[4] = r;
+    this.p[5] = g;
+    this.p[6] = b;
+    this.p[7] = a;
+    return this;
+  }
+  setLight(sky, block) {
+    this.p[8] = sky;
+    this.p[9] = block;
+    return this;
+  }
+  setFullBright(v) {
+    this.p[10] = v ? 1 : 0;
+    return this;
+  }
+  setNoLighting(v) {
+    this.p[11] = v ? 1 : 0;
+    return this;
+  }
+  setGuiLighting(v) {
+    this.p[11] = v ? 2 : 0;
+    return this;
+  } // RenderHelper.enableGUIStandardItemLighting
+  setAlphaTest(v) {
+    this.p[12] = v;
+    return this;
+  }
+  setUvTransform(du, dv, scale = 0) {
+    this.p[13] = du;
+    this.p[14] = dv;
+    this.p[15] = scale;
+    return this;
+  }
 }
 
 // Params used when a draw passes none (white, no alpha test)
@@ -127,9 +243,14 @@ export const DEFAULT_PARAMS = {
 export function quadIndices(quads) {
   const idx = new Uint32Array(quads * 6);
   for (let i = 0; i < quads; i++) {
-    const v = i * 4, o = i * 6;
-    idx[o] = v; idx[o + 1] = v + 1; idx[o + 2] = v + 2;
-    idx[o + 3] = v; idx[o + 4] = v + 2; idx[o + 5] = v + 3;
+    const v = i * 4,
+      o = i * 6;
+    idx[o] = v;
+    idx[o + 1] = v + 1;
+    idx[o + 2] = v + 2;
+    idx[o + 3] = v;
+    idx[o + 4] = v + 2;
+    idx[o + 5] = v + 3;
   }
   return idx;
 }
@@ -137,48 +258,91 @@ export function quadIndices(quads) {
 // Box-filtered mip chain (RGBA). Returns [{width, height, data}, ...] excluding level 0.
 export function buildMips(width, height, data, maxLevels = 4) {
   const out = [];
-  let w = width, h = height, src = data;
+  let w = width,
+    h = height,
+    src = data;
   for (let l = 0; l < maxLevels && (w > 1 || h > 1); l++) {
-    const nw = Math.max(1, w >> 1), nh = Math.max(1, h >> 1);
+    const nw = Math.max(1, w >> 1),
+      nh = Math.max(1, h >> 1);
     const dst = new Uint8Array(nw * nh * 4);
     for (let y = 0; y < nh; y++) {
       for (let x = 0; x < nw; x++) {
-        let r = 0, g = 0, b = 0, a = 0, n = 0;
-        for (let dy = 0; dy < 2; dy++) for (let dx = 0; dx < 2; dx++) {
-          const sx = Math.min(w - 1, x * 2 + dx), sy = Math.min(h - 1, y * 2 + dy);
-          const i = (sy * w + sx) * 4;
-          const al = src[i + 3];
-          r += src[i] * al; g += src[i + 1] * al; b += src[i + 2] * al; a += al; n++;
-        }
+        let r = 0,
+          g = 0,
+          b = 0,
+          a = 0,
+          n = 0;
+        for (let dy = 0; dy < 2; dy++)
+          for (let dx = 0; dx < 2; dx++) {
+            const sx = Math.min(w - 1, x * 2 + dx),
+              sy = Math.min(h - 1, y * 2 + dy);
+            const i = (sy * w + sx) * 4;
+            const al = src[i + 3];
+            r += src[i] * al;
+            g += src[i + 1] * al;
+            b += src[i + 2] * al;
+            a += al;
+            n++;
+          }
         const o = (y * nw + x) * 4;
-        if (a > 0) { dst[o] = r / a; dst[o + 1] = g / a; dst[o + 2] = b / a; }
+        if (a > 0) {
+          dst[o] = r / a;
+          dst[o + 1] = g / a;
+          dst[o + 2] = b / a;
+        }
         dst[o + 3] = a / n;
       }
     }
     out.push({ width: nw, height: nh, data: dst });
-    w = nw; h = nh; src = dst;
+    w = nw;
+    h = nh;
+    src = dst;
   }
   return out;
 }
 
 // A device that does nothing (headless / unsupported environments)
 export class NullDevice {
-  constructor() { this.name = 'null'; this.width = 1; this.height = 1; }
-  resize(w, h) { this.width = w; this.height = h; }
-  createTexture(o) { return { width: o.width, height: o.height }; }
+  constructor() {
+    this.name = "null";
+    this.width = 1;
+    this.height = 1;
+  }
+  resize(w, h) {
+    this.width = w;
+    this.height = h;
+  }
+  createTexture(o) {
+    return { width: o.width, height: o.height };
+  }
   updateTexture() {}
   destroyTexture() {}
-  createMesh(format, vertices, opts = {}) { return { format, vertexCount: vertices.byteLength / vertexLayout(format).byteStride, indexCount: 0, ...opts }; }
-  updateMesh(m, v) { m.vertexCount = v.byteLength / vertexLayout(m.format).byteStride; }
+  createMesh(format, vertices, opts = {}) {
+    return {
+      format,
+      vertexCount: vertices.byteLength / vertexLayout(format).byteStride,
+      indexCount: 0,
+      ...opts,
+    };
+  }
+  updateMesh(m, v) {
+    m.vertexCount = v.byteLength / vertexLayout(m.format).byteStride;
+  }
   destroyMesh() {}
   beginFrame() {}
   clearDepth() {}
   setGlobals() {}
   setScissor() {}
   draw() {}
-  createRenderTarget(w, h) { return { width: w, height: h }; }
+  createRenderTarget(w, h) {
+    return { width: w, height: h };
+  }
   setRenderTarget() {}
-  busy() { return false; }
+  busy() {
+    return false;
+  }
   endFrame() {}
-  capture() { return Promise.resolve({ width: 1, height: 1, data: new Uint8Array(4) }); }
+  capture() {
+    return Promise.resolve({ width: 1, height: 1, data: new Uint8Array(4) });
+  }
 }

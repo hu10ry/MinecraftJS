@@ -37,9 +37,7 @@
   "creeperArmor": {
     "class": "net.minecraft.client.model.CreeperModel",
     "descriptor": "(F)V",
-    "args": [
-      2
-    ],
+    "args": [2],
     "fields": [
       {
         "owner": "net.minecraft.client.model.CreeperModel",
@@ -109,10 +107,7 @@
   "strayOverlay": {
     "class": "net.minecraft.client.model.SkeletonModel",
     "descriptor": "(FZ)V",
-    "args": [
-      0.25,
-      1
-    ],
+    "args": [0.25, 1],
     "fields": [
       {
         "owner": "net.minecraft.client.model.HumanoidModel",
@@ -233,12 +228,7 @@
   "drowned": {
     "class": "net.minecraft.client.model.DrownedModel",
     "descriptor": "(FFII)V",
-    "args": [
-      0,
-      0,
-      64,
-      64
-    ],
+    "args": [0, 0, 64, 64],
     "fields": [
       {
         "owner": "net.minecraft.client.model.HumanoidModel",
@@ -273,12 +263,7 @@
   "drownedOuter": {
     "class": "net.minecraft.client.model.DrownedModel",
     "descriptor": "(FFII)V",
-    "args": [
-      0.25,
-      0,
-      64,
-      64
-    ],
+    "args": [0.25, 0, 64, 64],
     "fields": [
       {
         "owner": "net.minecraft.client.model.HumanoidModel",
@@ -313,10 +298,7 @@
   "zombieVillager": {
     "class": "net.minecraft.client.model.ZombieVillagerModel",
     "descriptor": "(FZ)V",
-    "args": [
-      0,
-      false
-    ],
+    "args": [0, false],
     "fields": [
       {
         "owner": "net.minecraft.client.model.HumanoidModel",
@@ -355,9 +337,7 @@
   "slime": {
     "class": "net.minecraft.client.model.SlimeModel",
     "descriptor": "(I)V",
-    "args": [
-      16
-    ],
+    "args": [16],
     "fields": [
       {
         "owner": "net.minecraft.client.model.SlimeModel",
@@ -380,9 +360,7 @@
   "slimeOuter": {
     "class": "net.minecraft.client.model.SlimeModel",
     "descriptor": "(I)V",
-    "args": [
-      0
-    ],
+    "args": [0],
     "fields": [
       {
         "owner": "net.minecraft.client.model.SlimeModel",
@@ -421,9 +399,7 @@
   "enderman": {
     "class": "net.minecraft.client.model.EndermanModel",
     "descriptor": "(F)V",
-    "args": [
-      0
-    ],
+    "args": [0],
     "fields": [
       {
         "owner": "net.minecraft.client.model.HumanoidModel",
@@ -503,9 +479,7 @@
   "wither": {
     "class": "net.minecraft.client.model.WitherBossModel",
     "descriptor": "(F)V",
-    "args": [
-      0
-    ],
+    "args": [0],
     "fields": [
       {
         "owner": "net.minecraft.client.model.WitherBossModel",
@@ -562,9 +536,7 @@
   "witch": {
     "class": "net.minecraft.client.model.WitchModel",
     "descriptor": "(F)V",
-    "args": [
-      0
-    ],
+    "args": [0],
     "fields": [
       {
         "owner": "net.minecraft.client.model.VillagerModel",
@@ -695,9 +667,7 @@
   "pigSaddle": {
     "class": "net.minecraft.client.model.PigModel",
     "descriptor": "(F)V",
-    "args": [
-      0.5
-    ],
+    "args": [0.5],
     "fields": [
       {
         "owner": "net.minecraft.client.model.QuadrupedModel",
@@ -927,23 +897,17 @@
       {
         "owner": "net.minecraft.client.model.SalmonModel",
         "name": "bodyFront",
-        "children": [
-          0
-        ]
+        "children": [0]
       },
       {
         "owner": "net.minecraft.client.model.SalmonModel",
         "name": "bodyBack",
-        "children": [
-          1
-        ]
+        "children": [1]
       },
       {
         "owner": "net.minecraft.client.model.SalmonModel",
         "name": "bodyBack",
-        "children": [
-          0
-        ]
+        "children": [0]
       },
       {
         "owner": "net.minecraft.client.model.SalmonModel",
@@ -1099,9 +1063,7 @@
   "tropicalFishA": {
     "class": "net.minecraft.client.model.TropicalFishModelA",
     "descriptor": "(F)V",
-    "args": [
-      0
-    ],
+    "args": [0],
     "fields": [
       {
         "owner": "net.minecraft.client.model.TropicalFishModelA",
@@ -1128,9 +1090,7 @@
   "tropicalFishB": {
     "class": "net.minecraft.client.model.TropicalFishModelB",
     "descriptor": "(F)V",
-    "args": [
-      0
-    ],
+    "args": [0],
     "fields": [
       {
         "owner": "net.minecraft.client.model.TropicalFishModelB",
@@ -1161,9 +1121,7 @@
   "tropicalFishPatternA": {
     "class": "net.minecraft.client.model.TropicalFishModelA",
     "descriptor": "(F)V",
-    "args": [
-      0.00800000037997961
-    ],
+    "args": [0.00800000037997961],
     "fields": [
       {
         "owner": "net.minecraft.client.model.TropicalFishModelA",
@@ -1190,9 +1148,7 @@
   "tropicalFishPatternB": {
     "class": "net.minecraft.client.model.TropicalFishModelB",
     "descriptor": "(F)V",
-    "args": [
-      0.00800000037997961
-    ],
+    "args": [0.00800000037997961],
     "fields": [
       {
         "owner": "net.minecraft.client.model.TropicalFishModelB",
@@ -1228,9 +1184,7 @@
       {
         "owner": "net.minecraft.client.model.DolphinModel",
         "name": "body",
-        "children": [
-          4
-        ]
+        "children": [4]
       },
       {
         "owner": "net.minecraft.client.model.DolphinModel",
@@ -1249,9 +1203,7 @@
   "turtle": {
     "class": "net.minecraft.client.model.TurtleModel",
     "descriptor": "(F)V",
-    "args": [
-      0
-    ],
+    "args": [0],
     "fields": [
       {
         "owner": "net.minecraft.client.model.QuadrupedModel",
@@ -1311,9 +1263,7 @@
       {
         "owner": "net.minecraft.client.model.PhantomModel",
         "name": "body",
-        "children": [
-          1
-        ]
+        "children": [1]
       },
       {
         "owner": "net.minecraft.client.model.PhantomModel",
@@ -1394,9 +1344,7 @@
   "ocelot": {
     "class": "net.minecraft.client.model.OcelotModel",
     "descriptor": "(F)V",
-    "args": [
-      0
-    ],
+    "args": [0],
     "fields": [
       {
         "owner": "net.minecraft.client.model.OcelotModel",
@@ -1466,9 +1414,7 @@
   "horse": {
     "class": "net.minecraft.client.model.HorseModel",
     "descriptor": "(F)V",
-    "args": [
-      0
-    ],
+    "args": [0],
     "fields": [
       {
         "owner": "net.minecraft.client.model.HorseModel",
@@ -1511,9 +1457,7 @@
   "donkey": {
     "class": "net.minecraft.client.model.ChestedHorseModel",
     "descriptor": "(F)V",
-    "args": [
-      0
-    ],
+    "args": [0],
     "fields": [
       {
         "owner": "net.minecraft.client.model.HorseModel",
@@ -1619,9 +1563,7 @@
   "cat": {
     "class": "net.minecraft.client.model.CatModel",
     "descriptor": "(F)V",
-    "args": [
-      0
-    ],
+    "args": [0],
     "fields": [
       {
         "owner": "net.minecraft.client.model.OcelotModel",
@@ -1707,10 +1649,7 @@
   "panda": {
     "class": "net.minecraft.client.model.PandaModel",
     "descriptor": "(IF)V",
-    "args": [
-      9,
-      0
-    ],
+    "args": [9, 0],
     "fields": [
       {
         "owner": "net.minecraft.client.model.QuadrupedModel",
@@ -1780,9 +1719,7 @@
   "villager": {
     "class": "net.minecraft.client.model.VillagerModel",
     "descriptor": "(F)V",
-    "args": [
-      0
-    ],
+    "args": [0],
     "fields": [
       {
         "owner": "net.minecraft.client.model.VillagerModel",
@@ -1911,9 +1848,7 @@
   "llama": {
     "class": "net.minecraft.client.model.LlamaModel",
     "descriptor": "(F)V",
-    "args": [
-      0
-    ],
+    "args": [0],
     "fields": [
       {
         "owner": "net.minecraft.client.model.QuadrupedModel",
@@ -1952,9 +1887,7 @@
   "llamaDecor": {
     "class": "net.minecraft.client.model.LlamaModel",
     "descriptor": "(F)V",
-    "args": [
-      0.5
-    ],
+    "args": [0.5],
     "fields": [
       {
         "owner": "net.minecraft.client.model.QuadrupedModel",
@@ -2087,12 +2020,7 @@
   "illager": {
     "class": "net.minecraft.client.model.IllagerModel",
     "descriptor": "(FFII)V",
-    "args": [
-      0,
-      0,
-      64,
-      64
-    ],
+    "args": [0, 0, 64, 64],
     "fields": [
       {
         "owner": "net.minecraft.client.model.IllagerModel",
@@ -2121,9 +2049,7 @@
       {
         "owner": "net.minecraft.client.model.IllagerModel",
         "name": "head",
-        "children": [
-          0
-        ]
+        "children": [0]
       },
       {
         "owner": "net.minecraft.client.model.IllagerModel",
@@ -2234,9 +2160,7 @@
   "enderCrystal": {
     "class": "net.minecraft.client.renderer.entity.EndCrystalRenderer",
     "descriptor": "(Lnet/minecraft/client/renderer/entity/EntityRenderDispatcher;)V",
-    "args": [
-      null
-    ],
+    "args": [null],
     "fields": [
       {
         "owner": "net.minecraft.client.renderer.entity.EndCrystalRenderer",
@@ -2255,9 +2179,7 @@
   "enderCrystalNoBase": {
     "class": "net.minecraft.client.renderer.entity.EndCrystalRenderer",
     "descriptor": "(Lnet/minecraft/client/renderer/entity/EntityRenderDispatcher;)V",
-    "args": [
-      null
-    ],
+    "args": [null],
     "fields": [
       {
         "owner": "net.minecraft.client.renderer.entity.EndCrystalRenderer",
@@ -2339,9 +2261,7 @@
   "chest": {
     "class": "net.minecraft.client.renderer.blockentity.ChestRenderer",
     "descriptor": "(Lnet/minecraft/client/renderer/blockentity/BlockEntityRenderDispatcher;)V",
-    "args": [
-      null
-    ],
+    "args": [null],
     "fields": [
       {
         "owner": "net.minecraft.client.renderer.blockentity.ChestRenderer",
@@ -2360,9 +2280,7 @@
   "largeChest": {
     "class": "net.minecraft.client.renderer.blockentity.ChestRenderer",
     "descriptor": "(Lnet/minecraft/client/renderer/blockentity/BlockEntityRenderDispatcher;)V",
-    "args": [
-      null
-    ],
+    "args": [null],
     "fields": [
       {
         "owner": "net.minecraft.client.renderer.blockentity.ChestRenderer",
@@ -2431,9 +2349,7 @@
   "bed": {
     "class": "net.minecraft.client.renderer.blockentity.BedRenderer",
     "descriptor": "(Lnet/minecraft/client/renderer/blockentity/BlockEntityRenderDispatcher;)V",
-    "args": [
-      null
-    ],
+    "args": [null],
     "fields": [
       {
         "owner": "net.minecraft.client.renderer.blockentity.BedRenderer",
@@ -2452,12 +2368,7 @@
   "skull": {
     "class": "net.minecraft.client.model.SkullModel",
     "descriptor": "(IIII)V",
-    "args": [
-      0,
-      0,
-      64,
-      32
-    ],
+    "args": [0, 0, 64, 32],
     "fields": [
       {
         "owner": "net.minecraft.client.model.SkullModel",
@@ -2468,9 +2379,7 @@
   "dragonHead": {
     "class": "net.minecraft.client.model.dragon.DragonHeadModel",
     "descriptor": "(F)V",
-    "args": [
-      0
-    ],
+    "args": [0],
     "fields": [
       {
         "owner": "net.minecraft.client.model.SkullModel",
@@ -2504,9 +2413,7 @@
   "banner": {
     "class": "net.minecraft.client.renderer.blockentity.BannerRenderer",
     "descriptor": "(Lnet/minecraft/client/renderer/blockentity/BlockEntityRenderDispatcher;)V",
-    "args": [
-      null
-    ],
+    "args": [null],
     "fields": [
       {
         "owner": "net.minecraft.client.renderer.blockentity.BannerRenderer",
@@ -2540,9 +2447,7 @@
   "biped": {
     "class": "net.minecraft.client.model.HumanoidModel",
     "descriptor": "(F)V",
-    "args": [
-      0
-    ],
+    "args": [0],
     "fields": [
       {
         "owner": "net.minecraft.client.model.HumanoidModel",
@@ -2577,9 +2482,7 @@
   "armorInner": {
     "class": "net.minecraft.client.model.HumanoidModel",
     "descriptor": "(F)V",
-    "args": [
-      0.5
-    ],
+    "args": [0.5],
     "fields": [
       {
         "owner": "net.minecraft.client.model.HumanoidModel",
@@ -2614,9 +2517,7 @@
   "armorOuter": {
     "class": "net.minecraft.client.model.HumanoidModel",
     "descriptor": "(F)V",
-    "args": [
-      1
-    ],
+    "args": [1],
     "fields": [
       {
         "owner": "net.minecraft.client.model.HumanoidModel",
@@ -2651,10 +2552,7 @@
   "player": {
     "class": "net.minecraft.client.model.PlayerModel",
     "descriptor": "(FZ)V",
-    "args": [
-      0,
-      0
-    ],
+    "args": [0, 0],
     "fields": [
       {
         "owner": "net.minecraft.client.model.HumanoidModel",
@@ -2717,10 +2615,7 @@
   "playerSlim": {
     "class": "net.minecraft.client.model.PlayerModel",
     "descriptor": "(FZ)V",
-    "args": [
-      0,
-      1
-    ],
+    "args": [0, 1],
     "fields": [
       {
         "owner": "net.minecraft.client.model.HumanoidModel",
@@ -2830,9 +2725,7 @@
   "chestLeft": {
     "class": "net.minecraft.client.renderer.blockentity.ChestRenderer",
     "descriptor": "(Lnet/minecraft/client/renderer/blockentity/BlockEntityRenderDispatcher;)V",
-    "args": [
-      null
-    ],
+    "args": [null],
     "fields": [
       {
         "owner": "net.minecraft.client.renderer.blockentity.ChestRenderer",
@@ -2851,9 +2744,7 @@
   "chestRight": {
     "class": "net.minecraft.client.renderer.blockentity.ChestRenderer",
     "descriptor": "(Lnet/minecraft/client/renderer/blockentity/BlockEntityRenderDispatcher;)V",
-    "args": [
-      null
-    ],
+    "args": [null],
     "fields": [
       {
         "owner": "net.minecraft.client.renderer.blockentity.ChestRenderer",

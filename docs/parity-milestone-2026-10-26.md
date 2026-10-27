@@ -4,11 +4,11 @@ Implementation and remaining scope are recorded in the [feature audit](feature-a
 
 Applicable shared fixes were adapted to older target jars:
 
-| Target | Commit | Scope | Validation |
-| --- | --- | --- | --- |
+| Target | Commit    | Scope                                                                                                          | Validation                                              |
+| ------ | --------- | -------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------- |
 | 1.13.2 | `8d0d941` | Native note state events, named enchantments, held maps/bows, native book editing and technical editor packets | 223 checks pass; one optional external endpoint skipped |
-| 1.12.2 | `d7a42b2` | Post-1.9 Sharpness prediction formula | 63 checks pass; one optional external endpoint skipped |
-| 1.8.9 | unchanged | Its native Sharpness formula differs; protocol-404 editor changes and flattened item fixes do not apply | Existing artifact retained |
+| 1.12.2 | `d7a42b2` | Post-1.9 Sharpness prediction formula                                                                          | 63 checks pass; one optional external endpoint skipped  |
+| 1.8.9  | unchanged | Its native Sharpness formula differs; protocol-404 editor changes and flattened item fixes do not apply        | Existing artifact retained                              |
 
 New 1.14 content, metadata layouts, particle JSON format, crossbows, crawling and new menus remain exclusive to 1.14.4. The 1.13.2 book retains its native page limit. No server-owned AI or generation changes are simulated by these backports.
 

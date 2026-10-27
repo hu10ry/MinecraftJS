@@ -13,7 +13,6 @@
 > The [complete feature audit](docs/feature-audit-1.14.4.md) covers every 1.14 additions/change topic and target patch changes, including confirmed gaps and unexecuted gameplay checks. The [1.14.1–1.14.4 patch review](docs/patch-audit-1.14.1-1.14.4.md) inventories all requested patch topics and bug tickets. Asset coverage does not imply full parity.
 > Experimental [shader-pack image effects and vegetation support](docs/camera-and-shader-packs.md) is available in Video Settings with WebGL 2. This runs final image effects and BSL vegetation animation; full BSL lighting/shadows are not implemented.
 
-
 A Minecraft 1.14.4 client that runs in the browser (WebGL 2 or WebGPU). It joins vanilla 1.14.4 servers through a
 small Node proxy, and Eaglercraft servers directly over WebSockets.
 
@@ -44,11 +43,11 @@ Game assets are found automatically, in this order:
 2. the 1.14.4 jar from `./1.14.4/`, `MC_JAR`, `MC_DIR`, or your launcher's `.minecraft` folder
 3. otherwise a download from Mojang into `cache/`
 
-| Variable | Default | Meaning |
-| --- | --- | --- |
-| `PORT` | `3000` | HTTP and WebSocket port |
-| `MC_JAR` | | path to a `1.14.4.jar` |
-| `MC_DIR` | | a `.minecraft` folder to look in |
+| Variable | Default | Meaning                          |
+| -------- | ------- | -------------------------------- |
+| `PORT`   | `3000`  | HTTP and WebSocket port          |
+| `MC_JAR` |         | path to a `1.14.4.jar`           |
+| `MC_DIR` |         | a `.minecraft` folder to look in |
 
 ## Building
 
@@ -63,17 +62,17 @@ re-encoded to Opus. It runs from any web server or straight from disk (`file://`
 
 Options (after `npm run build --` or with `node tools/build.js html`):
 
-| Option | Meaning |
-| --- | --- |
-| `--no-music` | leave out music and music discs (a much smaller file) |
-| `--no-assets` | embed only the code: the page loads `assets/` and `data/` next to it |
-| `--config=file.json` | embed a `config.json` as the page's defaults |
-| `--proxy=type,url[,name]` | add a proxy to the embedded config (repeatable, see [config.json](#configjson)) |
-| `--server=address[,name]` | add a server to the embedded config (repeatable) |
-| `--no-proxies`, `--no-servers` | ignore that list from `--config` before adding `--proxy` / `--server` entries |
-| `--out=path` | output file |
-| `--audio=opus\|vorbis\|copy` | sound codec (`copy` keeps the original files) |
-| `--sfx-kbps=N`, `--music-kbps=N` | bitrates (32 and 48) |
+| Option                           | Meaning                                                                         |
+| -------------------------------- | ------------------------------------------------------------------------------- |
+| `--no-music`                     | leave out music and music discs (a much smaller file)                           |
+| `--no-assets`                    | embed only the code: the page loads `assets/` and `data/` next to it            |
+| `--config=file.json`             | embed a `config.json` as the page's defaults                                    |
+| `--proxy=type,url[,name]`        | add a proxy to the embedded config (repeatable, see [config.json](#configjson)) |
+| `--server=address[,name]`        | add a server to the embedded config (repeatable)                                |
+| `--no-proxies`, `--no-servers`   | ignore that list from `--config` before adding `--proxy` / `--server` entries   |
+| `--out=path`                     | output file                                                                     |
+| `--audio=opus\|vorbis\|copy`     | sound codec (`copy` keeps the original files)                                   |
+| `--sfx-kbps=N`, `--music-kbps=N` | bitrates (32 and 48)                                                            |
 
 Encoded sounds are cached in `cache/audio/`, so later builds are fast.
 
@@ -98,8 +97,16 @@ A `config.json` next to `index.html` (or embedded in the single-file build) sets
   "skinProxy": "",
   "proxies": [
     { "name": "This website", "url": "origin", "type": "minecraftjs" },
-    { "name": "Eaglercraft Relay", "url": "wss://relay.eaglercraft.net", "type": "relay" },
-    { "name": "Public Java Relay", "url": "wss://eagler-minecraft-relay.u2471966200.workers.dev", "type": "relay" }
+    {
+      "name": "Eaglercraft Relay",
+      "url": "wss://relay.eaglercraft.net",
+      "type": "relay"
+    },
+    {
+      "name": "Public Java Relay",
+      "url": "wss://eagler-minecraft-relay.u2471966200.workers.dev",
+      "type": "relay"
+    }
   ],
   "servers": [
     { "name": "My Server", "address": "mc.example.com" },
@@ -131,11 +138,11 @@ Vanilla servers are reached through a proxy, picked with the **Proxy Servers** b
 the account button): add, edit, delete, test, reorder and select. The edit screen switches an entry between three
 types:
 
-| Type | What it is | Who speaks the Minecraft protocol |
-| --- | --- | --- |
-| MinecraftJS Proxy | `npm start` on any machine (`wss://proxy.example.com/`, `localhost:3000`) | the proxy |
-| Java Relay | an [Eaglercraft 26.2 relay](https://radicle.network/nodes/radicle.jarg.io/rad%3Az3rCaaQD1cNmPDTjyinYWmPpcMgNX) (`wss://relay.eaglercraft.net`) | the client |
-| Wisp | a [Wisp](https://github.com/MercuryWorkshop/wisp-protocol) server (v1 protocol, which v2 servers also speak) | the client |
+| Type              | What it is                                                                                                                                     | Who speaks the Minecraft protocol |
+| ----------------- | ---------------------------------------------------------------------------------------------------------------------------------------------- | --------------------------------- |
+| MinecraftJS Proxy | `npm start` on any machine (`wss://proxy.example.com/`, `localhost:3000`)                                                                      | the proxy                         |
+| Java Relay        | an [Eaglercraft 26.2 relay](https://radicle.network/nodes/radicle.jarg.io/rad%3Az3rCaaQD1cNmPDTjyinYWmPpcMgNX) (`wss://relay.eaglercraft.net`) | the client                        |
+| Wisp              | a [Wisp](https://github.com/MercuryWorkshop/wisp-protocol) server (v1 protocol, which v2 servers also speak)                                   | the client                        |
 
 Wisp v1 is supported, including `wisp-python`. Select the **Wisp** proxy type and enter its WebSocket endpoint (for example, `ws://localhost:4000/`); endpoint paths are normalized to end in `/`. The client waits for the server’s initial buffer allowance before sending data. For local or LAN Minecraft targets, start wisp-python with `--allow-loopback` or `--allow-private` as appropriate.
 
@@ -187,16 +194,16 @@ ender:password@wss://play.example.com:8081/server
 
 ## Layout
 
-| Path | Contents |
-| --- | --- |
-| `proxy.js` | the proxy (HTTP, WebSocket bridge, asset serving) |
-| `lib/` | asset discovery (`mcassets.js`), zip and class file reading, the model extractor, Microsoft sign in |
-| `tools/build.js` | `npm run build` and `npm run assets` |
-| `client/index.html`, `client/js/main.js` | the client's entry point |
-| `client/js/platform/` | the only code that talks to the browser (`platform.js` describes the contract) |
-| `client/js/net/` | protocol, proxy and Eaglercraft connections, address parsing |
-| `client/js/game/`, `render/`, `gui/`, `world/`, `audio/`, `gfx/` | game logic, rendering, screens, world, sound, graphics devices |
-| `client/data/` | game data tables (blocks, items, entities, ...) |
+| Path                                                             | Contents                                                                                            |
+| ---------------------------------------------------------------- | --------------------------------------------------------------------------------------------------- |
+| `proxy.js`                                                       | the proxy (HTTP, WebSocket bridge, asset serving)                                                   |
+| `lib/`                                                           | asset discovery (`mcassets.js`), zip and class file reading, the model extractor, Microsoft sign in |
+| `tools/build.js`                                                 | `npm run build` and `npm run assets`                                                                |
+| `client/index.html`, `client/js/main.js`                         | the client's entry point                                                                            |
+| `client/js/platform/`                                            | the only code that talks to the browser (`platform.js` describes the contract)                      |
+| `client/js/net/`                                                 | protocol, proxy and Eaglercraft connections, address parsing                                        |
+| `client/js/game/`, `render/`, `gui/`, `world/`, `audio/`, `gfx/` | game logic, rendering, screens, world, sound, graphics devices                                      |
+| `client/data/`                                                   | game data tables (blocks, items, entities, ...)                                                     |
 
 Static website output: `npm run build -- --static --out=dist/site`. Separate backend:
 `npm start -- --proxy-only`. Outbound loopback is blocked by default; use

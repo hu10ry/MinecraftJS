@@ -1,7 +1,6 @@
 // Binary reader/writer for the Minecraft 1.13.2 protocol.
-import { readNbtRoot, writeNbtRoot } from './nbt.js';
-import { decodeUtf8, encodeUtf8 } from '../util/utf8.js';
-
+import { readNbtRoot, writeNbtRoot } from "./nbt.js";
+import { decodeUtf8, encodeUtf8 } from "../util/utf8.js";
 
 export class Reader {
   constructor(bytes, offset = 0) {
@@ -10,21 +9,62 @@ export class Reader {
     this.offset = offset;
   }
 
-  remaining() { return this.bytes.length - this.offset; }
-
-  _check(n) {
-    if (this.offset + n > this.bytes.length) throw new RangeError('Packet underflow');
+  remaining() {
+    return this.bytes.length - this.offset;
   }
 
-  i8() { this._check(1); return this.view.getInt8(this.offset++); }
-  u8() { this._check(1); return this.bytes[this.offset++]; }
-  bool() { return this.u8() !== 0; }
-  i16() { this._check(2); const v = this.view.getInt16(this.offset); this.offset += 2; return v; }
-  u16() { this._check(2); const v = this.view.getUint16(this.offset); this.offset += 2; return v; }
-  i32() { this._check(4); const v = this.view.getInt32(this.offset); this.offset += 4; return v; }
-  i64() { this._check(8); const v = this.view.getBigInt64(this.offset); this.offset += 8; return v; }
-  f32() { this._check(4); const v = this.view.getFloat32(this.offset); this.offset += 4; return v; }
-  f64() { this._check(8); const v = this.view.getFloat64(this.offset); this.offset += 8; return v; }
+  _check(n) {
+    if (this.offset + n > this.bytes.length)
+      throw new RangeError("Packet underflow");
+  }
+
+  i8() {
+    this._check(1);
+    return this.view.getInt8(this.offset++);
+  }
+  u8() {
+    this._check(1);
+    return this.bytes[this.offset++];
+  }
+  bool() {
+    return this.u8() !== 0;
+  }
+  i16() {
+    this._check(2);
+    const v = this.view.getInt16(this.offset);
+    this.offset += 2;
+    return v;
+  }
+  u16() {
+    this._check(2);
+    const v = this.view.getUint16(this.offset);
+    this.offset += 2;
+    return v;
+  }
+  i32() {
+    this._check(4);
+    const v = this.view.getInt32(this.offset);
+    this.offset += 4;
+    return v;
+  }
+  i64() {
+    this._check(8);
+    const v = this.view.getBigInt64(this.offset);
+    this.offset += 8;
+    return v;
+  }
+  f32() {
+    this._check(4);
+    const v = this.view.getFloat32(this.offset);
+    this.offset += 4;
+    return v;
+  }
+  f64() {
+    this._check(8);
+    const v = this.view.getFloat64(this.offset);
+    this.offset += 8;
+    return v;
+  }
 
   varint() {
     let value = 0;
@@ -34,7 +74,7 @@ export class Reader {
       b = this.u8();
       value |= (b & 0x7f) << shift;
       shift += 7;
-      if (shift > 35) throw new Error('VarInt too big');
+      if (shift > 35) throw new Error("VarInt too big");
     } while (b & 0x80);
     return value | 0;
   }
@@ -66,12 +106,14 @@ export class Reader {
     return b;
   }
 
-  rest() { return this.bytesN(this.remaining()); }
+  rest() {
+    return this.bytesN(this.remaining());
+  }
 
   uuid() {
     const b = this.bytesN(16);
-    let hex = '';
-    for (let i = 0; i < 16; i++) hex += b[i].toString(16).padStart(2, '0');
+    let hex = "";
+    for (let i = 0; i < 16; i++) hex += b[i].toString(16).padStart(2, "0");
     return `${hex.slice(0, 8)}-${hex.slice(8, 12)}-${hex.slice(12, 16)}-${hex.slice(16, 20)}-${hex.slice(20)}`;
   }
 
@@ -83,7 +125,9 @@ export class Reader {
     return { x, y, z };
   }
 
-  angle() { return this.i8() * 360 / 256; }
+  angle() {
+    return (this.i8() * 360) / 256;
+  }
 
   // Slot: { id, count, damage, nbt, nbtRaw } or null
   slot() {
@@ -113,10 +157,20 @@ export class Reader {
   // Particle parameter registry in 1.13.2 (also used by area-effect-cloud metadata).
   particleData(particleId) {
     switch (particleId) {
-      case 3: case 20: return { blockState: this.varint() }; // block, falling_dust
-      case 11: return { red: this.f32(), green: this.f32(), blue: this.f32(), scale: this.f32() };
-      case 27: return { item: this.slot() };
-      default: return {};
+      case 3:
+      case 20:
+        return { blockState: this.varint() }; // block, falling_dust
+      case 11:
+        return {
+          red: this.f32(),
+          green: this.f32(),
+          blue: this.f32(),
+          scale: this.f32(),
+        };
+      case 27:
+        return { item: this.slot() };
+      default:
+        return {};
     }
   }
 
@@ -133,22 +187,58 @@ export class Reader {
       if (index === 0xff) break;
       const type = this.varint();
       switch (type) {
-        case 0: meta[index] = this.i8(); break;
-        case 1: meta[index] = this.varint(); break;
-        case 2: meta[index] = this.f32(); break;
-        case 3: case 4: meta[index] = this.string(); break; // string, chat component
-        case 5: meta[index] = this.bool() ? this.string() : null; break; // optional chat
-        case 6: meta[index] = this.slot(); break;
-        case 7: meta[index] = this.bool(); break;
-        case 8: meta[index] = { pitch: this.f32(), yaw: this.f32(), roll: this.f32() }; break;
-        case 9: meta[index] = this.position(); break;
-        case 10: meta[index] = this.bool() ? this.position() : null; break;
-        case 11: meta[index] = this.varint(); break; // direction
-        case 12: meta[index] = this.bool() ? this.uuid() : null; break;
-        case 13: meta[index] = this.varint(); break; // optional direct block state; 0 = absent (no boolean)
-        case 14: meta[index] = this.optionalNbt(); break;
-        case 15: meta[index] = this.particle(); break;
-        default: throw new Error('Unknown metadata type ' + type);
+        case 0:
+          meta[index] = this.i8();
+          break;
+        case 1:
+          meta[index] = this.varint();
+          break;
+        case 2:
+          meta[index] = this.f32();
+          break;
+        case 3:
+        case 4:
+          meta[index] = this.string();
+          break; // string, chat component
+        case 5:
+          meta[index] = this.bool() ? this.string() : null;
+          break; // optional chat
+        case 6:
+          meta[index] = this.slot();
+          break;
+        case 7:
+          meta[index] = this.bool();
+          break;
+        case 8:
+          meta[index] = {
+            pitch: this.f32(),
+            yaw: this.f32(),
+            roll: this.f32(),
+          };
+          break;
+        case 9:
+          meta[index] = this.position();
+          break;
+        case 10:
+          meta[index] = this.bool() ? this.position() : null;
+          break;
+        case 11:
+          meta[index] = this.varint();
+          break; // direction
+        case 12:
+          meta[index] = this.bool() ? this.uuid() : null;
+          break;
+        case 13:
+          meta[index] = this.varint();
+          break; // optional direct block state; 0 = absent (no boolean)
+        case 14:
+          meta[index] = this.optionalNbt();
+          break;
+        case 15:
+          meta[index] = this.particle();
+          break;
+        default:
+          throw new Error("Unknown metadata type " + type);
       }
     }
     return meta;
@@ -172,15 +262,55 @@ export class Writer {
     this.view = new DataView(nb.buffer);
   }
 
-  i8(v) { this._ensure(1); this.view.setInt8(this.offset++, v); return this; }
-  u8(v) { this._ensure(1); this.bytes[this.offset++] = v & 0xff; return this; }
-  bool(v) { return this.u8(v ? 1 : 0); }
-  i16(v) { this._ensure(2); this.view.setInt16(this.offset, v); this.offset += 2; return this; }
-  u16(v) { this._ensure(2); this.view.setUint16(this.offset, v); this.offset += 2; return this; }
-  i32(v) { this._ensure(4); this.view.setInt32(this.offset, v); this.offset += 4; return this; }
-  i64(v) { this._ensure(8); this.view.setBigInt64(this.offset, BigInt(v)); this.offset += 8; return this; }
-  f32(v) { this._ensure(4); this.view.setFloat32(this.offset, v); this.offset += 4; return this; }
-  f64(v) { this._ensure(8); this.view.setFloat64(this.offset, v); this.offset += 8; return this; }
+  i8(v) {
+    this._ensure(1);
+    this.view.setInt8(this.offset++, v);
+    return this;
+  }
+  u8(v) {
+    this._ensure(1);
+    this.bytes[this.offset++] = v & 0xff;
+    return this;
+  }
+  bool(v) {
+    return this.u8(v ? 1 : 0);
+  }
+  i16(v) {
+    this._ensure(2);
+    this.view.setInt16(this.offset, v);
+    this.offset += 2;
+    return this;
+  }
+  u16(v) {
+    this._ensure(2);
+    this.view.setUint16(this.offset, v);
+    this.offset += 2;
+    return this;
+  }
+  i32(v) {
+    this._ensure(4);
+    this.view.setInt32(this.offset, v);
+    this.offset += 4;
+    return this;
+  }
+  i64(v) {
+    this._ensure(8);
+    this.view.setBigInt64(this.offset, BigInt(v));
+    this.offset += 8;
+    return this;
+  }
+  f32(v) {
+    this._ensure(4);
+    this.view.setFloat32(this.offset, v);
+    this.offset += 4;
+    return this;
+  }
+  f64(v) {
+    this._ensure(8);
+    this.view.setFloat64(this.offset, v);
+    this.offset += 8;
+    return this;
+  }
 
   varlong(v) {
     let x = BigInt.asUintN(64, BigInt(v));
@@ -218,13 +348,16 @@ export class Writer {
   }
 
   uuid(str) {
-    const hex = str.replace(/-/g, '');
+    const hex = str.replace(/-/g, "");
     for (let i = 0; i < 16; i++) this.u8(parseInt(hex.substr(i * 2, 2), 16));
     return this;
   }
 
   position(x, y, z) {
-    const v = ((BigInt(x) & 0x3ffffffn) << 38n) | ((BigInt(y) & 0xfffn) << 26n) | (BigInt(z) & 0x3ffffffn);
+    const v =
+      ((BigInt(x) & 0x3ffffffn) << 38n) |
+      ((BigInt(y) & 0xfffn) << 26n) |
+      (BigInt(z) & 0x3ffffffn);
     return this.i64(BigInt.asIntN(64, v));
   }
 
@@ -236,5 +369,7 @@ export class Writer {
     return this.u8(0);
   }
 
-  build() { return this.bytes.slice(0, this.offset); }
+  build() {
+    return this.bytes.slice(0, this.offset);
+  }
 }

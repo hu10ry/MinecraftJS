@@ -1,75 +1,84 @@
-import {NbtQueries,copyInspect} from './nbt-queries.js';
-import {replaceServerRecipes,resetServerRecipes} from './server-recipes.js';
-import {tickPortal,portalWarp} from './portal.js';
-import {EaglerTextures} from '../net/eagler-textures.js';
-import {zoomFov,smoothCameraActive} from './zoom.js';
-import {captureText} from '../debug/text-capture.js';
-import {pushLocalPlayer} from './entity-pushing.js';
-import {ShaderPackFinal} from '../render/shader-pack.js';
-import {CameraEye} from '../render/camera-eye.js';
-import {MENUS_498} from './menus-1.14.4.js';
-import { RegistryTags } from './tags.js';
-import { CommandTree } from './commands.js';
-import { startSleeping, sleepingCamera } from './bed-sleep.js';
-import { jarSelectionBox } from '../world/blocks.js';
-import { sectionLod, lodDistance } from '../render/lod.js';
+import { NbtQueries, copyInspect } from "./nbt-queries.js";
+import { replaceServerRecipes, resetServerRecipes } from "./server-recipes.js";
+import { tickPortal, portalWarp } from "./portal.js";
+import { EaglerTextures } from "../net/eagler-textures.js";
+import { zoomFov, smoothCameraActive } from "./zoom.js";
+import { captureText } from "../debug/text-capture.js";
+import { pushLocalPlayer } from "./entity-pushing.js";
+import { ShaderPackFinal } from "../render/shader-pack.js";
+import { CameraEye } from "../render/camera-eye.js";
+import { MENUS_498 } from "./menus-1.14.4.js";
+import { RegistryTags } from "./tags.js";
+import { CommandTree } from "./commands.js";
+import { startSleeping, sleepingCamera } from "./bed-sleep.js";
+import { jarSelectionBox } from "../world/blocks.js";
+import { sectionLod, lodDistance } from "../render/lod.js";
 // MinecraftJS game core: networking, world sync, ticking, input, camera.
-import { buildCrashReport, showCrashScreen } from '../crash.js';
-import { mat4 } from '../gfx/math.js';
-import { DebugLines } from '../render/debug-lines.js';
-import { Profiler } from './profiler.js';
-import { celestialAngle } from '../render/sky.js';
-import { tr } from '../gui/i18n.js';
-import { Connection } from '../net/connection.js';
-import { isEaglerAddress } from '../net/address.js';
-import { C } from '../net/packets.js';
-import { Writer } from '../net/buffer.js';
-import { simplify } from '../net/nbt.js';
-import { World } from '../world/world.js';
-import { getBlock, getBlockById, getStateProperties } from '../world/blocks.js';
-import { isPointInFluid } from '../world/fluids.js';
-import { resolveState } from '../world/blockstates.js';
-import { biomeInfo } from '../world/biomes.js';
-import { LocalPlayer } from './physics.js';
-import { BoatController, HorseController } from './vehicle.js';
-import { Advancements } from './advancements.js';
-import { RecipeBook } from './recipebook.js';
-import { Input } from './input.js';
-import { Renderer } from '../render/renderer.js';
-import { Gui } from '../gui/gui.js';
-import { chatToLegacy, setTranslator } from '../gui/chat.js';
-import { Hud } from '../gui/hud.js';
-import { Narrator } from '../gui/narrator.js';
-import { Tutorial } from './tutorial.js';
-import { ScreenManager } from '../gui/screens/manager.js';
-import { DownloadingTerrainScreen, DisconnectedScreen, ConnectingScreen } from '../gui/screens/menus.js';
-import { ChatScreen } from '../gui/screens/chat.js';
-import { PauseScreen,InvisiblePauseScreen } from '../gui/screens/pause.js';
-import { DeathScreen } from '../gui/screens/death.js';
-import { SignEditScreen } from '../gui/screens/sign.js';
-import { openContainerScreen, InventoryScreen, CreativeScreen, handleHotbarSnapshots } from '../gui/screens/containers.js';
-import { BookScreen, SleepScreen } from '../gui/screens/book.js';
-import { CommandBlockScreen } from '../gui/screens/commandblock.js';
-import { Inventory, ContainerWindow } from './container.js';
-import { Items } from './items.js';
-import { EntityManager, shulkerBox } from './entities.js';
-import { EntityRenderer } from '../render/entity-renderer.js';
-import { ItemRenderer } from '../render/item-renderer.js';
-import { HandRenderer } from '../render/hand-renderer.js';
-import { Pistons } from './pistons.js';
-import { ServerPacks } from './serverpacks.js';
-import { PostEffects, entityShaderName } from '../render/post.js';
-import { TileEntityRenderer } from '../render/tile-renderer.js';
-import { Particles } from '../render/particles.js';
-import { Weather } from '../render/weather.js';
-import { SoundManager } from '../audio/sound.js';
-import { Scoreboard } from './scoreboard.js';
-import { Interaction } from './interaction.js';
-import { Accounts } from './accounts.js';
-import { platform } from '../platform/platform.js';
-import { buildSlice } from '../world/slice.js';
-import { setModelDevice } from '../render/boxmodel.js';
-import { encodePng } from '../util/png.js';
+import { buildCrashReport, showCrashScreen } from "../crash.js";
+import { mat4 } from "../gfx/math.js";
+import { DebugLines } from "../render/debug-lines.js";
+import { Profiler } from "./profiler.js";
+import { celestialAngle } from "../render/sky.js";
+import { tr } from "../gui/i18n.js";
+import { Connection } from "../net/connection.js";
+import { isEaglerAddress } from "../net/address.js";
+import { C } from "../net/packets.js";
+import { Writer } from "../net/buffer.js";
+import { simplify } from "../net/nbt.js";
+import { World } from "../world/world.js";
+import { getBlock, getBlockById, getStateProperties } from "../world/blocks.js";
+import { isPointInFluid } from "../world/fluids.js";
+import { resolveState } from "../world/blockstates.js";
+import { biomeInfo } from "../world/biomes.js";
+import { LocalPlayer } from "./physics.js";
+import { BoatController, HorseController } from "./vehicle.js";
+import { Advancements } from "./advancements.js";
+import { RecipeBook } from "./recipebook.js";
+import { Input } from "./input.js";
+import { Renderer } from "../render/renderer.js";
+import { Gui } from "../gui/gui.js";
+import { chatToLegacy, setTranslator } from "../gui/chat.js";
+import { Hud } from "../gui/hud.js";
+import { Narrator } from "../gui/narrator.js";
+import { Tutorial } from "./tutorial.js";
+import { ScreenManager } from "../gui/screens/manager.js";
+import {
+  DownloadingTerrainScreen,
+  DisconnectedScreen,
+  ConnectingScreen,
+} from "../gui/screens/menus.js";
+import { ChatScreen } from "../gui/screens/chat.js";
+import { PauseScreen, InvisiblePauseScreen } from "../gui/screens/pause.js";
+import { DeathScreen } from "../gui/screens/death.js";
+import { SignEditScreen } from "../gui/screens/sign.js";
+import {
+  openContainerScreen,
+  InventoryScreen,
+  CreativeScreen,
+  handleHotbarSnapshots,
+} from "../gui/screens/containers.js";
+import { BookScreen, SleepScreen } from "../gui/screens/book.js";
+import { CommandBlockScreen } from "../gui/screens/commandblock.js";
+import { Inventory, ContainerWindow } from "./container.js";
+import { Items } from "./items.js";
+import { EntityManager, shulkerBox } from "./entities.js";
+import { EntityRenderer } from "../render/entity-renderer.js";
+import { ItemRenderer } from "../render/item-renderer.js";
+import { HandRenderer } from "../render/hand-renderer.js";
+import { Pistons } from "./pistons.js";
+import { ServerPacks } from "./serverpacks.js";
+import { PostEffects, entityShaderName } from "../render/post.js";
+import { TileEntityRenderer } from "../render/tile-renderer.js";
+import { Particles } from "../render/particles.js";
+import { Weather } from "../render/weather.js";
+import { SoundManager } from "../audio/sound.js";
+import { Scoreboard } from "./scoreboard.js";
+import { Interaction } from "./interaction.js";
+import { Accounts } from "./accounts.js";
+import { platform } from "../platform/platform.js";
+import { buildSlice } from "../world/slice.js";
+import { setModelDevice } from "../render/boxmodel.js";
+import { encodePng } from "../util/png.js";
 
 // IAttributeInstance.getAttributeValue: base, + op 0 amounts, x (1 + sum of op 1), x (1 + each op 2)
 function attributeValue(prop) {
@@ -83,13 +92,36 @@ function attributeValue(prop) {
 
 // SPacketUpdateTileEntity action per block entity id (signs are handled by applyBlockEntity)
 const BLOCK_ENTITY_ACTIONS = {
-  mob_spawner: 1, command_block: 2, beacon: 3, skull: 4, flower_pot: 5, banner: 6, structure_block: 7, end_gateway: 8,
-  shulker_box: 10, bed: 11, jigsaw:12, campfire:13, beehive:14, bee_nest:14,
+  mob_spawner: 1,
+  command_block: 2,
+  beacon: 3,
+  skull: 4,
+  flower_pot: 5,
+  banner: 6,
+  structure_block: 7,
+  end_gateway: 8,
+  shulker_box: 10,
+  bed: 11,
+  jigsaw: 12,
+  campfire: 13,
+  beehive: 14,
+  bee_nest: 14,
 };
 
 const TICK_MS = 50;
 // SoundCategory names (SoundCategory.getByName)
-const SOUND_CATEGORIES = ['master', 'music', 'record', 'weather', 'block', 'hostile', 'neutral', 'player', 'ambient', 'voice'];
+const SOUND_CATEGORIES = [
+  "master",
+  "music",
+  "record",
+  "weather",
+  "block",
+  "hostile",
+  "neutral",
+  "player",
+  "ambient",
+  "voice",
+];
 
 export class Game {
   constructor(assets, settings, device) {
@@ -119,7 +151,13 @@ export class Game {
     this.eaglerTextures = new EaglerTextures(this);
     this.handRenderer = new HandRenderer(this);
     this.tileRenderer = new TileEntityRenderer(this);
-    this.renderer.breakContext=()=>({world:this.world,tileRenderer:this.tileRenderer,tileProps:this.tileProps,alternatives:this.settings.blockAlternatives!==false,fancy:!!this.settings.fancyGraphics});
+    this.renderer.breakContext = () => ({
+      world: this.world,
+      tileRenderer: this.tileRenderer,
+      tileProps: this.tileProps,
+      alternatives: this.settings.blockAlternatives !== false,
+      fancy: !!this.settings.fancyGraphics,
+    });
     this.structureBlocks = new Map(); // "x,y,z" -> structure block tile entity data
     this.jigsawBlocks = new Map();
     this.pistons = new Pistons(this);
@@ -129,24 +167,51 @@ export class Game {
     this.particles = new Particles(this);
     this.debugLines = new DebugLines(this);
     this.weather = new Weather(this);
-    this.renderer.drawEntities = (d, camRot) => this.entityRenderer.draw(d, camRot);
+    this.renderer.drawEntities = (d, camRot) =>
+      this.entityRenderer.draw(d, camRot);
     this.renderer.columnLoaded = (cx, cz) => !!this.world.getChunk(cx, cz);
-    this.renderer.opaqueAt = (x, y, z) => { const b = getBlock(this.world.getState(Math.floor(x), Math.floor(y), Math.floor(z))); return !!(b && b.opaque); };
-    platform().on('resize', () => { this.gui.resize(); this.renderer.resize(); });
+    this.renderer.opaqueAt = (x, y, z) => {
+      const b = getBlock(
+        this.world.getState(Math.floor(x), Math.floor(y), Math.floor(z)),
+      );
+      return !!(b && b.opaque);
+    };
+    platform().on("resize", () => {
+      this.gui.resize();
+      this.renderer.resize();
+    });
 
     this.world = new World();
-    this.world.selectionProvider = (state, x, y, z) => this.selectionBox(state, x, y, z);
+    this.world.selectionProvider = (state, x, y, z) =>
+      this.selectionBox(state, x, y, z);
     this.player = new LocalPlayer();
     this.cameraEye = new CameraEye();
-    this.player.onStep = (x, y, z, state) => this.sound.playStep(x, y, z, state, [this.player.x, this.player.y, this.player.z]);
-    this.player.onFall = (dmg, state) => this.sound.playFall(dmg, this.player.x, this.player.y, this.player.z, state);
+    this.player.onStep = (x, y, z, state) =>
+      this.sound.playStep(x, y, z, state, [
+        this.player.x,
+        this.player.y,
+        this.player.z,
+      ]);
+    this.player.onFall = (dmg, state) =>
+      this.sound.playFall(
+        dmg,
+        this.player.x,
+        this.player.y,
+        this.player.z,
+        state,
+      );
     this.player.onWaterEnter = () => this._waterSplash();
-    this.player.onSwim = (vol) => this.sound.playAtPlayer('entity.player.swim', vol, 1 + (Math.random() - Math.random()) * 0.4);
+    this.player.onSwim = (vol) =>
+      this.sound.playAtPlayer(
+        "entity.player.swim",
+        vol,
+        1 + (Math.random() - Math.random()) * 0.4,
+      );
     this.entities = new EntityManager(this);
     this.scoreboard = new Scoreboard(this);
     this.advancements = new Advancements(this);
     this.recipeBook = new RecipeBook(this);
-    this.nbtQueries=new NbtQueries(this);
+    this.nbtQueries = new NbtQueries(this);
     this.inventory = new Inventory(this);
     this.interaction = new Interaction(this);
     this.conn = null;
@@ -155,12 +220,12 @@ export class Game {
     this._setupWorker();
     this._setupWorldListeners();
     this.applyGraphicsSettings(true);
-    this.input.on('key', (e) => this.onKey(e));
-    this.input.on('char', (c) => this.screens.onChar(c));
-    this.input.on('mouse', (e) => this.onMouse(e));
-    this.input.on('wheel', (d) => this.screens.onWheel(d));
-    this.input.on('lock', (l) => this.onLockChange(l));
-    this.input.on('move', () => this.screens.onMove());
+    this.input.on("key", (e) => this.onKey(e));
+    this.input.on("char", (c) => this.screens.onChar(c));
+    this.input.on("mouse", (e) => this.onMouse(e));
+    this.input.on("wheel", (d) => this.screens.onWheel(d));
+    this.input.on("lock", (l) => this.onLockChange(l));
+    this.input.on("move", () => this.screens.onMove());
 
     this.profiler = new Profiler();
     this.frameTimes = new Float32Array(240); // lagometer (FrameTimer)
@@ -168,9 +233,14 @@ export class Game {
     this.showHitboxes = false;
     this.showProfiler = false;
     this.showLagometer = false;
-    platform().on('blur', () => {
+    platform().on("blur", () => {
       // GameSettings.pauseOnLostFocus (F3+P)
-      if (this.settings.pauseOnLostFocus !== false && this.inWorld && !this.screens.current) this.screens.open(new PauseScreen(this));
+      if (
+        this.settings.pauseOnLostFocus !== false &&
+        this.inWorld &&
+        !this.screens.current
+      )
+        this.screens.open(new PauseScreen(this));
     });
     this.lastFrame = platform().now();
     this.tickAccumulator = 0;
@@ -190,7 +260,7 @@ export class Game {
     this.gameMode = 0;
     this.dimension = 0;
     this.difficulty = 1;
-    this.levelType = 'default';
+    this.levelType = "default";
     this.reducedDebug = false;
     this.health = 20;
     this.prevHealth = 20;
@@ -202,7 +272,15 @@ export class Game {
     this.heldSlot = 0;
     this.spawnPos = null;
     this.doneLoadingTerrain = false;
-    this.lastReported = { x: 0, y: 0, z: 0, yaw: 0, pitch: 0, sneak: false, sprint: false };
+    this.lastReported = {
+      x: 0,
+      y: 0,
+      z: 0,
+      yaw: 0,
+      pitch: 0,
+      sneak: false,
+      sprint: false,
+    };
     this.positionUpdateTicks = 0;
     this.thirdPerson = 0;
     this.hideGui = false;
@@ -210,7 +288,13 @@ export class Game {
     this.effects = new Map();
     this.dead = false;
     this.ticks = 0;
-    this.worldBorder = { x: 0, z: 0, radius: 29999984, warningTime: 15, warningBlocks: 5 };
+    this.worldBorder = {
+      x: 0,
+      z: 0,
+      radius: 29999984,
+      warningTime: 15,
+      warningBlocks: 5,
+    };
     this.cameraEntity = null;
     this.ridingEntityId = -1;
     this.pendingTeleport = false;
@@ -241,14 +325,17 @@ export class Game {
   // both wobble towards their target like vanilla's held compass and clock
   _updateCompassClock() {
     const surface = this.dimension === 0;
-    const cs = this._compass || (this._compass = { angle: 0, delta: 0, clock: 0, clockDelta: 0 });
+    const cs =
+      this._compass ||
+      (this._compass = { angle: 0, delta: 0, clock: 0, clockDelta: 0 });
     let d0 = 0;
     if (this.inWorld) {
       if (surface) {
         const sp = this.spawnPos || { x: 0, z: 0 };
-        const d1 = sp.x - this.player.x, d2 = sp.z - this.player.z;
+        const d1 = sp.x - this.player.x,
+          d2 = sp.z - this.player.z;
         const yaw = ((this.player.yaw % 360) + 360) % 360;
-        d0 = -((yaw - 90) * Math.PI / 180 - Math.atan2(d2, d1));
+        d0 = -(((yaw - 90) * Math.PI) / 180 - Math.atan2(d2, d1));
       } else d0 = Math.random() * Math.PI * 2;
     }
     let d3 = d0 - cs.angle;
@@ -261,7 +348,8 @@ export class Game {
     const mod1 = (v) => ((v % 1) + 1) % 1;
     this.compassAngle = mod1(cs.angle / (Math.PI * 2) - 0.5); // compass model (frame 16) points at the target
     let t0 = 0;
-    if (this.inWorld) t0 = surface ? celestialAngle(this.world.timeOfDay, 1) : Math.random();
+    if (this.inWorld)
+      t0 = surface ? celestialAngle(this.world.timeOfDay, 1) : Math.random();
     let t1 = t0 - cs.clock;
     while (t1 < -0.5) t1 += 1;
     while (t1 >= 0.5) t1 -= 1;
@@ -276,60 +364,119 @@ export class Game {
   // Minecraft.debugFeedbackTranslated: a bold yellow "[Debug]:" then the message, as a local chat line
   debugFeedback(key, ...args) {
     const t = this.assets.translate;
-    this.hud.addChat('§e§l' + t.call(this.assets, 'debug.prefix') + '§r ' + t.call(this.assets, key, args), null, true);
+    this.hud.addChat(
+      "§e§l" +
+        t.call(this.assets, "debug.prefix") +
+        "§r " +
+        t.call(this.assets, key, args),
+      null,
+      true,
+    );
   }
 
   // F3 + key combinations (Minecraft.processKeyF3, 1.12). Returns true when the key was used.
   _debugCombo(e) {
     const s = this.settings;
     switch (e.code) {
-      case 'KeyI':copyInspect(this,!!e.shift);return true;
-      case 'KeyC':platform().setClipboard(`/execute in ${this.dimension===-1?'minecraft:the_nether':this.dimension===1?'minecraft:the_end':'minecraft:overworld'} run tp @s ${this.player.x.toFixed(2)} ${this.player.y.toFixed(2)} ${this.player.z.toFixed(2)} ${this.player.yaw.toFixed(2)} ${this.player.pitch.toFixed(2)}`);this.debugFeedback('debug.copy_location.message');return true;
-      case 'KeyA': // RenderGlobal.loadRenderers
-        for (const c of this.world.chunks.values()) for (let y = 0; y < 16; y++) if (c.sections[y]) this.dirty.add(c.x + ',' + y + ',' + c.z);
-        this.debugFeedback('debug.reload_chunks.message');
+      case "KeyI":
+        copyInspect(this, !!e.shift);
         return true;
-      case 'KeyB':
+      case "KeyC":
+        platform().setClipboard(
+          `/execute in ${this.dimension === -1 ? "minecraft:the_nether" : this.dimension === 1 ? "minecraft:the_end" : "minecraft:overworld"} run tp @s ${this.player.x.toFixed(2)} ${this.player.y.toFixed(2)} ${this.player.z.toFixed(2)} ${this.player.yaw.toFixed(2)} ${this.player.pitch.toFixed(2)}`,
+        );
+        this.debugFeedback("debug.copy_location.message");
+        return true;
+      case "KeyA": // RenderGlobal.loadRenderers
+        for (const c of this.world.chunks.values())
+          for (let y = 0; y < 16; y++)
+            if (c.sections[y]) this.dirty.add(c.x + "," + y + "," + c.z);
+        this.debugFeedback("debug.reload_chunks.message");
+        return true;
+      case "KeyB":
         this.showHitboxes = !this.showHitboxes; // RenderManager.setDebugBoundingBox
-        this.debugFeedback(this.showHitboxes ? 'debug.show_hitboxes.on' : 'debug.show_hitboxes.off');
+        this.debugFeedback(
+          this.showHitboxes
+            ? "debug.show_hitboxes.on"
+            : "debug.show_hitboxes.off",
+        );
         return true;
-      case 'KeyD': this.hud.clearChat(); return true;
-      case 'KeyF': // render distance +1 (Shift: -1)
-        s.renderDistance = Math.max(2, Math.min(32, s.renderDistance + (e.shift ? -1 : 1)));
+      case "KeyD":
+        this.hud.clearChat();
+        return true;
+      case "KeyF": // render distance +1 (Shift: -1)
+        s.renderDistance = Math.max(
+          2,
+          Math.min(32, s.renderDistance + (e.shift ? -1 : 1)),
+        );
         this.renderer.renderDistance = s.renderDistance;
         s.save();
         if (this.inWorld) this.sendSettings();
-        this.debugFeedback('debug.cycle_renderdistance.message', s.renderDistance);
+        this.debugFeedback(
+          "debug.cycle_renderdistance.message",
+          s.renderDistance,
+        );
         return true;
-      case 'KeyG': // DebugRenderer.toggleChunkBorders
+      case "KeyG": // DebugRenderer.toggleChunkBorders
         this.showChunkBorders = !this.showChunkBorders;
-        this.debugFeedback(this.showChunkBorders ? 'debug.chunk_boundaries.on' : 'debug.chunk_boundaries.off');
+        this.debugFeedback(
+          this.showChunkBorders
+            ? "debug.chunk_boundaries.on"
+            : "debug.chunk_boundaries.off",
+        );
         return true;
-      case 'KeyH':
-        s.advancedItemTooltips = !s.advancedItemTooltips; s.save();
-        this.debugFeedback(s.advancedItemTooltips ? 'debug.advanced_tooltips.on' : 'debug.advanced_tooltips.off');
+      case "KeyH":
+        s.advancedItemTooltips = !s.advancedItemTooltips;
+        s.save();
+        this.debugFeedback(
+          s.advancedItemTooltips
+            ? "debug.advanced_tooltips.on"
+            : "debug.advanced_tooltips.off",
+        );
         return true;
-      case 'KeyN': // creative <-> spectator, needs permission level 2
-        if ((this.permissionLevel | 0) < 2) this.debugFeedback('debug.creative_spectator.error');
-        else if (this.gameMode === 1) this.send(C.chat('/gamemode spectator'));
-        else if (this.gameMode === 3) this.send(C.chat('/gamemode creative'));
-        else this.send(C.chat('/gamemode creative'));
+      case "KeyN": // creative <-> spectator, needs permission level 2
+        if ((this.permissionLevel | 0) < 2)
+          this.debugFeedback("debug.creative_spectator.error");
+        else if (this.gameMode === 1) this.send(C.chat("/gamemode spectator"));
+        else if (this.gameMode === 3) this.send(C.chat("/gamemode creative"));
+        else this.send(C.chat("/gamemode creative"));
         return true;
-      case 'Escape':this.screens.open(new InvisiblePauseScreen(this));return true;
-      case 'KeyP':
-        s.pauseOnLostFocus = s.pauseOnLostFocus === false; s.save();
-        this.debugFeedback(s.pauseOnLostFocus ? 'debug.pause_focus.on' : 'debug.pause_focus.off');
+      case "Escape":
+        this.screens.open(new InvisiblePauseScreen(this));
         return true;
-      case 'KeyQ':
-        this.debugFeedback('debug.help.message');
-        for (const k of ['reload_chunks', 'show_hitboxes', 'clear_chat', 'cycle_renderdistance', 'chunk_boundaries', 'advanced_tooltips',
-          'creative_spectator', 'pause_focus', 'help', 'reload_resourcepacks']) this.hud.addChat(this.assets.translate('debug.' + k + '.help'), null, true);
+      case "KeyP":
+        s.pauseOnLostFocus = s.pauseOnLostFocus === false;
+        s.save();
+        this.debugFeedback(
+          s.pauseOnLostFocus ? "debug.pause_focus.on" : "debug.pause_focus.off",
+        );
         return true;
-      case 'KeyT':
-        this.debugFeedback('debug.reload_resourcepacks.message');
+      case "KeyQ":
+        this.debugFeedback("debug.help.message");
+        for (const k of [
+          "reload_chunks",
+          "show_hitboxes",
+          "clear_chat",
+          "cycle_renderdistance",
+          "chunk_boundaries",
+          "advanced_tooltips",
+          "creative_spectator",
+          "pause_focus",
+          "help",
+          "reload_resourcepacks",
+        ])
+          this.hud.addChat(
+            this.assets.translate("debug." + k + ".help"),
+            null,
+            true,
+          );
+        return true;
+      case "KeyT":
+        this.debugFeedback("debug.reload_resourcepacks.message");
         this.reloadResources().catch((err) => console.error(err)); // refreshResources
         return true;
-      default: return false;
+      default:
+        return false;
     }
   }
 
@@ -342,11 +489,20 @@ export class Game {
   _drawSuperSecret(gui) {
     const m = this.superSecret || 0;
     if (!m || this.superSecretOff) return;
-    const W = gui.width, H = gui.height;
-    if (m === 1) { gui.setBlend('invert'); gui.rect(0, 0, W, H, 0xffffffff); }          // invert
-    else if (m === 2) { gui.setBlend('multiply'); gui.rect(0, 0, W, H, 0xff70ff70); }   // green
-    else if (m === 3) { gui.rect(0, 0, W, H, 0x80808080); }                             // desaturate-ish wash
-    gui.setBlend('alpha');
+    const W = gui.width,
+      H = gui.height;
+    if (m === 1) {
+      gui.setBlend("invert");
+      gui.rect(0, 0, W, H, 0xffffffff);
+    } // invert
+    else if (m === 2) {
+      gui.setBlend("multiply");
+      gui.rect(0, 0, W, H, 0xff70ff70);
+    } // green
+    else if (m === 3) {
+      gui.rect(0, 0, W, H, 0x80808080);
+    } // desaturate-ish wash
+    gui.setBlend("alpha");
   }
 
   // Font flags for the current language (LanguageManager.isCurrentLocaleUnicode / isCurrentLanguageBidirectional)
@@ -384,9 +540,10 @@ export class Game {
     this.applyGraphicsSettings(true);
     // Rebuild every loaded section with the new models / atlas
     this.renderer.clearSections();
-    if(this._meshUploads)this._meshUploads.length=0;
+    if (this._meshUploads) this._meshUploads.length = 0;
     for (const c of this.world.chunks.values()) {
-      for (let y = 0; y < 16; y++) if (c.sections[y]) this.dirty.add(c.x + ',' + y + ',' + c.z);
+      for (let y = 0; y < 16; y++)
+        if (c.sections[y]) this.dirty.add(c.x + "," + y + "," + c.z);
       this.tileRenderer.scanChunk(c);
     }
   }
@@ -397,46 +554,58 @@ export class Game {
     this.worker = this.assets.worker;
     this.dirty = new Set();
     this.inFlight = new Map();
-    this.buildTokens = new Map(); this.buildSerial = 0;
+    this.buildTokens = new Map();
+    this.buildSerial = 0;
     this.maxInFlight = 3 * (this.worker.size || 1) + 2;
-    this._meshUploads=[];
+    this._meshUploads = [];
     this.meshedChunks = new Set();
     this._chunkWaitStart = new Map();
     this.meshGen = (this.meshGen || 0) + 1;
     if (!this.tileProps) this.tileProps = new Map();
     this.worker.onmessage = (e) => {
       const m = e.data;
-      if (m.type !== 'built') return;
-      const key = m.x + ',' + m.y + ',' + m.z;
-      if (m.gen !== this.meshGen || m.token !== this.buildTokens.get(key)) return;
-      if (!this.world.getChunk(m.x,m.z) || this.dirty.has(key)){this.inFlight.delete(key);return;}
+      if (m.type !== "built") return;
+      const key = m.x + "," + m.y + "," + m.z;
+      if (m.gen !== this.meshGen || m.token !== this.buildTokens.get(key))
+        return;
+      if (!this.world.getChunk(m.x, m.z) || this.dirty.has(key)) {
+        this.inFlight.delete(key);
+        return;
+      }
       this._meshUploads.push(m);
-
     };
     this.meshStats = { builds: 0, ms: 0 };
   }
 
   // Apply completed worker meshes within a per-frame upload budget. Keep each
   // lease until it is consumed so workers cannot flood the main thread queue.
-  _uploadMeshes(){
-    const start=platform().now();let applied=0;
-    while(this._meshUploads?.length){
-      if(applied&&platform().now()-start>=2)break;
-      const m=this._meshUploads.shift(),key=m.x+','+m.y+','+m.z;
-      if(m.gen!==this.meshGen||m.token!==this.buildTokens.get(key))continue;
+  _uploadMeshes() {
+    const start = platform().now();
+    let applied = 0;
+    while (this._meshUploads?.length) {
+      if (applied && platform().now() - start >= 2) break;
+      const m = this._meshUploads.shift(),
+        key = m.x + "," + m.y + "," + m.z;
+      if (m.gen !== this.meshGen || m.token !== this.buildTokens.get(key))
+        continue;
       this.inFlight.delete(key);
-      if(!this.world.getChunk(m.x,m.z)||this.dirty.has(key))continue;
-      this.meshStats.builds++;this.meshStats.ms+=m.ms||0;
-      this._chunkUpdatesCount=(this._chunkUpdatesCount||0)+1;
-      this.renderer.setSectionMesh(m.x,m.y,m.z,m);this._lodKey=null;applied++;
+      if (!this.world.getChunk(m.x, m.z) || this.dirty.has(key)) continue;
+      this.meshStats.builds++;
+      this.meshStats.ms += m.ms || 0;
+      this._chunkUpdatesCount = (this._chunkUpdatesCount || 0) + 1;
+      this.renderer.setSectionMesh(m.x, m.y, m.z, m);
+      this._lodKey = null;
+      applied++;
     }
   }
 
   // Forget all meshing state (world change)
   _resetMeshing() {
-    if(this._meshUploads)this._meshUploads.length=0;
+    if (this._meshUploads) this._meshUploads.length = 0;
     this.renderer.clearSections();
-    this.dirty.clear(); this.inFlight.clear(); this.meshedChunks.clear();
+    this.dirty.clear();
+    this.inFlight.clear();
+    this.meshedChunks.clear();
     this.buildTokens.clear();
     this.tileProps.clear();
     this.meshGen++;
@@ -444,52 +613,110 @@ export class Game {
 
   _setupWorldListeners() {
     const w = this.world;
-    w.on('chunkLoaded', (c, bitMap, groundUp) => {
-      void bitMap; void groundUp;
-      for (let y = 0; y < 16; y++) if (c.sections[y]) this.dirty.add(c.x + ',' + y + ',' + c.z);
+    w.on("chunkLoaded", (c, bitMap, groundUp) => {
+      void bitMap;
+      void groundUp;
+      for (let y = 0; y < 16; y++)
+        if (c.sections[y]) this.dirty.add(c.x + "," + y + "," + c.z);
       this.tileRenderer.scanChunk(c);
       // Neighbours that were already meshed need their edges rebuilt
-      for (const [dx, dz] of [[1, 0], [-1, 0], [0, 1], [0, -1]]) {
-        const nk = (c.x + dx) + ',' + (c.z + dz);
+      for (const [dx, dz] of [
+        [1, 0],
+        [-1, 0],
+        [0, 1],
+        [0, -1],
+      ]) {
+        const nk = c.x + dx + "," + (c.z + dz);
         if (this.meshedChunks.has(nk)) {
           const n = w.getChunk(c.x + dx, c.z + dz);
-          if (n) for (let y = 0; y < 16; y++) if (n.sections[y]) this.dirty.add(n.x + ',' + y + ',' + n.z);
+          if (n)
+            for (let y = 0; y < 16; y++)
+              if (n.sections[y]) this.dirty.add(n.x + "," + y + "," + n.z);
         }
       }
     });
-    w.on('chunkUnloaded', (c) => {
+    w.on("chunkUnloaded", (c) => {
       this.renderer.removeChunk(c.x, c.z);
-      this.meshedChunks.delete(c.x + ',' + c.z);
-      for (let y = 0; y < 16; y++) { const key=c.x+','+y+','+c.z;this.dirty.delete(key);this.inFlight.delete(key);this.buildTokens.delete(key); }
+      this.meshedChunks.delete(c.x + "," + c.z);
+      for (let y = 0; y < 16; y++) {
+        const key = c.x + "," + y + "," + c.z;
+        this.dirty.delete(key);
+        this.inFlight.delete(key);
+        this.buildTokens.delete(key);
+      }
       this.tileRenderer.removeChunk(c.x, c.z);
     });
-    w.on('sectionDirty', (cx, sy, cz) => {
+    w.on("sectionDirty", (cx, sy, cz) => {
       if (!w.getChunk(cx, cz)) return;
-      this.dirty.add(cx + ',' + sy + ',' + cz);
+      this.dirty.add(cx + "," + sy + "," + cz);
     });
     // World.getCollisionBoxes' entity part (1.12): boats and live shulkers are solid to every mover
     // (getCollisionBoundingBox); a moving boat also collides with pushable entities (EntityBoat.getCollisionBox).
     // Passengers of the same vehicle never collide (isRidingSameEntity).
     w.movingCollider = (bb, out) => this.pistons.collision(bb, out);
-    w.shulkerCollider = (x, y, z, state, out) => this.tileRenderer.shulkerCollision(x, y, z, state, out);
+    w.shulkerCollider = (x, y, z, state, out) =>
+      this.tileRenderer.shulkerCollision(x, y, z, state, out);
     w.entityCollider = (bb, mover) => {
       const out = [];
       const self = mover.entity || null; // the vehicle being steered, or null for the player
-      const g = [bb[0] - 0.25, bb[1] - 0.25, bb[2] - 0.25, bb[3] + 0.25, bb[4] + 0.25, bb[5] + 0.25];
+      const g = [
+        bb[0] - 0.25,
+        bb[1] - 0.25,
+        bb[2] - 0.25,
+        bb[3] + 0.25,
+        bb[4] + 0.25,
+        bb[5] + 0.25,
+      ];
       for (const e of this.entities.map.values()) {
         if (e === self || e.dead) continue;
-        if (self ? e.riding === self.id : e.id === this.ridingEntityId) continue;
+        if (self ? e.riding === self.id : e.id === this.ridingEntityId)
+          continue;
         const hw = (e.width || 0) / 2;
-        const eb = e.kind === 'mob' && e.type === 69 ? shulkerBox(e) : [e.x - hw, e.y, e.z - hw, e.x + hw, e.y + (e.height || 0), e.z + hw];
-        if (!(eb[3] > g[0] && eb[0] < g[3] && eb[4] > g[1] && eb[1] < g[4] && eb[5] > g[2] && eb[2] < g[5])) continue;
-        const solid = e.kind === 'boat' || (e.kind === 'mob' && e.type === 69);
-        const pushable = self && self.kind === 'boat' && (e.kind === 'player' || e.kind === 'mob' || e.kind === 'boat' || e.kind === 'minecart') && e.riding < 0;
+        const eb =
+          e.kind === "mob" && e.type === 69
+            ? shulkerBox(e)
+            : [
+                e.x - hw,
+                e.y,
+                e.z - hw,
+                e.x + hw,
+                e.y + (e.height || 0),
+                e.z + hw,
+              ];
+        if (
+          !(
+            eb[3] > g[0] &&
+            eb[0] < g[3] &&
+            eb[4] > g[1] &&
+            eb[1] < g[4] &&
+            eb[5] > g[2] &&
+            eb[2] < g[5]
+          )
+        )
+          continue;
+        const solid = e.kind === "boat" || (e.kind === "mob" && e.type === 69);
+        const pushable =
+          self &&
+          self.kind === "boat" &&
+          (e.kind === "player" ||
+            e.kind === "mob" ||
+            e.kind === "boat" ||
+            e.kind === "minecart") &&
+          e.riding < 0;
         if (!solid && !pushable) continue;
-        if (eb[3] > bb[0] && eb[0] < bb[3] && eb[4] > bb[1] && eb[1] < bb[4] && eb[5] > bb[2] && eb[2] < bb[5]) out.push(eb);
+        if (
+          eb[3] > bb[0] &&
+          eb[0] < bb[3] &&
+          eb[4] > bb[1] &&
+          eb[1] < bb[4] &&
+          eb[5] > bb[2] &&
+          eb[2] < bb[5]
+        )
+          out.push(eb);
       }
       return out;
     };
-    w.on('blockChanged', (x, y, z, oldState, newState) => {
+    w.on("blockChanged", (x, y, z, oldState, newState) => {
       this.pistons.onBlockChanged(x, y, z);
       this.tileRenderer.onBlockChanged(x, y, z, oldState, newState);
     });
@@ -499,81 +726,147 @@ export class Game {
   applyGraphicsSettings(initial = false) {
     const s = this.settings;
     // Minimum and Maximum smooth lighting render the same in 1.8.9 (only 'ambient occlusion on' is checked)
-    const opts = { fancy: !!s.fancyGraphics, smooth: (s.smoothLighting | 0) > 0 ? 2 : 0, alt: s.blockAlternatives !== false, biomeBlendRadius: s.biomeBlendRadius ?? 2 };
-    this.assets.setMipmapLevels(s.mipmapLevels === undefined ? 4 : s.mipmapLevels);
+    const opts = {
+      fancy: !!s.fancyGraphics,
+      smooth: (s.smoothLighting | 0) > 0 ? 2 : 0,
+      alt: s.blockAlternatives !== false,
+      biomeBlendRadius: s.biomeBlendRadius ?? 2,
+    };
+    this.assets.setMipmapLevels(
+      s.mipmapLevels === undefined ? 4 : s.mipmapLevels,
+    );
     platform().vsync = s.enableVsync !== false;
     const key = JSON.stringify(opts);
     if (key === this._meshOptsKey) return;
     this._meshOptsKey = key;
-    this.worker.postMessage({ type: 'options', options: opts });
+    this.worker.postMessage({ type: "options", options: opts });
     if (!initial) {
-      for (const c of this.world.chunks.values()) for (let y = 0; y < 16; y++) if (c.sections[y]) this.dirty.add(c.x + ',' + y + ',' + c.z);
+      for (const c of this.world.chunks.values())
+        for (let y = 0; y < 16; y++)
+          if (c.sections[y]) this.dirty.add(c.x + "," + y + "," + c.z);
     }
   }
 
   _lodCamera() {
-    return this.renderer.camPos || [this.player.x, this.player.y, this.player.z];
+    return (
+      this.renderer.camPos || [this.player.x, this.player.y, this.player.z]
+    );
   }
 
   _lodFor(cx, cz, sy = 0) {
-    const previous = !!this.renderer.sections.get(cx + ',' + sy + ',' + cz)?.lod;
+    const previous = !!this.renderer.sections.get(cx + "," + sy + "," + cz)
+      ?.lod;
     return sectionLod(this.settings, this._lodCamera(), cx, sy, cz, previous);
   }
 
   // Recheck at block boundaries and after sections arrive, rather than chunk borders.
   _updateLod() {
     const camera = this._lodCamera();
-    const key = Math.floor(camera[0]) + ',' + Math.floor(camera[1]) + ',' + Math.floor(camera[2]) + ',' + lodDistance(this.settings) + ',' + this.renderer.sections.size;
+    const key =
+      Math.floor(camera[0]) +
+      "," +
+      Math.floor(camera[1]) +
+      "," +
+      Math.floor(camera[2]) +
+      "," +
+      lodDistance(this.settings) +
+      "," +
+      this.renderer.sections.size;
     if (key === this._lodKey) return;
     this._lodKey = key;
     for (const section of this.renderer.sections.values()) {
-      if (section.lod !== this._lodFor(section.cx, section.cz, section.sy)) this.dirty.add(section.cx + ',' + section.sy + ',' + section.cz);
+      if (section.lod !== this._lodFor(section.cx, section.cz, section.sy))
+        this.dirty.add(section.cx + "," + section.sy + "," + section.cz);
     }
   }
 
   _scheduleMeshes() {
-    if(this._meshUploads?.length)this._uploadMeshes();
-    const started=platform().now();let posted=0;
+    if (this._meshUploads?.length) this._uploadMeshes();
+    const started = platform().now();
+    let posted = 0;
     this._updateLod();
     if (!this.dirty.size || this.inFlight.size >= this.maxInFlight) return;
     const camera = this._lodCamera();
-    const px = camera[0] / 16, py = camera[1] / 16, pz = camera[2] / 16;
+    const px = camera[0] / 16,
+      py = camera[1] / 16,
+      pz = camera[2] / 16;
     const rd = this.settings.renderDistance + 1;
     const candidates = [];
     for (const key of this.dirty) {
       if (this.inFlight.has(key)) continue;
-      const parts = key.split(',');
-      const cx = +parts[0], sy = +parts[1], cz = +parts[2];
-      if (Math.abs(cx - Math.floor(px)) > rd || Math.abs(cz - Math.floor(pz)) > rd) continue;
+      const parts = key.split(",");
+      const cx = +parts[0],
+        sy = +parts[1],
+        cz = +parts[2];
+      if (
+        Math.abs(cx - Math.floor(px)) > rd ||
+        Math.abs(cz - Math.floor(pz)) > rd
+      )
+        continue;
       // Wait for horizontal neighbours so edge faces are culled correctly
       let ready = true;
-      for (const [dx, dz] of [[1, 0], [-1, 0], [0, 1], [0, -1]]) {
+      for (const [dx, dz] of [
+        [1, 0],
+        [-1, 0],
+        [0, 1],
+        [0, -1],
+      ]) {
         if (!this.world.getChunk(cx + dx, cz + dz)) {
-          const age = this._chunkWaitStart.get(cx + ',' + cz) || 0;
-          if (!age) { this._chunkWaitStart.set(cx + ',' + cz, platform().now()); ready = false; }
-          else if (platform().now() - age < 1500) ready = false;
+          const age = this._chunkWaitStart.get(cx + "," + cz) || 0;
+          if (!age) {
+            this._chunkWaitStart.set(cx + "," + cz, platform().now());
+            ready = false;
+          } else if (platform().now() - age < 1500) ready = false;
           break;
         }
       }
       if (!ready) continue;
-      const dx = cx + 0.5 - px, dy = sy + 0.5 - py, dz = cz + 0.5 - pz;
+      const dx = cx + 0.5 - px,
+        dy = sy + 0.5 - py,
+        dz = cz + 0.5 - pz;
       candidates.push([dx * dx + dy * dy * 0.5 + dz * dz, key, cx, sy, cz]);
     }
     candidates.sort((a, b) => a[0] - b[0]);
     for (const [, key, cx, sy, cz] of candidates) {
-      if (this.inFlight.size >= this.maxInFlight || posted&&platform().now()-started>=2) break;
+      if (
+        this.inFlight.size >= this.maxInFlight ||
+        (posted && platform().now() - started >= 2)
+      )
+        break;
       this.dirty.delete(key);
       this.inFlight.set(key, platform().now());
-      this.meshedChunks.add(cx + ',' + cz);
+      this.meshedChunks.add(cx + "," + cz);
       const sec = this.world.getChunk(cx, cz).sections[sy];
-      if (!sec || sec.nonAir === 0) { this.inFlight.delete(key); this.renderer.removeSection(key); continue; }
-      const slice = buildSlice(this.world, cx, sy, cz, this.tileProps, this.settings.biomeBlendRadius ?? 2);
-      const token=++this.buildSerial;this.buildTokens.set(key,token);
-      this.worker.postMessage({ type: 'build', gen: this.meshGen, token, slice, lod: this._lodFor(cx, cz, sy) }, [slice.states.buffer, slice.light.buffer, slice.biomes.buffer]);
+      if (!sec || sec.nonAir === 0) {
+        this.inFlight.delete(key);
+        this.renderer.removeSection(key);
+        continue;
+      }
+      const slice = buildSlice(
+        this.world,
+        cx,
+        sy,
+        cz,
+        this.tileProps,
+        this.settings.biomeBlendRadius ?? 2,
+      );
+      const token = ++this.buildSerial;
+      this.buildTokens.set(key, token);
+      this.worker.postMessage(
+        {
+          type: "build",
+          gen: this.meshGen,
+          token,
+          slice,
+          lod: this._lodFor(cx, cz, sy),
+        },
+        [slice.states.buffer, slice.light.buffer, slice.biomes.buffer],
+      );
       posted++;
     }
     // Recover from lost builds
-    for (const [k, t] of this.inFlight) if (platform().now() - t > 10000) this.inFlight.delete(k);
+    for (const [k, t] of this.inFlight)
+      if (platform().now() - t > 10000) this.inFlight.delete(k);
   }
 
   // ---------------------------------------------------------------- Connection
@@ -588,9 +881,17 @@ export class Game {
     if (!username) {
       let acc = this.accounts.active();
       // Eaglercraft servers log in by name only (no Mojang session check)
-      if (acc.type === 'microsoft' && !isEaglerAddress(host)) {
-        try { acc = await this.accounts.ensureFresh(acc); } catch (e) {
-          this.screens.open(new DisconnectedScreen(this, tr('disconnect.loginFailed'), e.message));
+      if (acc.type === "microsoft" && !isEaglerAddress(host)) {
+        try {
+          acc = await this.accounts.ensureFresh(acc);
+        } catch (e) {
+          this.screens.open(
+            new DisconnectedScreen(
+              this,
+              tr("disconnect.loginFailed"),
+              e.message,
+            ),
+          );
           return;
         }
         auth = { accessToken: acc.accessToken, uuid: acc.uuid };
@@ -598,14 +899,20 @@ export class Game {
       username = acc.name;
     }
     this.username = username;
-    const conn = this.conn = new Connection();
-    conn.on('control', (m) => this.onControl(m, conn));
-    conn.on('packet', (p) => { if (this.conn === conn) this.handlePacket(p); });
-    conn.on('close', () => { if (this.conn === conn) this.onConnectionClosed(); });
+    const conn = (this.conn = new Connection());
+    conn.on("control", (m) => this.onControl(m, conn));
+    conn.on("packet", (p) => {
+      if (this.conn === conn) this.handlePacket(p);
+    });
+    conn.on("close", () => {
+      if (this.conn === conn) this.onConnectionClosed();
+    });
     try {
       await conn.connect(host, port, username, auth);
     } catch (e) {
-      this.screens.open(new DisconnectedScreen(this, tr('connect.failed'), e.message));
+      this.screens.open(
+        new DisconnectedScreen(this, tr("connect.failed"), e.message),
+      );
     }
   }
 
@@ -621,24 +928,44 @@ export class Game {
 
   // NetHandlerPlayClient.handleChangeGameState(5): a demo server's welcome screen (0) and control hints (101-103)
   onDemoMessage(value) {
-    const s = this.settings, key = (k) => s.keyName(s.keys[k]);
-    const say = (k, ...args) => this.hud.addChat(this.assets.translate(k, args), null, true);
-    if (value === 0) import('../gui/screens/demo.js').then((m) => this.screens.open(new m.DemoScreen(this)));
-    else if (value === 101) say('demo.help.movement', key('forward'), key('left'), key('back'), key('right'));
-    else if (value === 102) say('demo.help.jump', key('jump'));
-    else if (value === 103) say('demo.help.inventory', key('inventory'));
+    const s = this.settings,
+      key = (k) => s.keyName(s.keys[k]);
+    const say = (k, ...args) =>
+      this.hud.addChat(this.assets.translate(k, args), null, true);
+    if (value === 0)
+      import("../gui/screens/demo.js").then((m) =>
+        this.screens.open(new m.DemoScreen(this)),
+      );
+    else if (value === 101)
+      say(
+        "demo.help.movement",
+        key("forward"),
+        key("left"),
+        key("back"),
+        key("right"),
+      );
+    else if (value === 102) say("demo.help.jump", key("jump"));
+    else if (value === 103) say("demo.help.inventory", key("inventory"));
   }
 
   // EntityPlayer.canUseCommandBlock: creative and op level 2
-  canUseCommandBlock() { return this.gameMode === 1 && (this.permissionLevel | 0) >= 2; }
+  canUseCommandBlock() {
+    return this.gameMode === 1 && (this.permissionLevel | 0) >= 2;
+  }
 
-  updateWindowTitle(){
-    const base=this.assets.translate('minecraftjs.version');
-    platform().setTitle?.(base+(this.inWorld?' - '+this.assets.translate('title.multiplayer.other'):''));
+  updateWindowTitle() {
+    const base = this.assets.translate("minecraftjs.version");
+    platform().setTitle?.(
+      base +
+        (this.inWorld
+          ? " - " + this.assets.translate("title.multiplayer.other")
+          : ""),
+    );
   }
 
   leaveWorld() {
-    resetServerRecipes(this);this.nbtQueries?.clear();
+    resetServerRecipes(this);
+    this.nbtQueries?.clear();
     this.structureBlocks.clear();
     this.jigsawBlocks.clear();
     if (this.tutorial) this.tutorial.stop();
@@ -656,38 +983,47 @@ export class Game {
     this.input.unlock();
     // Per-server state: tab list, teams, objectives/sidebar, header/footer, titles, action bar
     this.scoreboard.reset();
-    this.tags = new RegistryTags(); this.commands = null;
+    this.tags = new RegistryTags();
+    this.commands = null;
     if (this.advancements) this.advancements.clear();
     this.hud.resetServerState();
-    this.statValues = null; this.stats = null;
+    this.statValues = null;
+    this.stats = null;
     if (this.serverPacks) this.serverPacks.clear();
   }
 
   onControl(m, conn) {
     if (this.conn !== conn) return;
     switch (m.type) {
-      case 'status':
-        if (this.screens.current instanceof ConnectingScreen) this.screens.current.status = m.key ? tr(m.key) : m.message;
+      case "status":
+        if (this.screens.current instanceof ConnectingScreen)
+          this.screens.current.status = m.key ? tr(m.key) : m.message;
         break;
-      case 'login_success':
+      case "login_success":
         this.connected = true;
         this.playerUuid = m.uuid;
         this.username = m.username;
         this.screens.open(new DownloadingTerrainScreen(this));
         break;
-      case 'kicked':
+      case "kicked":
         this.kickReason = chatToLegacy(m.reason);
         break;
-      case 'error':
+      case "error":
         this.lastError = m.message;
         break;
-      default: break;
+      default:
+        break;
     }
   }
 
   onConnectionClosed() {
-    const reason = this.kickReason || (this.lastError ? this.lastError : tr('disconnect.closed'));
-    const title = this.inWorld || this.connected ? tr('disconnect.lost') : tr('connect.failed');
+    const reason =
+      this.kickReason ||
+      (this.lastError ? this.lastError : tr("disconnect.closed"));
+    const title =
+      this.inWorld || this.connected
+        ? tr("disconnect.lost")
+        : tr("connect.failed");
     this.conn = null;
     this.leaveWorld();
     this.kickReason = null;
@@ -695,21 +1031,30 @@ export class Game {
     this.screens.open(new DisconnectedScreen(this, title, reason));
   }
 
-  send(bytes) { if (this.conn) this.conn.send(bytes); }
+  send(bytes) {
+    if (this.conn) this.conn.send(bytes);
+  }
 
   // ---------------------------------------------------------------- Packet handling
 
   handlePacket(p) {
-    const h = this['on_' + p.name];
+    const h = this["on_" + p.name];
     if (h) {
-      try { h.call(this, p); } catch (e) { console.error('Error handling', p.name, e); }
+      try {
+        h.call(this, p);
+      } catch (e) {
+        console.error("Error handling", p.name, e);
+      }
     }
   }
 
-  on_keep_alive(p) { this.send(C.keepAlive(p.keepAliveId)); }
+  on_keep_alive(p) {
+    this.send(C.keepAlive(p.keepAliveId));
+  }
 
   on_login(p) {
-    resetServerRecipes(this);this.nbtQueries?.clear();
+    resetServerRecipes(this);
+    this.nbtQueries?.clear();
     this.eaglerTextures?.clear();
     this.interaction?.predictedBlocks?.clear();
     // handleJoinGame always starts a new WorldClient (proxies may send another Join Game on server switch)
@@ -718,17 +1063,18 @@ export class Game {
       this._resetMeshing();
       this.entities.clear();
       this.tileRenderer.clear();
-    this.pistons.clear();
+      this.pistons.clear();
     }
     this.cameraEye?.reset();
     this.entityId = p.entityId;
     this.selfMetadata = {};
     this.maxHealth = 20;
-    if (this.gameMode !== (p.gameMode & 7)) this.previousGameMode = this.gameMode;
+    if (this.gameMode !== (p.gameMode & 7))
+      this.previousGameMode = this.gameMode;
     this.gameMode = p.gameMode & 7;
     this.hardcore = !!(p.gameMode & 8);
     this.dimension = p.dimension;
-    if(p.difficulty!==undefined)this.difficulty = p.difficulty;
+    if (p.difficulty !== undefined) this.difficulty = p.difficulty;
     this.maxPlayers = p.maxPlayers;
     this.levelType = p.levelType;
     this.reducedDebug = p.reducedDebugInfo;
@@ -738,12 +1084,26 @@ export class Game {
     this.inWorld = true;
     this.updateWindowTitle?.();
     this.sendSettings();
-    this.send(C.customPayload('minecraft:brand', new Writer().string('vanilla').build()));
+    this.send(
+      C.customPayload(
+        "minecraft:brand",
+        new Writer().string("vanilla").build(),
+      ),
+    );
   }
 
   sendSettings() {
     const s = this.settings;
-    this.send(C.settings(this.assets.language || 'en_us', s.renderDistance, s.chatVisibility, s.chatColors, s.skinParts, s.mainHand === 'left' ? 0 : 1));
+    this.send(
+      C.settings(
+        this.assets.language || "en_us",
+        s.renderDistance,
+        s.chatVisibility,
+        s.chatColors,
+        s.skinParts,
+        s.mainHand === "left" ? 0 : 1,
+      ),
+    );
   }
 
   applyGameMode() {
@@ -756,9 +1116,13 @@ export class Game {
     if (gm === 0 || gm === 2) p.flying = false;
   }
 
-  captureText(options) { return captureText(this,options); }
+  captureText(options) {
+    return captureText(this, options);
+  }
 
-  on_custom_payload(p) { this.eaglerTextures?.handle(p.channel,p.data); }
+  on_custom_payload(p) {
+    this.eaglerTextures?.handle(p.channel, p.data);
+  }
 
   on_chat(p) {
     const text = chatToLegacy(p.message);
@@ -774,9 +1138,13 @@ export class Game {
     this.world.timeOfDay = Math.abs(t);
   }
 
-  on_entity_equipment(p) { this.entities.setEquipment(p.entityId, p.slot, p.item); }
+  on_entity_equipment(p) {
+    this.entities.setEquipment(p.entityId, p.slot, p.item);
+  }
 
-  on_spawn_position(p) { this.spawnPos = p.location; }
+  on_spawn_position(p) {
+    this.spawnPos = p.location;
+  }
 
   on_update_health(p) {
     const wasAlive = this.health > 0;
@@ -804,15 +1172,15 @@ export class Game {
       this._resetMeshing();
       this.entities.clear();
       this.tileRenderer.clear();
-    this.pistons.clear();
+      this.pistons.clear();
       this.doneLoadingTerrain = false;
       this.screens.open(new DownloadingTerrainScreen(this));
     }
     this.dimension = p.dimension;
     this.world.setDimension(p.dimension);
     this.world.setBiomeSeed?.(p.hashedSeed);
-    if(p.difficulty!==undefined)this.difficulty = p.difficulty;
-    if (this.gameMode !== (p.gamemode)) this.previousGameMode = this.gameMode;
+    if (p.difficulty !== undefined) this.difficulty = p.difficulty;
+    if (this.gameMode !== p.gamemode) this.previousGameMode = this.gameMode;
     this.gameMode = p.gamemode;
     this.levelType = p.levelType;
     this.applyGameMode();
@@ -825,26 +1193,41 @@ export class Game {
   on_position(p) {
     const pl = this.player;
     // NetHandlerPlayClient.handlePlayerPosLook (relative flags add to the current values, float angles)
-    let x = p.x, y = p.y, z = p.z, yaw = Math.fround(p.yaw), pitch = Math.fround(p.pitch);
-    if (p.flags & 1) x += pl.x; else pl.motionX = 0;
-    if (p.flags & 2) y += pl.y; else pl.motionY = 0;
-    if (p.flags & 4) z += pl.z; else pl.motionZ = 0;
+    let x = p.x,
+      y = p.y,
+      z = p.z,
+      yaw = Math.fround(p.yaw),
+      pitch = Math.fround(p.pitch);
+    if (p.flags & 1) x += pl.x;
+    else pl.motionX = 0;
+    if (p.flags & 2) y += pl.y;
+    else pl.motionY = 0;
+    if (p.flags & 4) z += pl.z;
+    else pl.motionZ = 0;
     if (p.flags & 8) yaw = Math.fround(yaw + pl.yaw);
     if (p.flags & 16) pitch = Math.fround(pitch + pl.pitch);
     // Entity.setPositionAndRotation: x / z clamped to the world, pitch to +-90, then setRotation keeps angle % 360
-    x = Math.max(-3e7, Math.min(3e7, x)); z = Math.max(-3e7, Math.min(3e7, z));
+    x = Math.max(-3e7, Math.min(3e7, x));
+    z = Math.max(-3e7, Math.min(3e7, z));
     pitch = Math.max(-90, Math.min(90, pitch));
     pl.setPosition(x, y, z);
-    pl.prevX = x; pl.prevY = y; pl.prevZ = z;
-    pl.prevYaw = yaw; pl.prevPitch = pitch;
-    pl.yaw = Math.fround(yaw % 360); pl.pitch = Math.fround(pitch % 360);
+    pl.prevX = x;
+    pl.prevY = y;
+    pl.prevZ = z;
+    pl.prevYaw = yaw;
+    pl.prevPitch = pitch;
+    pl.yaw = Math.fround(yaw % 360);
+    pl.pitch = Math.fround(pitch % 360);
     this.send(C.teleportConfirm(p.teleportId));
     this.send(C.positionLook(pl.x, pl.y, pl.z, pl.yaw, pl.pitch, false));
     // the last reported position stays: the next tick reports the new position again (onUpdateWalkingPlayer)
     if (!this.doneLoadingTerrain) {
       this.doneLoadingTerrain = true;
-      pl.prevX = pl.x; pl.prevY = pl.y; pl.prevZ = pl.z;
-      if (this.screens.current instanceof DownloadingTerrainScreen) this.screens.current.terrainReady = true;
+      pl.prevX = pl.x;
+      pl.prevY = pl.y;
+      pl.prevZ = pl.z;
+      if (this.screens.current instanceof DownloadingTerrainScreen)
+        this.screens.current.terrainReady = true;
     }
   }
 
@@ -872,17 +1255,29 @@ export class Game {
     this.entities.onAnimation(p);
   }
 
-  on_named_entity_spawn(p) { this.entities.spawnPlayer(p); }
+  on_named_entity_spawn(p) {
+    this.entities.spawnPlayer(p);
+  }
 
-  on_collect(p) { this.entities.onCollect(p); }
+  on_collect(p) {
+    this.entities.onCollect(p);
+  }
 
-  on_spawn_entity(p) { this.entities.spawnObject(p); }
+  on_spawn_entity(p) {
+    this.entities.spawnObject(p);
+  }
 
-  on_spawn_entity_living(p) { this.entities.spawnMob(p); }
+  on_spawn_entity_living(p) {
+    this.entities.spawnMob(p);
+  }
 
-  on_spawn_entity_painting(p) { this.entities.spawnPainting(p); }
+  on_spawn_entity_painting(p) {
+    this.entities.spawnPainting(p);
+  }
 
-  on_spawn_entity_experience_orb(p) { this.entities.spawnXpOrb(p); }
+  on_spawn_entity_experience_orb(p) {
+    this.entities.spawnXpOrb(p);
+  }
 
   on_entity_velocity(p) {
     if (p.entityId === this.entityId) {
@@ -892,28 +1287,50 @@ export class Game {
     } else this.entities.setVelocity(p);
   }
 
-  on_entity_destroy(p) { this.entities.destroy(p.entityIds); }
+  on_entity_destroy(p) {
+    this.entities.destroy(p.entityIds);
+  }
 
-  on_rel_entity_move(p) { this.entities.relMove(p, true, false); }
-  on_entity_look(p) { this.entities.look(p); }
-  on_entity_move_look(p) { this.entities.relMove(p, true, true); }
-  on_entity_teleport(p) { this.entities.teleport(p); }
-  on_entity_head_rotation(p) { this.entities.headLook(p); }
+  on_rel_entity_move(p) {
+    this.entities.relMove(p, true, false);
+  }
+  on_entity_look(p) {
+    this.entities.look(p);
+  }
+  on_entity_move_look(p) {
+    this.entities.relMove(p, true, true);
+  }
+  on_entity_teleport(p) {
+    this.entities.teleport(p);
+  }
+  on_entity_head_rotation(p) {
+    this.entities.headLook(p);
+  }
 
   on_entity_status(p) {
     if (p.entityId === this.entityId) {
-      if (p.entityStatus === 2) { this.hurtTime = 10; this.sound.playAtPlayer('entity.player.hurt', 1, 1); }
-      else if(p.entityStatus===53||p.entityStatus===54)this.particles.honeyBlockEffect(this.player,p.entityStatus===53?5:10);
-      else if (p.entityStatus === 9) this.player.usingItem = false; // item use finished
+      if (p.entityStatus === 2) {
+        this.hurtTime = 10;
+        this.sound.playAtPlayer("entity.player.hurt", 1, 1);
+      } else if (p.entityStatus === 53 || p.entityStatus === 54)
+        this.particles.honeyBlockEffect(
+          this.player,
+          p.entityStatus === 53 ? 5 : 10,
+        );
+      else if (p.entityStatus === 9)
+        this.player.usingItem = false; // item use finished
       else if (p.entityStatus === 22) this.reducedDebug = true;
       else if (p.entityStatus === 23) this.reducedDebug = false;
-      else if (p.entityStatus >= 24 && p.entityStatus <= 28) this.permissionLevel = p.entityStatus - 24; // EntityPlayer op level
+      else if (p.entityStatus >= 24 && p.entityStatus <= 28)
+        this.permissionLevel = p.entityStatus - 24; // EntityPlayer op level
     }
     this.entities.onStatus(p);
   }
 
   // leash (riding is set_passengers since 1.9)
-  on_attach_entity(p) { this.entities.setLeash(p.entityId, p.vehicleId); }
+  on_attach_entity(p) {
+    this.entities.setLeash(p.entityId, p.vehicleId);
+  }
 
   // SPacketSetPassengers: the full passenger list of a vehicle
   on_set_passengers(p) {
@@ -921,16 +1338,25 @@ export class Game {
     const v = this.entities.get(p.entityId);
     if (v) v.passengerList = p.passengers.slice(); // the server's order: the first passenger steers
     for (const id of before) if (!p.passengers.includes(id)) this._ride(id, -1);
-    for (const id of p.passengers) if (!before.includes(id)) this._ride(id, p.entityId);
+    for (const id of p.passengers)
+      if (!before.includes(id)) this._ride(id, p.entityId);
   }
 
   _ride(entityId, vehicleId) {
     if (entityId === this.entityId) {
       this.ridingEntityId = vehicleId;
-      this.player.ridingEntity = vehicleId >= 0 ? this.entities.get(vehicleId) : null;
-      this.player.ridingBoat = !!(this.player.ridingEntity && this.player.ridingEntity.kind === 'boat');
+      this.player.ridingEntity =
+        vehicleId >= 0 ? this.entities.get(vehicleId) : null;
+      this.player.ridingBoat = !!(
+        this.player.ridingEntity && this.player.ridingEntity.kind === "boat"
+      );
       if (vehicleId < 0) this._dropVehicle();
-      if (vehicleId >= 0) this.hud.setActionBar(this.assets.translate('mount.onboard', [this.settings.keyName(this.settings.keys.sneak)]));
+      if (vehicleId >= 0)
+        this.hud.setActionBar(
+          this.assets.translate("mount.onboard", [
+            this.settings.keyName(this.settings.keys.sneak),
+          ]),
+        );
     }
     this.entities.attach(entityId, vehicleId);
   }
@@ -940,24 +1366,36 @@ export class Game {
       this.selfMetadata = Object.assign(this.selfMetadata || {}, p.metadata);
       if (p.metadata[7] !== undefined) {
         this.player.riptide = !!(p.metadata[7] & 4);
-        if (this.player.riptide && !this.player.riptideTicks) this.player.riptideTicks = 20;
+        if (this.player.riptide && !this.player.riptideTicks)
+          this.player.riptideTicks = 20;
         if (!this.player.riptide) this.player.riptideTicks = 0;
       }
-      if (p.metadata[0] !== undefined) this.player.elytraFlying = !!(p.metadata[0] & 0x80); // flag 7: elytra flying
+      if (p.metadata[0] !== undefined)
+        this.player.elytraFlying = !!(p.metadata[0] & 0x80); // flag 7: elytra flying
     }
     this.entities.setMetadata(p.entityId, p.metadata);
   }
 
   on_entity_effect(p) {
     if (p.entityId === this.entityId) {
-      this.effects.set(p.effectId, { amplifier: p.amplifier, duration: p.duration, hideParticles: p.hideParticles, ambient:p.ambient, showIcon:p.showIcon, start: this.ticks });
+      this.effects.set(p.effectId, {
+        amplifier: p.amplifier,
+        duration: p.duration,
+        hideParticles: p.hideParticles,
+        ambient: p.ambient,
+        showIcon: p.showIcon,
+        start: this.ticks,
+      });
       this._applyEffects();
     }
     this.entities.addEffect(p);
   }
 
   on_remove_entity_effect(p) {
-    if (p.entityId === this.entityId) { this.effects.delete(p.effectId); this._applyEffects(); }
+    if (p.entityId === this.entityId) {
+      this.effects.delete(p.effectId);
+      this._applyEffects();
+    }
   }
 
   _applyEffects() {
@@ -968,14 +1406,23 @@ export class Game {
     this.player.levitation = lev ? lev.amplifier : -1;
   }
 
-  on_experience(p) { this.xpBar = p.experienceBar; this.xpLevel = p.level; this.xpTotal = p.totalExperience; }
+  on_experience(p) {
+    this.xpBar = p.experienceBar;
+    this.xpLevel = p.level;
+    this.xpTotal = p.totalExperience;
+  }
 
   on_update_attributes(p) {
     if (p.entityId === this.entityId) {
       for (const prop of p.properties) {
-        if (prop.key === 'generic.movementSpeed') this.player.speedAttr = { base: prop.value, modifiers: prop.modifiers };
-        if (prop.key === 'generic.maxHealth') this.maxHealth = prop.value;
-        if (prop.key === 'generic.attackSpeed') this.player.attackSpeed = attributeValue(prop);
+        if (prop.key === "generic.movementSpeed")
+          this.player.speedAttr = {
+            base: prop.value,
+            modifiers: prop.modifiers,
+          };
+        if (prop.key === "generic.maxHealth") this.maxHealth = prop.value;
+        if (prop.key === "generic.attackSpeed")
+          this.player.attackSpeed = attributeValue(prop);
       }
     }
     this.entities.setAttributes(p);
@@ -986,9 +1433,13 @@ export class Game {
     for (const nbt of p.blockEntities) this.applyBlockEntity(nbt);
   }
 
-  on_update_light(p) { this.world.updateLight578(p); }
+  on_update_light(p) {
+    this.world.updateLight578(p);
+  }
 
-  on_unload_chunk(p) { this.world.unloadChunk(p.chunkX, p.chunkZ); }
+  on_unload_chunk(p) {
+    this.world.unloadChunk(p.chunkX, p.chunkZ);
+  }
 
   // Block entity NBT (from chunk data or the update packet): signs carry their text, the rest goes to the renderer
   // with the update action vanilla uses for that block entity
@@ -996,26 +1447,45 @@ export class Game {
     const data = simplify(nbt);
     if (!data || data.x === undefined) return;
     const pos = { x: data.x, y: data.y, z: data.z };
-    const id = String(data.id || '').replace(/^minecraft:/, '');
-    if (id === 'sign') {
-      this.tileRenderer.setTileEntity(pos,9,data,nbt);
+    const id = String(data.id || "").replace(/^minecraft:/, "");
+    if (id === "sign") {
+      this.tileRenderer.setTileEntity(pos, 9, data, nbt);
       return;
     }
-    if (id === 'structure_block') this.structureBlocks.set(pos.x + ',' + pos.y + ',' + pos.z, data); // for GuiEditStructure
-    if (id === 'jigsaw') this.jigsawBlocks.set(pos.x+','+pos.y+','+pos.z,data);
+    if (id === "structure_block")
+      this.structureBlocks.set(pos.x + "," + pos.y + "," + pos.z, data); // for GuiEditStructure
+    if (id === "jigsaw")
+      this.jigsawBlocks.set(pos.x + "," + pos.y + "," + pos.z, data);
     // GuiCommandBlock.updateGui once the opened block's data (action 2) arrives
-    if (id === 'command_block' && action === 2) {
+    if (id === "command_block" && action === 2) {
       const s = this.screens.current;
-      if (s instanceof CommandBlockScreen && s.pos.x === pos.x && s.pos.y === pos.y && s.pos.z === pos.z) s.updateGui(data);
+      if (
+        s instanceof CommandBlockScreen &&
+        s.pos.x === pos.x &&
+        s.pos.y === pos.y &&
+        s.pos.z === pos.z
+      )
+        s.updateGui(data);
     }
     if (action === undefined) action = BLOCK_ENTITY_ACTIONS[id];
-    if (action !== undefined) this.tileRenderer.setTileEntity(pos, action, data, nbt);
+    if (action !== undefined)
+      this.tileRenderer.setTileEntity(pos, action, data, nbt);
   }
 
   on_multi_block_change(p) {
     // Relight all changed blocks together in one pass
     this.world.beginBatch();
-    try { for (const r of p.records) this.world.setState(p.chunkX * 16 + r.x, r.y, p.chunkZ * 16 + r.z, r.state); } finally { this.world.endBatch(); }
+    try {
+      for (const r of p.records)
+        this.world.setState(
+          p.chunkX * 16 + r.x,
+          r.y,
+          p.chunkZ * 16 + r.z,
+          r.state,
+        );
+    } finally {
+      this.world.endBatch();
+    }
   }
 
   on_block_change(p) {
@@ -1026,70 +1496,150 @@ export class Game {
   on_block_action(p) {
     // BlockPistonBase.eventReceived runs on the client too: the moving blocks start sliding right away
     const n = getBlockById(p.blockId).name;
-    if (n === 'piston' || n === 'sticky_piston') this.pistons.onBlockEvent(p.location, p.byte1, p.byte2, p.blockId);
+    if (n === "piston" || n === "sticky_piston")
+      this.pistons.onBlockEvent(p.location, p.byte1, p.byte2, p.blockId);
     this.tileRenderer.onBlockAction(p);
     this.sound.onBlockAction(p);
   }
 
-  on_block_break_animation(p) { this.interaction.setRemoteBreak(p.entityId, p.location, p.destroyStage); }
+  on_block_break_animation(p) {
+    this.interaction.setRemoteBreak(p.entityId, p.location, p.destroyStage);
+  }
 
   on_explosion(p) {
-    for (const r of p.records) this.world.setState(Math.floor(p.x) + r.x, Math.floor(p.y) + r.y, Math.floor(p.z) + r.z, 0);
+    for (const r of p.records)
+      this.world.setState(
+        Math.floor(p.x) + r.x,
+        Math.floor(p.y) + r.y,
+        Math.floor(p.z) + r.z,
+        0,
+      );
     this.player.motionX += p.motionX;
     this.player.motionY += p.motionY;
     this.player.motionZ += p.motionZ;
     this.particles.explosion(p.x, p.y, p.z, p.radius);
   }
 
-  on_world_event(p) { this.sound.onWorldEvent(p); this.particles.onWorldEvent(p); }
+  on_world_event(p) {
+    this.sound.onWorldEvent(p);
+    this.particles.onWorldEvent(p);
+  }
 
-  on_named_sound_effect(p) { this.sound.play(p.soundName.replace(/^minecraft:/, ''), p.x, p.y, p.z, p.volume, p.pitch, { category: p.soundCategory }); }
+  on_named_sound_effect(p) {
+    this.sound.play(
+      p.soundName.replace(/^minecraft:/, ""),
+      p.x,
+      p.y,
+      p.z,
+      p.volume,
+      p.pitch,
+      { category: p.soundCategory },
+    );
+  }
 
   // SoundEvent registry id (data/sounds.json)
   on_sound_effect(p) {
     const name = this.assets.soundNames[p.soundId];
-    if (name) this.sound.play(name, p.x, p.y, p.z, p.volume, p.pitch, { category: p.soundCategory });
+    if (name)
+      this.sound.play(name, p.x, p.y, p.z, p.volume, p.pitch, {
+        category: p.soundCategory,
+      });
   }
 
-  on_world_particles(p) { this.particles.onPacket(p); }
+  on_world_particles(p) {
+    this.particles.onPacket(p);
+  }
 
   on_entity_sound_effect(p) {
-    const e = p.entityId === this.entityId ? this.player : this.entities.get(p.entityId);
+    const e =
+      p.entityId === this.entityId
+        ? this.player
+        : this.entities.get(p.entityId);
     const name = this.assets.soundNames[p.soundId];
-    if (e && name) this.sound.play(name,e.x,e.y,e.z,p.volume,p.pitch,{category:p.soundCategory,entity:e});
+    if (e && name)
+      this.sound.play(name, e.x, e.y, e.z, p.volume, p.pitch, {
+        category: p.soundCategory,
+        entity: e,
+      });
   }
 
   on_open_horse_window(p) {
-    this.on_open_window({...p,inventoryType:'EntityHorse',slotCount:p.nbSlots,windowTitle:JSON.stringify({translate:'entity.minecraft.horse'})});
+    this.on_open_window({
+      ...p,
+      inventoryType: "EntityHorse",
+      slotCount: p.nbSlots,
+      windowTitle: JSON.stringify({ translate: "entity.minecraft.horse" }),
+    });
   }
 
   on_open_book(p) {
     const item = this.inventory.getHand(p.hand);
-    if (item && this.items.name(item.id) === 'written_book') this.screens.open(new BookScreen(this,item,false,p.hand));
+    if (item && this.items.name(item.id) === "written_book")
+      this.screens.open(new BookScreen(this, item, false, p.hand));
   }
 
-  on_acknowledge_player_digging(p) { this.interaction.acknowledgeDigging(p); }
+  on_acknowledge_player_digging(p) {
+    this.interaction.acknowledgeDigging(p);
+  }
 
   on_game_state_change(p) {
     switch (p.reason) {
-      case 0: this.hud.addChat(this.assets.translate('tile.bed.notValid')); break;
+      case 0:
+        this.hud.addChat(this.assets.translate("tile.bed.notValid"));
+        break;
       // World.setRainStrength sets the previous and current strength
-      case 1: this.world.raining = true; this.world.rainStrength = this.world.prevRain = 0; break;
-      case 2: this.world.raining = false; this.world.rainStrength = this.world.prevRain = 1; break;
-      case 3: { const gm = Math.floor(p.value + 0.5); if (gm !== this.gameMode) this.previousGameMode = this.gameMode; this.gameMode = gm; this.applyGameMode(); break; }
-      case 4: {
-        const value=Math.floor(p.value+.5);
-        if(value===0){this.send(C.clientCommand(0));this.screens.open(new DownloadingTerrainScreen(this));}
-        else if(value===1){const conn=this.conn;import('../gui/screens/credits.js').then(m=>{if(this.conn===conn&&this.inWorld)this.screens.open(new m.CreditsScreen(this));});}
+      case 1:
+        this.world.raining = true;
+        this.world.rainStrength = this.world.prevRain = 0;
+        break;
+      case 2:
+        this.world.raining = false;
+        this.world.rainStrength = this.world.prevRain = 1;
+        break;
+      case 3: {
+        const gm = Math.floor(p.value + 0.5);
+        if (gm !== this.gameMode) this.previousGameMode = this.gameMode;
+        this.gameMode = gm;
+        this.applyGameMode();
         break;
       }
-      case 5: this.onDemoMessage(p.value); break;
-      case 6: this.sound.playAtPlayer('entity.arrow.hit_player', 0.18, 0.45); break;
-      case 7: this.world.rainStrength = p.value; this.world.prevRain = p.value; break;
-      case 8: this.world.thunderStrength = p.value; break;
-      case 10: this.sound.playAtPlayer('entity.elder_guardian.curse', 1, 1); this.hud.elderGuardianTime = 60; break;
-      case 11: this.dead = false; if (this.screens.current instanceof DeathScreen) this.screens.close(); break;
-      default: break;
+      case 4: {
+        const value = Math.floor(p.value + 0.5);
+        if (value === 0) {
+          this.send(C.clientCommand(0));
+          this.screens.open(new DownloadingTerrainScreen(this));
+        } else if (value === 1) {
+          const conn = this.conn;
+          import("../gui/screens/credits.js").then((m) => {
+            if (this.conn === conn && this.inWorld)
+              this.screens.open(new m.CreditsScreen(this));
+          });
+        }
+        break;
+      }
+      case 5:
+        this.onDemoMessage(p.value);
+        break;
+      case 6:
+        this.sound.playAtPlayer("entity.arrow.hit_player", 0.18, 0.45);
+        break;
+      case 7:
+        this.world.rainStrength = p.value;
+        this.world.prevRain = p.value;
+        break;
+      case 8:
+        this.world.thunderStrength = p.value;
+        break;
+      case 10:
+        this.sound.playAtPlayer("entity.elder_guardian.curse", 1, 1);
+        this.hud.elderGuardianTime = 60;
+        break;
+      case 11:
+        this.dead = false;
+        if (this.screens.current instanceof DeathScreen) this.screens.close();
+        break;
+      default:
+        break;
     }
   }
 
@@ -1100,26 +1650,60 @@ export class Game {
   }
 
   on_open_window(p) {
-    if(typeof p.inventoryType==='number'){
-      const name=MENUS_498[p.inventoryType],rows=/generic_9x([1-6])/.exec(name||'');
-      const aliases={'minecraft:generic_3x3':['minecraft:dispenser',9],'minecraft:crafting':['minecraft:crafting_table',10],'minecraft:enchantment':['minecraft:enchanting_table',2],'minecraft:merchant':['minecraft:villager',3],'minecraft:blast_furnace':['minecraft:blast_furnace',3],'minecraft:smoker':['minecraft:smoker',3]};
-      const fixed={'minecraft:anvil':3,'minecraft:beacon':1,'minecraft:brewing_stand':5,'minecraft:furnace':3,'minecraft:hopper':5,'minecraft:shulker_box':27,'minecraft:grindstone':3,'minecraft:lectern':1,'minecraft:loom':4,'minecraft:cartography':3,'minecraft:stonecutter':2};
-      const [type,count]=rows?['minecraft:chest',Number(rows[1])*9]:aliases[name]||[name,fixed[name]];
-      if(!type||count===undefined)throw new Error('Unknown 1.14.4 menu '+p.inventoryType);
-      p={...p,inventoryType:type,slotCount:count};
+    if (typeof p.inventoryType === "number") {
+      const name = MENUS_498[p.inventoryType],
+        rows = /generic_9x([1-6])/.exec(name || "");
+      const aliases = {
+        "minecraft:generic_3x3": ["minecraft:dispenser", 9],
+        "minecraft:crafting": ["minecraft:crafting_table", 10],
+        "minecraft:enchantment": ["minecraft:enchanting_table", 2],
+        "minecraft:merchant": ["minecraft:villager", 3],
+        "minecraft:blast_furnace": ["minecraft:blast_furnace", 3],
+        "minecraft:smoker": ["minecraft:smoker", 3],
+      };
+      const fixed = {
+        "minecraft:anvil": 3,
+        "minecraft:beacon": 1,
+        "minecraft:brewing_stand": 5,
+        "minecraft:furnace": 3,
+        "minecraft:hopper": 5,
+        "minecraft:shulker_box": 27,
+        "minecraft:grindstone": 3,
+        "minecraft:lectern": 1,
+        "minecraft:loom": 4,
+        "minecraft:cartography": 3,
+        "minecraft:stonecutter": 2,
+      };
+      const [type, count] = rows
+        ? ["minecraft:chest", Number(rows[1]) * 9]
+        : aliases[name] || [name, fixed[name]];
+      if (!type || count === undefined)
+        throw new Error("Unknown 1.14.4 menu " + p.inventoryType);
+      p = { ...p, inventoryType: type, slotCount: count };
     }
-    const win = new ContainerWindow(this, p.windowId, p.inventoryType, chatToLegacy(p.windowTitle), p.slotCount, p.entityId);
+    const win = new ContainerWindow(
+      this,
+      p.windowId,
+      p.inventoryType,
+      chatToLegacy(p.windowTitle),
+      p.slotCount,
+      p.entityId,
+    );
     this.window = win;
     openContainerScreen(this, win);
   }
 
-  on_nbt_query_response(p) { this.nbtQueries?.handle(p); }
+  on_nbt_query_response(p) {
+    this.nbtQueries?.handle(p);
+  }
 
-  on_declare_recipes(p) { replaceServerRecipes(this,p.recipes); }
+  on_declare_recipes(p) {
+    replaceServerRecipes(this, p.recipes);
+  }
 
   on_trade_list(p) {
-    if(this.window?.id!==p.windowId)return;
-    this.window.tradeData=p;
+    if (this.window?.id !== p.windowId) return;
+    this.window.tradeData = p;
     this.screens.current?.onTradeList?.(p);
   }
 
@@ -1133,35 +1717,48 @@ export class Game {
 
   on_set_slot(p) {
     this.tutorial.handleSetSlot(p.item);
-    if (p.windowId === -1 && p.slot === -1) { this.inventory.cursor = p.item; return; }
+    if (p.windowId === -1 && p.slot === -1) {
+      this.inventory.cursor = p.item;
+      return;
+    }
     if (p.windowId === 0 || p.windowId === -2) {
-      if (p.windowId === -2) this.inventory.setPlayerSlotByInventoryIndex(p.slot, p.item);
+      if (p.windowId === -2)
+        this.inventory.setPlayerSlotByInventoryIndex(p.slot, p.item);
       else this.inventory.setSlot(p.slot, p.item);
       if (this.window && p.windowId === 0) return;
       return;
     }
-    if (this.window && this.window.id === p.windowId) this.window.setSlot(p.slot, p.item);
+    if (this.window && this.window.id === p.windowId)
+      this.window.setSlot(p.slot, p.item);
   }
 
   on_window_items(p) {
     if (p.windowId === 0) this.inventory.setAll(p.items);
-    else if (this.window && this.window.id === p.windowId) this.window.setAll(p.items);
+    else if (this.window && this.window.id === p.windowId)
+      this.window.setAll(p.items);
   }
 
   on_craft_progress_bar(p) {
-    if (this.window && this.window.id === p.windowId) this.window.properties[p.property] = p.value;
+    if (this.window && this.window.id === p.windowId)
+      this.window.properties[p.property] = p.value;
   }
 
   on_transaction(p) {
     if (!p.accepted) this.send(C.transaction(p.windowId, p.action, true));
   }
 
-  on_map(p) { this.items.updateMap(p); }
+  on_map(p) {
+    this.items.updateMap(p);
+  }
 
   // CooldownTracker (ender pearls, chorus fruit, shields disabled by an axe)
   on_set_cooldown(p) {
     if (!this.cooldowns) this.cooldowns = new Map();
-    if (p.cooldownTicks > 0) this.cooldowns.set(p.itemId, { start: this.ticks, end: this.ticks + p.cooldownTicks });
+    if (p.cooldownTicks > 0)
+      this.cooldowns.set(p.itemId, {
+        start: this.ticks,
+        end: this.ticks + p.cooldownTicks,
+      });
     else this.cooldowns.delete(p.itemId);
   }
 
@@ -1170,13 +1767,21 @@ export class Game {
     const c = this.cooldowns && this.cooldowns.get(itemId);
     if (!c) return 0;
     const t = this.ticks + partial;
-    if (t >= c.end) { this.cooldowns.delete(itemId); return 0; }
+    if (t >= c.end) {
+      this.cooldowns.delete(itemId);
+      return 0;
+    }
     return Math.max(0, Math.min(1, (c.end - t) / (c.end - c.start)));
   }
 
-  on_tile_entity_data(p) { if (p.nbtData) this.applyBlockEntity(p.nbtData, p.action === 9 ? undefined : p.action); }
+  on_tile_entity_data(p) {
+    if (p.nbtData)
+      this.applyBlockEntity(p.nbtData, p.action === 9 ? undefined : p.action);
+  }
 
-  on_open_sign_entity(p) { this.screens.open(new SignEditScreen(this, p.location)); }
+  on_open_sign_entity(p) {
+    this.screens.open(new SignEditScreen(this, p.location));
+  }
 
   // S37PacketStatistics only carries stats that changed since the last one, so keep a running copy
   // (StatFileWriter) and hand screens the whole map
@@ -1184,16 +1789,19 @@ export class Game {
     if (!this.statValues) this.statValues = new Map();
     for (const e of p.entries) this.statValues.set(e.name, e.value);
     this.stats = [...this.statValues].map(([name, value]) => ({ name, value }));
-    if (this.screens.current && this.screens.current.onStats) this.screens.current.onStats(this.stats);
+    if (this.screens.current && this.screens.current.onStats)
+      this.screens.current.onStats(this.stats);
   }
 
   on_player_info(p) {
     this.scoreboard.onPlayerInfo(p);
     // skins and capes follow the tab list's textures property (it can arrive after the player is first drawn)
-    for (const d of p.data || []) if (d.uuid) {
-      if(p.action===4)this.eaglerTextures?.drop(d.uuid);
-      else if(d.properties&&!this.eaglerTextures?.active)this.entityRenderer.skinFor({uuid:d.uuid});
-    }
+    for (const d of p.data || [])
+      if (d.uuid) {
+        if (p.action === 4) this.eaglerTextures?.drop(d.uuid);
+        else if (d.properties && !this.eaglerTextures?.active)
+          this.entityRenderer.skinFor({ uuid: d.uuid });
+      }
   }
 
   on_abilities(p) {
@@ -1206,22 +1814,39 @@ export class Game {
     pl.walkSpeed = p.walkingSpeed;
   }
 
-  on_tags(p) { this.tags.replace(p.tags); this.screens.current?.requestSuggestions?.(); }
+  on_tags(p) {
+    this.tags.replace(p.tags);
+    this.screens.current?.requestSuggestions?.();
+  }
   on_declare_commands(p) {
     this.commands = new CommandTree(p, this);
     this.screens.current?.requestSuggestions?.();
   }
 
-  on_tab_complete(p) { if (this.screens.current && this.screens.current.onTabComplete) this.screens.current.onTabComplete(p); }
+  on_tab_complete(p) {
+    if (this.screens.current && this.screens.current.onTabComplete)
+      this.screens.current.onTabComplete(p);
+  }
 
-  on_scoreboard_objective(p) { this.scoreboard.onObjective(p); }
-  on_scoreboard_score(p) { this.scoreboard.onScore(p); }
-  on_scoreboard_display_objective(p) { this.scoreboard.onDisplay(p); }
-  on_scoreboard_team(p) { this.scoreboard.onTeam(p); }
+  on_scoreboard_objective(p) {
+    this.scoreboard.onObjective(p);
+  }
+  on_scoreboard_score(p) {
+    this.scoreboard.onScore(p);
+  }
+  on_scoreboard_display_objective(p) {
+    this.scoreboard.onDisplay(p);
+  }
+  on_scoreboard_team(p) {
+    this.scoreboard.onTeam(p);
+  }
 
   on_stop_sound(p) {
-    const category = p.source === null || p.source === undefined ? null : SOUND_CATEGORIES[p.source] || null;
-    this.sound.stop(p.sound || '', category);
+    const category =
+      p.source === null || p.source === undefined
+        ? null
+        : SOUND_CATEGORIES[p.source] || null;
+    this.sound.stop(p.sound || "", category);
   }
 
   on_kick_disconnect(p) {
@@ -1229,12 +1854,15 @@ export class Game {
     if (this.conn) this.conn.close();
   }
 
-  on_difficulty(p) { this.difficulty = p.difficulty; }
+  on_difficulty(p) {
+    this.difficulty = p.difficulty;
+  }
 
   on_combat_event(p) {
     if (p.event === 2 && p.playerId === this.entityId) {
       this.deathMessage = chatToLegacy(p.message);
-      if (this.screens.current instanceof DeathScreen) this.screens.current.message = this.deathMessage;
+      if (this.screens.current instanceof DeathScreen)
+        this.screens.current.message = this.deathMessage;
     }
   }
 
@@ -1245,63 +1873,135 @@ export class Game {
   on_world_border(p) {
     const b = this.worldBorder;
     switch (p.action) {
-      case 0: b.radius = p.radius / 2; break;
-      case 1: b.radius = p.newRadius / 2; break;
-      case 2: b.x = p.x; b.z = p.z; break;
-      case 3: b.x = p.x; b.z = p.z; b.radius = p.newRadius / 2; b.warningTime = p.warningTime; b.warningBlocks = p.warningBlocks; break;
-      case 4: b.warningTime = p.warningTime; break;
-      case 5: b.warningBlocks = p.warningBlocks; break;
-      default: break;
+      case 0:
+        b.radius = p.radius / 2;
+        break;
+      case 1:
+        b.radius = p.newRadius / 2;
+        break;
+      case 2:
+        b.x = p.x;
+        b.z = p.z;
+        break;
+      case 3:
+        b.x = p.x;
+        b.z = p.z;
+        b.radius = p.newRadius / 2;
+        b.warningTime = p.warningTime;
+        b.warningBlocks = p.warningBlocks;
+        break;
+      case 4:
+        b.warningTime = p.warningTime;
+        break;
+      case 5:
+        b.warningBlocks = p.warningBlocks;
+        break;
+      default:
+        break;
     }
   }
 
-  on_title(p) { this.hud.onTitle(p); }
+  on_title(p) {
+    this.hud.onTitle(p);
+  }
 
-  on_boss_bar(p) { this.hud.onBossBar(p); }
+  on_boss_bar(p) {
+    this.hud.onBossBar(p);
+  }
 
-  on_advancements(p) { this.advancements.onPacket(p); }
+  on_advancements(p) {
+    this.advancements.onPacket(p);
+  }
 
-  on_unlock_recipes(p) { this.recipeBook.onPacket(p); }
+  on_unlock_recipes(p) {
+    this.recipeBook.onPacket(p);
+  }
 
   // SPacketPlaceGhostRecipe: the server could not fill the grid; show what the recipe needs
   on_craft_recipe_response(p) {
     const s = this.screens.current;
     const win = s && s.container;
     const id = win ? (win.windowId !== undefined ? win.windowId : win.id) : -1;
-    if (s && s.recipeBook && id === p.windowId) s.recipeBook.setupGhost(p.recipe);
+    if (s && s.recipeBook && id === p.windowId)
+      s.recipeBook.setupGhost(p.recipe);
   }
-  on_select_advancement_tab(p) { this.advancements.onSelectTab(p.id); }
+  on_select_advancement_tab(p) {
+    this.advancements.onSelectTab(p.id);
+  }
 
   openAdvancements(parent = null) {
-    import('../gui/screens/advancements.js').then((m) => this.screens.open(new m.AdvancementsScreen(this, parent)));
+    import("../gui/screens/advancements.js").then((m) =>
+      this.screens.open(new m.AdvancementsScreen(this, parent)),
+    );
   }
 
-  on_set_compression() { /* handled by the proxy */ }
+  on_set_compression() {
+    /* handled by the proxy */
+  }
 
-  on_playerlist_header(p) { this.scoreboard.header = chatToLegacy(p.header); this.scoreboard.footer = chatToLegacy(p.footer); }
+  on_playerlist_header(p) {
+    this.scoreboard.header = chatToLegacy(p.header);
+    this.scoreboard.footer = chatToLegacy(p.footer);
+  }
 
   on_resource_pack_send(p) {
     const conn = this.conn;
-    this.serverPacks.handle(p.url, p.hash, (status) => { if (this.conn === conn) this.send(C.resourcePackStatus(status)); });
+    this.serverPacks.handle(p.url, p.hash, (status) => {
+      if (this.conn === conn) this.send(C.resourcePackStatus(status));
+    });
   }
 
-  on_update_entity_nbt() { /* unused by vanilla client */ }
+  on_update_entity_nbt() {
+    /* unused by vanilla client */
+  }
 
   // ---------------------------------------------------------------- Selection boxes
 
   // Entity.resetHeight for the local player: splash sound scaled by speed, bubbles + splash particles
   _waterSplash() {
     const pl = this.player;
-    const f = Math.min(1, Math.sqrt(pl.motionX * pl.motionX * 0.2 + pl.motionY * pl.motionY + pl.motionZ * pl.motionZ * 0.2) * 0.2);
-    this.sound.playAtPlayer('entity.player.splash', f, 1 + (Math.random() - Math.random()) * 0.4);
-    const y = Math.floor(pl.y) + 1, w = 0.6, n = 1 + w * 20;
+    const f = Math.min(
+      1,
+      Math.sqrt(
+        pl.motionX * pl.motionX * 0.2 +
+          pl.motionY * pl.motionY +
+          pl.motionZ * pl.motionZ * 0.2,
+      ) * 0.2,
+    );
+    this.sound.playAtPlayer(
+      "entity.player.splash",
+      f,
+      1 + (Math.random() - Math.random()) * 0.4,
+    );
+    const y = Math.floor(pl.y) + 1,
+      w = 0.6,
+      n = 1 + w * 20;
     // RenderGlobal.spawnEntityFX: "decreased" drops a third of particles, "minimal" drops them all
-    const show = () => { const s = this.settings.particles || 0; return s === 0 || (s === 1 && Math.random() * 3 >= 1); };
+    const show = () => {
+      const s = this.settings.particles || 0;
+      return s === 0 || (s === 1 && Math.random() * 3 >= 1);
+    };
     for (let i = 0; i < n; i++) {
-      if (show()) this.particles.bubble(pl.x + (Math.random() * 2 - 1) * w, y, pl.z + (Math.random() * 2 - 1) * w, pl.motionX, pl.motionY - Math.random() * 0.2, pl.motionZ);
+      if (show())
+        this.particles.bubble(
+          pl.x + (Math.random() * 2 - 1) * w,
+          y,
+          pl.z + (Math.random() * 2 - 1) * w,
+          pl.motionX,
+          pl.motionY - Math.random() * 0.2,
+          pl.motionZ,
+        );
     }
     for (let i = 0; i < n; i++) {
-      if (show()) this.particles.splash(pl.x + (Math.random() * 2 - 1) * w, y, pl.z + (Math.random() * 2 - 1) * w, pl.motionX, pl.motionY, pl.motionZ);
+      if (show())
+        this.particles.splash(
+          pl.x + (Math.random() * 2 - 1) * w,
+          y,
+          pl.z + (Math.random() * 2 - 1) * w,
+          pl.motionX,
+          pl.motionY,
+          pl.motionZ,
+        );
     }
   }
 
@@ -1309,71 +2009,153 @@ export class Game {
     const b = getBlock(state);
     if (!b || b.isAir) return null;
     const n = b.name;
-    if (n === 'barrier') return this.player.creative ? [0, 0, 0, 1, 1, 1] : null;
-    if (n === 'fire' || n === 'nether_portal' || n === 'portal' || n === 'end_portal' || n === 'moving_piston' || n === 'piston_extension') return null;
+    if (n === "barrier")
+      return this.player.creative ? [0, 0, 0, 1, 1, 1] : null;
+    if (
+      n === "fire" ||
+      n === "nether_portal" ||
+      n === "portal" ||
+      n === "end_portal" ||
+      n === "moving_piston" ||
+      n === "piston_extension"
+    )
+      return null;
     const extracted = jarSelectionBox(state);
     if (extracted !== undefined) return extracted;
 
-    if (n === 'chest' || n === 'trapped_chest' || n === 'ender_chest') return [0.0625, 0, 0.0625, 0.9375, 0.875, 0.9375];
-    if (n === 'sign') return [0.25, 0, 0.25, 0.75, 1, 0.75];
-    if (n === 'wall_sign') {
+    if (n === "chest" || n === "trapped_chest" || n === "ender_chest")
+      return [0.0625, 0, 0.0625, 0.9375, 0.875, 0.9375];
+    if (n === "sign") return [0.25, 0, 0.25, 0.75, 1, 0.75];
+    if (n === "wall_sign") {
       switch (getStateProperties(state).facing) {
-        case 'south': return [0, 0.28125, 0.875, 1, 0.78125, 1];
-        case 'north': return [0, 0.28125, 0, 1, 0.78125, 0.125];
-        case 'west': return [0.875, 0.28125, 0, 1, 0.78125, 1];
-        default: return [0, 0.28125, 0, 0.125, 0.78125, 1];
+        case "south":
+          return [0, 0.28125, 0.875, 1, 0.78125, 1];
+        case "north":
+          return [0, 0.28125, 0, 1, 0.78125, 0.125];
+        case "west":
+          return [0.875, 0.28125, 0, 1, 0.78125, 1];
+        default:
+          return [0, 0.28125, 0, 0.125, 0.78125, 1];
       }
     }
-    if (n.endsWith('_skull') || n.endsWith('_head')) return [0.25, 0, 0.25, 0.75, 0.5, 0.75];
-    if (n.endsWith('_banner')) return [0.25, 0, 0.25, 0.75, 1, 0.75];
-    if (n.endsWith('_wall_banner')) return [0, 0, 0, 1, 1, 1];
-    if (n === 'barrier') return this.player.creative ? [0, 0, 0, 1, 1, 1] : null;
-    if (n === 'tall_grass' || n === 'dead_bush') return [0.1, 0, 0.1, 0.9, 0.8, 0.9];
-    if (n === 'fire' || n === 'nether_portal' || n === 'end_portal' || n === 'moving_piston') return null;
+    if (n.endsWith("_skull") || n.endsWith("_head"))
+      return [0.25, 0, 0.25, 0.75, 0.5, 0.75];
+    if (n.endsWith("_banner")) return [0.25, 0, 0.25, 0.75, 1, 0.75];
+    if (n.endsWith("_wall_banner")) return [0, 0, 0, 1, 1, 1];
+    if (n === "barrier")
+      return this.player.creative ? [0, 0, 0, 1, 1, 1] : null;
+    if (n === "tall_grass" || n === "dead_bush")
+      return [0.1, 0, 0.1, 0.9, 0.8, 0.9];
+    if (
+      n === "fire" ||
+      n === "nether_portal" ||
+      n === "end_portal" ||
+      n === "moving_piston"
+    )
+      return null;
     // Blocks whose vanilla bounds (setBlockBoundsBasedOnState) differ from their (rotated/cross) models
     const props = getStateProperties(state);
-    if (n === 'torch' || n === 'redstone_torch' || n === 'wall_torch' || n === 'redstone_wall_torch') {
+    if (
+      n === "torch" ||
+      n === "redstone_torch" ||
+      n === "wall_torch" ||
+      n === "redstone_wall_torch"
+    ) {
       const f = 0.15;
       switch (props.facing) {
-        case 'east': return [0, 0.2, 0.5 - f, f * 2, 0.8, 0.5 + f];
-        case 'west': return [1 - f * 2, 0.2, 0.5 - f, 1, 0.8, 0.5 + f];
-        case 'south': return [0.5 - f, 0.2, 0, 0.5 + f, 0.8, f * 2];
-        case 'north': return [0.5 - f, 0.2, 1 - f * 2, 0.5 + f, 0.8, 1];
-        default: return [0.4, 0, 0.4, 0.6, 0.6, 0.6];
+        case "east":
+          return [0, 0.2, 0.5 - f, f * 2, 0.8, 0.5 + f];
+        case "west":
+          return [1 - f * 2, 0.2, 0.5 - f, 1, 0.8, 0.5 + f];
+        case "south":
+          return [0.5 - f, 0.2, 0, 0.5 + f, 0.8, f * 2];
+        case "north":
+          return [0.5 - f, 0.2, 1 - f * 2, 0.5 + f, 0.8, 1];
+        default:
+          return [0.4, 0, 0.4, 0.6, 0.6, 0.6];
       }
     }
-    if (n === 'lever') {
+    if (n === "lever") {
       const f = 0.1875;
       switch (props.facing) {
-        case 'east': return [0, 0.2, 0.5 - f, f * 2, 0.8, 0.5 + f];
-        case 'west': return [1 - f * 2, 0.2, 0.5 - f, 1, 0.8, 0.5 + f];
-        case 'south': return [0.5 - f, 0.2, 0, 0.5 + f, 0.8, f * 2];
-        case 'north': return [0.5 - f, 0.2, 1 - f * 2, 0.5 + f, 0.8, 1];
-        case 'up': return [0.25, 0, 0.25, 0.75, 0.6, 0.75];
-        default: return [0.25, 0.4, 0.25, 0.75, 1, 0.75];
+        case "east":
+          return [0, 0.2, 0.5 - f, f * 2, 0.8, 0.5 + f];
+        case "west":
+          return [1 - f * 2, 0.2, 0.5 - f, 1, 0.8, 0.5 + f];
+        case "south":
+          return [0.5 - f, 0.2, 0, 0.5 + f, 0.8, f * 2];
+        case "north":
+          return [0.5 - f, 0.2, 1 - f * 2, 0.5 + f, 0.8, 1];
+        case "up":
+          return [0.25, 0, 0.25, 0.75, 0.6, 0.75];
+        default:
+          return [0.25, 0.4, 0.25, 0.75, 1, 0.75];
       }
     }
-    if (/^(dandelion|poppy|blue_orchid|allium|azure_bluet|red_tulip|orange_tulip|white_tulip|pink_tulip|oxeye_daisy)$/.test(n)) return [0.3, 0, 0.3, 0.7, 0.6, 0.7];
-    if (n.endsWith('_sapling')) return [0.1, 0, 0.1, 0.9, 0.8, 0.9];
-    if (n === 'brown_mushroom' || n === 'red_mushroom') return [0.3, 0, 0.3, 0.7, 0.4, 0.7];
-    if (n === 'wheat' || n === 'carrots' || n === 'potatoes' || n === 'nether_wart') return [0, 0, 0, 1, 0.25, 1];
-    if (n === 'sugar_cane') return [0.125, 0, 0.125, 0.875, 1, 0.875];
-    if (b.boundingBox === 'block' && !b.isFence && !b.isPane && !b.isWall && !b.isStairs && !b.isDoor && !b.isFenceGate) {
+    if (
+      /^(dandelion|poppy|blue_orchid|allium|azure_bluet|red_tulip|orange_tulip|white_tulip|pink_tulip|oxeye_daisy)$/.test(
+        n,
+      )
+    )
+      return [0.3, 0, 0.3, 0.7, 0.6, 0.7];
+    if (n.endsWith("_sapling")) return [0.1, 0, 0.1, 0.9, 0.8, 0.9];
+    if (n === "brown_mushroom" || n === "red_mushroom")
+      return [0.3, 0, 0.3, 0.7, 0.4, 0.7];
+    if (
+      n === "wheat" ||
+      n === "carrots" ||
+      n === "potatoes" ||
+      n === "nether_wart"
+    )
+      return [0, 0, 0, 1, 0.25, 1];
+    if (n === "sugar_cane") return [0.125, 0, 0.125, 0.875, 1, 0.875];
+    if (
+      b.boundingBox === "block" &&
+      !b.isFence &&
+      !b.isPane &&
+      !b.isWall &&
+      !b.isStairs &&
+      !b.isDoor &&
+      !b.isFenceGate
+    ) {
       // Prefer model bounds, which match vanilla selection for most blocks
     }
-    const rs = resolveState(state, (a, bb, c) => this.world.getState(a, bb, c), x, y, z);
+    const rs = resolveState(
+      state,
+      (a, bb, c) => this.world.getState(a, bb, c),
+      x,
+      y,
+      z,
+    );
     if (!rs) return [0, 0, 0, 1, 1, 1];
-    const bm = this.assets.modelStore.bakeVariant(rs.file, rs.props, rs.variant, 0);
+    const bm = this.assets.modelStore.bakeVariant(
+      rs.file,
+      rs.props,
+      rs.variant,
+      0,
+    );
     if (!bm || !bm.bounds) return [0, 0, 0, 1, 1, 1];
     const bb = bm.bounds;
     if (b.isFence || b.isWall) return [bb[0], 0, bb[2], bb[3], 1, bb[5]];
-    return [Math.max(0, bb[0]), Math.max(0, bb[1]), Math.max(0, bb[2]), Math.min(1, bb[3]), Math.min(1, bb[4]), Math.min(1, bb[5])];
+    return [
+      Math.max(0, bb[0]),
+      Math.max(0, bb[1]),
+      Math.max(0, bb[2]),
+      Math.min(1, bb[3]),
+      Math.min(1, bb[4]),
+      Math.min(1, bb[5]),
+    ];
   }
 
   // ---------------------------------------------------------------- Input
 
   onLockChange(locked) {
-    if (!locked && this.inWorld && !this.screens.current && !this.screens.ignoreUnlock) {
+    if (
+      !locked &&
+      this.inWorld &&
+      !this.screens.current &&
+      !this.screens.ignoreUnlock
+    ) {
       this.screens.open(new PauseScreen(this));
     }
     this.screens.ignoreUnlock = false;
@@ -1381,7 +2163,7 @@ export class Game {
 
   onKey(e) {
     // Minecraft.dispatchKeypresses: Ctrl+B cycles the narrator (in 1.12 even while typing: no screen is ever "focused")
-    if (e.down && !e.repeat && e.ctrl && e.code === 'KeyB') {
+    if (e.down && !e.repeat && e.ctrl && e.code === "KeyB") {
       this.narrator.cycle();
       return;
     }
@@ -1391,40 +2173,89 @@ export class Game {
       return;
     }
     // F3 is a modifier: F3+H toggles advanced tooltips, F3 alone toggles the debug screen on release
-    if (e.code === 'F3' && !e.down && this.inWorld) { if (!this.f3Combo) this.showDebug = !this.showDebug; this.f3Combo = false; return; }
+    if (e.code === "F3" && !e.down && this.inWorld) {
+      if (!this.f3Combo) this.showDebug = !this.showDebug;
+      this.f3Combo = false;
+      return;
+    }
     if (!e.down || !this.inWorld) return;
     const k = this.settings.keys;
-    if (this.input.down.has('F3') && e.code !== 'F3') {
+    if (this.input.down.has("F3") && e.code !== "F3") {
       this.f3Combo = true;
       if (this._debugCombo(e)) return;
     }
-    if (e.code === 'Escape') { this.screens.open(new PauseScreen(this)); return; }
-    if (e.code === k.chat) { this.input.suppressNextChar = true; this.screens.open(new ChatScreen(this, '')); return; }
-    if (e.code === k.command) { this.input.suppressNextChar = true; this.screens.open(new ChatScreen(this, '/')); return; }
-    if (e.code === k.inventory) { this.input.suppressNextChar = true; this.openInventory(); return; }
-    if (e.code === 'F3') {
+    if (e.code === "Escape") {
+      this.screens.open(new PauseScreen(this));
+      return;
+    }
+    if (e.code === k.chat) {
+      this.input.suppressNextChar = true;
+      this.screens.open(new ChatScreen(this, ""));
+      return;
+    }
+    if (e.code === k.command) {
+      this.input.suppressNextChar = true;
+      this.screens.open(new ChatScreen(this, "/"));
+      return;
+    }
+    if (e.code === k.inventory) {
+      this.input.suppressNextChar = true;
+      this.openInventory();
+      return;
+    }
+    if (e.code === "F3") {
       // Shift+F3: profiler pie chart, Alt+F3: lagometer (applied when the debug screen opens)
       this.f3Combo = false;
       this.showProfiler = !!e.shift;
       this.showLagometer = !!e.alt;
       return;
     }
-    if (this.showDebug && this.showProfiler && /^Digit[0-9]$/.test(e.code)) this.profiler.navigate(+e.code.slice(5));
-    if (e.code === 'F4') { if (this.superSecret) this.superSecretOff = !this.superSecretOff; return; } // switchUseShader
-    if (e.code === 'F1') { this.hideGui = !this.hideGui; return; } // not rebindable in 1.8.9
-    if (e.code === k.smoothCamera) { this.smoothCamera = !this.smoothCamera; return; }
-    if (e.code === k.perspective) { this.thirdPerson = (this.thirdPerson + 1) % 3; return; }
-    if (e.code === k.screenshot) { this.takeScreenshot(); return; }
-    if (e.code === k.drop) { this.interaction.dropItem(e.ctrl); return; }
-    if (e.code === k.advancements) { this.openAdvancements(); return; } // GuiScreenAdvancements
+    if (this.showDebug && this.showProfiler && /^Digit[0-9]$/.test(e.code))
+      this.profiler.navigate(+e.code.slice(5));
+    if (e.code === "F4") {
+      if (this.superSecret) this.superSecretOff = !this.superSecretOff;
+      return;
+    } // switchUseShader
+    if (e.code === "F1") {
+      this.hideGui = !this.hideGui;
+      return;
+    } // not rebindable in 1.8.9
+    if (e.code === k.smoothCamera) {
+      this.smoothCamera = !this.smoothCamera;
+      return;
+    }
+    if (e.code === k.perspective) {
+      this.thirdPerson = (this.thirdPerson + 1) % 3;
+      return;
+    }
+    if (e.code === k.screenshot) {
+      this.takeScreenshot();
+      return;
+    }
+    if (e.code === k.drop) {
+      this.interaction.dropItem(e.ctrl);
+      return;
+    }
+    if (e.code === k.advancements) {
+      this.openAdvancements();
+      return;
+    } // GuiScreenAdvancements
     // Minecraft.processKeyBinds: swap hands (CPacketPlayerDigging SWAP_HELD_ITEMS); not in spectator mode
-    if (e.code === k.swapHands && this.gameMode !== 3) { this.send(C.blockDig(6, 0, 0, 0, 0)); return; }
-    if (e.code === k.fullscreen) { platform().toggleFullscreen(); return; }
+    if (e.code === k.swapHands && this.gameMode !== 3) {
+      this.send(C.blockDig(6, 0, 0, 0, 0));
+      return;
+    }
+    if (e.code === k.fullscreen) {
+      platform().toggleFullscreen();
+      return;
+    }
     for (let i = 1; i <= 9; i++) {
-      if (e.code === k['hotbar' + i]) {
-        const load = this.input.isDown('loadToolbarActivator'), save = this.input.isDown('saveToolbarActivator');
+      if (e.code === k["hotbar" + i]) {
+        const load = this.input.isDown("loadToolbarActivator"),
+          save = this.input.isDown("saveToolbarActivator");
         if (this.gameMode === 3) this.hud.spectatorGui.onHotbarSelected(i - 1);
-        else if (this.gameMode === 1 && !this.screens.current && (load || save)) handleHotbarSnapshots(this, i - 1, load, save);
+        else if (this.gameMode === 1 && !this.screens.current && (load || save))
+          handleHotbarSnapshots(this, i - 1, load, save);
         else this.selectSlot(i - 1);
         return;
       }
@@ -1442,12 +2273,16 @@ export class Game {
       return;
     }
     // Minecraft.runTickMouse: middle click in spectator mode goes to the spectator menu
-    if (e.down && this.inWorld && this.gameMode === 3 && e.button === 1) this.hud.spectatorGui.onMiddleClick();
+    if (e.down && this.inWorld && this.gameMode === 3 && e.button === 1)
+      this.hud.spectatorGui.onMiddleClick();
   }
 
   openInventory() {
     if (this.gameMode === 3) return;
-    if (this.player.ridingEntity && this.entities.isHorse(this.ridingEntityId)) {
+    if (
+      this.player.ridingEntity &&
+      this.entities.isHorse(this.ridingEntityId)
+    ) {
       this.send(C.entityAction(this.entityId, 7));
       return;
     }
@@ -1465,12 +2300,21 @@ export class Game {
 
   takeScreenshot() {
     const d = new Date();
-    const pad = (n) => String(n).padStart(2, '0');
+    const pad = (n) => String(n).padStart(2, "0");
     const name = `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}_${pad(d.getHours())}.${pad(d.getMinutes())}.${pad(d.getSeconds())}.png`;
-    this.device.capture().then((img) => {
-      platform().saveFile(name, encodePng(img.width, img.height, img.data), 'image/png');
-      this.hud.addChat('Saved screenshot as ' + name);
-    }).catch((e) => this.hud.addChat('§cCouldn\'t save screenshot: ' + e.message));
+    this.device
+      .capture()
+      .then((img) => {
+        platform().saveFile(
+          name,
+          encodePng(img.width, img.height, img.data),
+          "image/png",
+        );
+        this.hud.addChat("Saved screenshot as " + name);
+      })
+      .catch((e) =>
+        this.hud.addChat("§cCouldn't save screenshot: " + e.message),
+      );
   }
 
   // ---------------------------------------------------------------- Tick
@@ -1480,9 +2324,11 @@ export class Game {
     if (smoothCameraActive(this) && this._smoothCam) {
       // EntityRenderer.updateRenderer: MouseFilter.smooth(accumulated, 0.05 * f)
       const sc = this._smoothCam;
-      const s = this.settings.sensitivity * 0.6 + 0.2, f = s * s * s * 8;
+      const s = this.settings.sensitivity * 0.6 + 0.2,
+        f = s * s * s * 8;
       const smooth = (mf, x, k) => {
-        mf.target += x; x = (mf.target - mf.remaining) * k;
+        mf.target += x;
+        x = (mf.target - mf.remaining) * k;
         mf.last += (x - mf.last) * 0.5;
         if ((x > 0 && x > mf.last) || (x < 0 && x < mf.last)) x = mf.last;
         mf.remaining += x;
@@ -1492,16 +2338,29 @@ export class Game {
       sc.my = sc.my || { target: 0, remaining: 0, last: 0 };
       sc.fx = smooth(sc.mx, sc.yaw, 0.05 * f);
       sc.fy = smooth(sc.my, sc.pitch, 0.05 * f);
-      sc.partial = 0; sc.yaw = 0; sc.pitch = 0;
+      sc.partial = 0;
+      sc.yaw = 0;
+      sc.pitch = 0;
     }
     this.renderer.tick();
     const A = this.assets;
     const changed = A.atlas.tick();
     for (const e of this._updateCompassClock()) changed.push(e);
-    for (const e of changed) this.device.updateTexture(A.atlasTexture, A.atlas.region(e), e.x, e.y, e.w, e.h);
+    for (const e of changed)
+      this.device.updateTexture(
+        A.atlasTexture,
+        A.atlas.region(e),
+        e.x,
+        e.y,
+        e.w,
+        e.h,
+      );
     this.screens.tick();
     this.hud.tick();
-    if (!this.inWorld || !this.doneLoadingTerrain) { this.sound.tick(); return; } // menus still run the MusicTicker
+    if (!this.inWorld || !this.doneLoadingTerrain) {
+      this.sound.tick();
+      return;
+    } // menus still run the MusicTicker
     const pl = this.player;
     const world = this.world;
 
@@ -1518,19 +2377,37 @@ export class Game {
       s = ((s % 9) + 9) % 9;
       if (this.gameMode === 3) {
         // Minecraft.runTickMouse: the spectator menu, else the flying speed (client side only)
-        if (this.hud.spectatorGui.active) this.hud.spectatorGui.onMouseScroll(Math.sign(this.input.wheel));
-        else this.player.flySpeed = Math.min(0.2, Math.max(0, Math.fround(this.player.flySpeed - Math.sign(this.input.wheel) * Math.fround(0.005))));
-      }
-      else this.selectSlot(s);
+        if (this.hud.spectatorGui.active)
+          this.hud.spectatorGui.onMouseScroll(Math.sign(this.input.wheel));
+        else
+          this.player.flySpeed = Math.min(
+            0.2,
+            Math.max(
+              0,
+              Math.fround(
+                this.player.flySpeed -
+                  Math.sign(this.input.wheel) * Math.fround(0.005),
+              ),
+            ),
+          );
+      } else this.selectSlot(s);
     }
     this.input.wheel = 0;
 
-    const canMove = !this.screens.current || this.screens.current.allowsMovement;
-    const inp = canMove && this.input.locked ? {
-      forward: this.input.isDown('forward'), back: this.input.isDown('back'),
-      left: this.input.isDown('left'), right: this.input.isDown('right'),
-      jump: this.input.isDown('jump'), sneak: this.input.isDown('sneak'), sprint: this.input.isDown('sprint'),
-    } : {};
+    const canMove =
+      !this.screens.current || this.screens.current.allowsMovement;
+    const inp =
+      canMove && this.input.locked
+        ? {
+            forward: this.input.isDown("forward"),
+            back: this.input.isDown("back"),
+            left: this.input.isDown("left"),
+            right: this.input.isDown("right"),
+            jump: this.input.isDown("jump"),
+            sneak: this.input.isDown("sneak"),
+            sprint: this.input.isDown("sprint"),
+          }
+        : {};
 
     // Interaction (dig/use/attack) before movement like vanilla runTick
     const presses = this.input.consumePresses();
@@ -1538,7 +2415,8 @@ export class Game {
     this.tutorial.update();
     this.tutorial.handleMovement(inp);
     this.tutorial.onMouseHover(this.interaction.target);
-    if (!this.screens.current && this.input.locked && !this.dead) this.interaction.tick(presses);
+    if (!this.screens.current && this.input.locked && !this.dead)
+      this.interaction.tick(presses);
     else this.interaction.tickIdle();
 
     // EntityPlayerSP.onUpdate: nothing at all happens (no movement, no packets) while the chunk under the player is
@@ -1554,9 +2432,17 @@ export class Game {
       const tin = blocked ? {} : inp;
       const chest = this.inventory.armor[2];
       tin.autoJump = this.settings.autoJump;
-      tin.elytraUsable = !!(chest && this.items.name(chest.id) === 'elytra' && this.items.damage(chest) < this.items.maxDurability(chest.id) - 1);
-      pl.depthStrider=this.items.enchantLevel(this.inventory.armor[0],'depth_strider');
-      pl.dolphinsGrace=this.effects.has(30);pl.slowFalling=this.effects.has(28);
+      tin.elytraUsable = !!(
+        chest &&
+        this.items.name(chest.id) === "elytra" &&
+        this.items.damage(chest) < this.items.maxDurability(chest.id) - 1
+      );
+      pl.depthStrider = this.items.enchantLevel(
+        this.inventory.armor[0],
+        "depth_strider",
+      );
+      pl.dolphinsGrace = this.effects.has(30);
+      pl.slowFalling = this.effects.has(28);
       pl.sleeping = !!this.sleeping;
       const res = pl.tick(world, tin);
       if (res.abilitiesChanged) this.sendAbilities();
@@ -1570,7 +2456,10 @@ export class Game {
     // (minecart, pig, someone else's boat) has moved before we are put back on it (Entity.updatePassenger)
     if (this.player.ridingEntity) {
       const v = this.entities.get(this.ridingEntityId);
-      if (v && !v.controlled) this.player.setPosition(...this.entities.riderPos(v, this.entityId, 'player'));
+      if (v && !v.controlled)
+        this.player.setPosition(
+          ...this.entities.riderPos(v, this.entityId, "player"),
+        );
     }
     this.particles.tick();
     this.weather.tick();
@@ -1579,7 +2468,11 @@ export class Game {
     this.pistons.tick();
     this.entityRenderer.tick();
     this.handRenderer.tick();
-    this.cameraEye.tick(this.cameraEntity == null ? pl.eyeHeight() : (this.entities.get(this.cameraEntity)?.eyeHeight ?? pl.eyeHeight()));
+    this.cameraEye.tick(
+      this.cameraEntity == null
+        ? pl.eyeHeight()
+        : (this.entities.get(this.cameraEntity)?.eyeHeight ?? pl.eyeHeight()),
+    );
     this.portalTick();
 
     // FOV modifier (AbstractClientPlayer.getFovModifier)
@@ -1591,7 +2484,7 @@ export class Game {
     if (walk === 0 || !isFinite(f)) f = 1;
     if (pl.usingItem) {
       const held = this.inventory.held();
-      if (held && this.items.name(held.id) === 'bow') {
+      if (held && this.items.name(held.id) === "bow") {
         const ticks = this.interaction.useTicks;
         let f1 = ticks / 20;
         f1 = f1 > 1 ? 1 : f1 * f1;
@@ -1608,46 +2501,72 @@ export class Game {
     }
   }
 
-  portalTick() { tickPortal(this); }
+  portalTick() {
+    tickPortal(this);
+  }
 
   // The vehicle the local player steers itself (1.9+: boats, saddled horses), or null
   _vehicleController(v) {
     const passengers = this.entities.passengersOf(v.id);
     const first = passengers.length ? passengers[0] : this.entityId;
     if (first !== this.entityId) return null; // only the first passenger steers
-    const horse = v.kind === 'mob' && v.type === 100 && !!((v.horseFlags || 0) & 4);
-    if (v.kind !== 'boat' && !horse) return null;
+    const horse =
+      v.kind === "mob" && v.type === 100 && !!((v.horseFlags || 0) & 4);
+    if (v.kind !== "boat" && !horse) return null;
     if (!this.vehicle || this.vehicle.e !== v) {
       if (this.vehicle) this.vehicle.e.controlled = false;
-      this.vehicle = v.kind === 'boat' ? new BoatController(this.world, v) : new HorseController(this.world, v);
+      this.vehicle =
+        v.kind === "boat"
+          ? new BoatController(this.world, v)
+          : new HorseController(this.world, v);
       v.controlled = true;
     }
     return this.vehicle;
   }
 
-  _dropVehicle() { if (this.vehicle) { this.vehicle.e.controlled = false; this.vehicle = null; } }
+  _dropVehicle() {
+    if (this.vehicle) {
+      this.vehicle.e.controlled = false;
+      this.vehicle = null;
+    }
+  }
 
   // SPacketMoveVehicle: the server's correction of the vehicle we steer
-  on_vehicle_move(p) { if (this.vehicle) this.vehicle.setFromServer(p.x, p.y, p.z, p.yaw); }
+  on_vehicle_move(p) {
+    if (this.vehicle) this.vehicle.setFromServer(p.x, p.y, p.z, p.yaw);
+  }
 
   // EntityPlayerSP while riding: the vehicle moves first (boats send their paddles), then the rider sends rotation,
   // input and, when steering, the vehicle's position. Horse jumps charge while space is held.
   _tickRiding(inp) {
     const pl = this.player;
-    pl.prevX = pl.x; pl.prevY = pl.y; pl.prevZ = pl.z;
-    pl.prevYaw = pl.yaw; pl.prevPitch = pl.pitch;
+    pl.prevX = pl.x;
+    pl.prevY = pl.y;
+    pl.prevZ = pl.z;
+    pl.prevYaw = pl.yaw;
+    pl.prevPitch = pl.pitch;
     const v = this.entities.get(this.ridingEntityId);
-    let forward = 0, strafe = 0;
-    if (inp.forward) forward++; if (inp.back) forward--;
-    if (inp.left) strafe++; if (inp.right) strafe--;
-    if (inp.sneak) { forward *= 0.3; strafe *= 0.3; }
-    forward = Math.fround(forward * 0.98); strafe = Math.fround(strafe * 0.98);
+    let forward = 0,
+      strafe = 0;
+    if (inp.forward) forward++;
+    if (inp.back) forward--;
+    if (inp.left) strafe++;
+    if (inp.right) strafe--;
+    if (inp.sneak) {
+      forward *= 0.3;
+      strafe *= 0.3;
+    }
+    forward = Math.fround(forward * 0.98);
+    strafe = Math.fround(strafe * 0.98);
     const jump = !!inp.jump;
     const ctl = v ? this._vehicleController(v) : null;
     if (!ctl) this._dropVehicle();
-    if (v && v.kind === 'mob' && v.type === 100) {
+    if (v && v.kind === "mob" && v.type === 100) {
       const was = this._rideJump;
-      if (this.horseJumpCounter < 0) { this.horseJumpCounter++; if (this.horseJumpCounter === 0) this.horseJump = 0; }
+      if (this.horseJumpCounter < 0) {
+        this.horseJumpCounter++;
+        if (this.horseJumpCounter === 0) this.horseJump = 0;
+      }
       if (was && !jump) {
         this.horseJumpCounter = -10;
         const power = Math.floor(this.horseJump * 100);
@@ -1655,10 +2574,15 @@ export class Game {
         // start + stop horse jump (1.9+)
         this.send(C.entityAction(this.entityId, 5, power));
         this.send(C.entityAction(this.entityId, 6));
-      } else if (!was && jump) { this.horseJumpCounter = 0; this.horseJump = 0; }
-      else if (was) {
+      } else if (!was && jump) {
+        this.horseJumpCounter = 0;
+        this.horseJump = 0;
+      } else if (was) {
         this.horseJumpCounter++;
-        this.horseJump = this.horseJumpCounter < 10 ? this.horseJumpCounter * 0.1 : 0.8 + 2 / (this.horseJumpCounter - 9) * 0.1;
+        this.horseJump =
+          this.horseJumpCounter < 10
+            ? this.horseJumpCounter * 0.1
+            : 0.8 + (2 / (this.horseJumpCounter - 9)) * 0.1;
       }
     } else this.horseJump = undefined;
     this._rideJump = jump;
@@ -1671,20 +2595,33 @@ export class Game {
         const a = v.attributes || {};
         const val = (k, d) => (a[k] ? attributeValue(a[k]) : d);
         const jb = this.effects.get(8);
-        ctl.tick(pl, strafe, forward, { speed: val('generic.movementSpeed', 0.225), jumpStrength: val('horse.jumpStrength', 0.7), jumpBoost: jb ? jb.amplifier : -1 });
+        ctl.tick(pl, strafe, forward, {
+          speed: val("generic.movementSpeed", 0.225),
+          jumpStrength: val("horse.jumpStrength", 0.7),
+          jumpBoost: jb ? jb.amplifier : -1,
+        });
       }
       // the vehicle entity follows the simulation
       const b = ctl.body;
-      v.prevX = v.x; v.prevY = v.y; v.prevZ = v.z; v.prevYaw = v.yaw;
-      v.x = v.newX = b.x; v.y = v.newY = b.y; v.z = v.newZ = b.z; v.inc = 0;
+      v.prevX = v.x;
+      v.prevY = v.y;
+      v.prevZ = v.z;
+      v.prevYaw = v.yaw;
+      v.x = v.newX = b.x;
+      v.y = v.newY = b.y;
+      v.z = v.newZ = b.z;
+      v.inc = 0;
       v.yaw = v.newYaw = ctl instanceof BoatController ? ctl.yaw : b.yaw;
     }
     if (v) {
-      pl.setPosition(...this.entities.riderPos(v, this.entityId, 'player'));
+      pl.setPosition(...this.entities.riderPos(v, this.entityId, "player"));
     }
     this.send(C.look(pl.yaw, pl.pitch, pl.onGround));
-    this.send(C.steerVehicle(strafe, forward, (jump ? 1 : 0) | (inp.sneak ? 2 : 0)));
-    if (ctl) this.send(C.vehicleMove(v.x, v.y, v.z, v.yaw, ctl.body.pitch || 0));
+    this.send(
+      C.steerVehicle(strafe, forward, (jump ? 1 : 0) | (inp.sneak ? 2 : 0)),
+    );
+    if (ctl)
+      this.send(C.vehicleMove(v.x, v.y, v.z, v.yaw, ctl.body.pitch || 0));
   }
 
   sendAbilities() {
@@ -1713,17 +2650,32 @@ export class Game {
     void sneak;
     if (this.cameraEntity !== null && this.cameraEntity !== undefined) return;
     // 1.9+: counted before the check, and with nothing else to send only an on-ground change is reported
-    const d0 = pl.x - lr.x, d1 = pl.y - lr.y, d2 = pl.z - lr.z;
-    const d3 = pl.yaw - lr.yaw, d4 = pl.pitch - lr.pitch;
+    const d0 = pl.x - lr.x,
+      d1 = pl.y - lr.y,
+      d2 = pl.z - lr.z;
+    const d3 = pl.yaw - lr.yaw,
+      d4 = pl.pitch - lr.pitch;
     this.positionUpdateTicks++;
-    const moved = d0 * d0 + d1 * d1 + d2 * d2 > 9.0e-4 || this.positionUpdateTicks >= 20;
+    const moved =
+      d0 * d0 + d1 * d1 + d2 * d2 > 9.0e-4 || this.positionUpdateTicks >= 20;
     const rotated = d3 !== 0 || d4 !== 0;
-    if (moved && rotated) this.send(C.positionLook(pl.x, pl.y, pl.z, pl.yaw, pl.pitch, pl.onGround));
+    if (moved && rotated)
+      this.send(
+        C.positionLook(pl.x, pl.y, pl.z, pl.yaw, pl.pitch, pl.onGround),
+      );
     else if (moved) this.send(C.position(pl.x, pl.y, pl.z, pl.onGround));
     else if (rotated) this.send(C.look(pl.yaw, pl.pitch, pl.onGround));
     else if (lr.onGround !== pl.onGround) this.send(C.flying(pl.onGround));
-    if (moved) { lr.x = pl.x; lr.y = pl.y; lr.z = pl.z; this.positionUpdateTicks = 0; }
-    if (rotated) { lr.yaw = pl.yaw; lr.pitch = pl.pitch; }
+    if (moved) {
+      lr.x = pl.x;
+      lr.y = pl.y;
+      lr.z = pl.z;
+      this.positionUpdateTicks = 0;
+    }
+    if (rotated) {
+      lr.yaw = pl.yaw;
+      lr.pitch = pl.pitch;
+    }
     lr.onGround = pl.onGround; // prevOnGround
   }
 
@@ -1733,16 +2685,32 @@ export class Game {
   // everything thrown by runGameLoop
   frame(t) {
     if (this.crashed) return;
-    try { this._frame(t); } catch (e) { this.crash(e, 'Running the game loop'); }
+    try {
+      this._frame(t);
+    } catch (e) {
+      this.crash(e, "Running the game loop");
+    }
   }
 
   crash(error, description) {
     if (this.crashed) return;
     this.crashed = true;
     let report;
-    try { report = buildCrashReport(error, description, this); } catch (e) { report = String(error && error.stack || error); }
-    try { if (this.conn) this.conn.close(); } catch (e) { /* already gone */ }
-    try { this.sound.stopAll(); } catch (e) { /* no audio */ }
+    try {
+      report = buildCrashReport(error, description, this);
+    } catch (e) {
+      report = String((error && error.stack) || error);
+    }
+    try {
+      if (this.conn) this.conn.close();
+    } catch (e) {
+      /* already gone */
+    }
+    try {
+      this.sound.stopAll();
+    } catch (e) {
+      /* no audio */
+    }
     showCrashScreen(report);
   }
 
@@ -1751,13 +2719,13 @@ export class Game {
     const now = platform().now();
     const P = this.profiler;
     P.enabled = this.showDebug && this.showProfiler;
-    P.start('root');
+    P.start("root");
     let dt = now - this.lastFrame;
     this.lastFrame = now;
     if (dt > 1000) dt = 1000;
     this.tickAccumulator += dt;
     let n = 0;
-    P.start('tick');
+    P.start("tick");
     while (this.tickAccumulator >= TICK_MS && n < 10) {
       this.tickAccumulator -= TICK_MS;
       this.tick();
@@ -1773,16 +2741,25 @@ export class Game {
       this.tutorial.handleMouse(mdx, mdy);
       const s = this.settings.sensitivity * 0.6 + 0.2;
       const f = s * s * s * 8;
-      let dx = mdx * f * 0.15, dy = mdy * f * 0.15 * (this.settings.invertMouse ? -1 : 1);
+      let dx = mdx * f * 0.15,
+        dy = mdy * f * 0.15 * (this.settings.invertMouse ? -1 : 1);
       if (smoothCameraActive(this)) {
         // EntityRenderer: accumulate input, filtered once per tick and spread over the frames of that tick
-        const sc = this._smoothCam || (this._smoothCam = { yaw: 0, pitch: 0, fx: 0, fy: 0, partial: 0 });
-        sc.yaw += mdx * f; sc.pitch += mdy * f * (this.settings.invertMouse ? -1 : 1);
+        const sc =
+          this._smoothCam ||
+          (this._smoothCam = { yaw: 0, pitch: 0, fx: 0, fy: 0, partial: 0 });
+        sc.yaw += mdx * f;
+        sc.pitch += mdy * f * (this.settings.invertMouse ? -1 : 1);
         const step = this.partial - sc.partial;
         sc.partial = this.partial;
-        dx = sc.fx * Math.max(0, step) * 0.15; dy = sc.fy * Math.max(0, step) * 0.15;
+        dx = sc.fx * Math.max(0, step) * 0.15;
+        dy = sc.fy * Math.max(0, step) * 0.15;
       }
-      if (this.cameraEntity === null || this.cameraEntity === undefined || true) {
+      if (
+        this.cameraEntity === null ||
+        this.cameraEntity === undefined ||
+        true
+      ) {
         // Entity.setAngles: rotations are floats
         this.player.yaw = Math.fround(this.player.yaw + dx);
         this.player.pitch = Math.fround(this.player.pitch + dy);
@@ -1791,18 +2768,29 @@ export class Game {
       }
     }
 
-    P.start('chunkScheduling');
+    P.start("chunkScheduling");
     this._scheduleMeshes();
     P.end();
     const maxFps = this.settings.maxFps;
-    if (maxFps > 0 && now - (this._lastRender || 0) < 1000 / maxFps - 1) { P.end(); P.endFrame(); return; }
+    if (maxFps > 0 && now - (this._lastRender || 0) < 1000 / maxFps - 1) {
+      P.end();
+      P.endFrame();
+      return;
+    }
     // VSync off runs frames from a message loop; never queue more than ~2 frames on the GPU or the
     // browser can't present them (and input starves) - frames beyond that would never be seen anyway
-    if (platform().vsync === false && this.device.busy && this.device.busy()) { P.end(); P.endFrame(); return; }
+    if (platform().vsync === false && this.device.busy && this.device.busy()) {
+      P.end();
+      P.endFrame();
+      return;
+    }
     // FrameTimer: time between rendered frames, for the lagometer
-    if (this._lastRender) { this.frameTimes[this.frameTimeIndex] = now - this._lastRender; this.frameTimeIndex = (this.frameTimeIndex + 1) % this.frameTimes.length; }
+    if (this._lastRender) {
+      this.frameTimes[this.frameTimeIndex] = now - this._lastRender;
+      this.frameTimeIndex = (this.frameTimeIndex + 1) % this.frameTimes.length;
+    }
     this._lastRender = now;
-    P.start('gameRenderer');
+    P.start("gameRenderer");
     this.renderFrame();
     P.end();
     P.end();
@@ -1826,14 +2814,25 @@ export class Game {
     let z = pl.prevZ + (pl.z - pl.prevZ) * partial;
     if (this.cameraEntity !== null && this.cameraEntity !== undefined) {
       const e = this.entities.get(this.cameraEntity);
-      if (e) { const ip = this.entities.interp(e, partial); x = ip.x; y = ip.y; z = ip.z; return [x, y + e.eyeHeight, z]; }
+      if (e) {
+        const ip = this.entities.interp(e, partial);
+        x = ip.x;
+        y = ip.y;
+        z = ip.z;
+        return [x, y + e.eyeHeight, z];
+      }
     }
     return [x, y + pl.eyeHeight(), z]; // EntityPlayer.getEyeHeight
   }
 
-  cameraPosition(partial=this.partial){
-    const position=this.eyePosition(partial),target=this.cameraEntity==null?this.player.eyeHeight():(this.entities.get(this.cameraEntity)?.eyeHeight??this.player.eyeHeight());
-    position[1]+=this.cameraEye.height(partial,target)-target;
+  cameraPosition(partial = this.partial) {
+    const position = this.eyePosition(partial),
+      target =
+        this.cameraEntity == null
+          ? this.player.eyeHeight()
+          : (this.entities.get(this.cameraEntity)?.eyeHeight ??
+            this.player.eyeHeight());
+    position[1] += this.cameraEye.height(partial, target) - target;
     return position;
   }
 
@@ -1841,8 +2840,10 @@ export class Game {
     const pl = this.player;
     const yaw = pl.prevYaw + (pl.yaw - pl.prevYaw) * partial;
     const pitch = pl.prevPitch + (pl.pitch - pl.prevPitch) * partial;
-    const f = Math.cos(-yaw * 0.017453292 - Math.PI), f1 = Math.sin(-yaw * 0.017453292 - Math.PI);
-    const f2 = -Math.cos(-pitch * 0.017453292), f3 = Math.sin(-pitch * 0.017453292);
+    const f = Math.cos(-yaw * 0.017453292 - Math.PI),
+      f1 = Math.sin(-yaw * 0.017453292 - Math.PI);
+    const f2 = -Math.cos(-pitch * 0.017453292),
+      f3 = Math.sin(-pitch * 0.017453292);
     return [f1 * f2, f3, f * f2];
   }
 
@@ -1851,7 +2852,8 @@ export class Game {
     const partial = this.partial;
     const gui = this.gui;
     if (!this.inWorld || !this.doneLoadingTerrain) {
-      if (this.screens.current && this.screens.current.panorama) r.renderPanorama(platform().now());
+      if (this.screens.current && this.screens.current.panorama)
+        r.renderPanorama(platform().now());
       else r.renderBlank();
       gui.begin();
       this.screens.render(gui, partial);
@@ -1864,97 +2866,182 @@ export class Game {
     let [ex, ey, ez] = this.cameraPosition(partial);
     const yaw = pl.prevYaw + (pl.yaw - pl.prevYaw) * partial;
     const pitch = pl.prevPitch + (pl.pitch - pl.prevPitch) * partial;
-    let camYaw = yaw, camPitch = pitch, roll = 0;
+    let camYaw = yaw,
+      camPitch = pitch,
+      roll = 0;
     const sleepView = sleepingCamera(this, partial);
-    if (sleepView) { ex=sleepView.x; ey=sleepView.y; ez=sleepView.z; camYaw=sleepView.yaw; camPitch=sleepView.pitch; }
+    if (sleepView) {
+      ex = sleepView.x;
+      ey = sleepView.y;
+      ez = sleepView.z;
+      camYaw = sleepView.yaw;
+      camPitch = sleepView.pitch;
+    }
 
-    if (this.debugCam) { [ex, ey, ez] = [this.debugCam.x, this.debugCam.y, this.debugCam.z]; camYaw = this.debugCam.yaw; camPitch = this.debugCam.pitch; }
+    if (this.debugCam) {
+      [ex, ey, ez] = [this.debugCam.x, this.debugCam.y, this.debugCam.z];
+      camYaw = this.debugCam.yaw;
+      camPitch = this.debugCam.pitch;
+    }
     // EntityRenderer.setupCameraTransform, view-space part before orientCamera:
     // hurtCameraEffect, setupViewBobbing, then the first-person 0.1 pull-back from orientCamera
     const pre = mat4.create();
     if (this.dead) {
-      const dt = (this.ticks - (this.deathTick || this.ticks)) + partial;
-      mat4.rotateZ(pre, pre, (40 - 8000 / (dt + 200)) * Math.PI / 180);
+      const dt = this.ticks - (this.deathTick || this.ticks) + partial;
+      mat4.rotateZ(pre, pre, ((40 - 8000 / (dt + 200)) * Math.PI) / 180);
     }
     if (this.hurtTime > 0) {
       let f = (this.hurtTime - partial) / 10; // maxHurtTime; attackedAtYaw is always 0 on the client
       f = Math.sin(f * f * f * f * Math.PI);
-      mat4.rotateZ(pre, pre, -f * 14 * Math.PI / 180);
+      mat4.rotateZ(pre, pre, (-f * 14 * Math.PI) / 180);
     }
     if (this.settings.viewBobbing && !sleepView) {
       const f = pl.distanceWalked - pl.prevDistanceWalked;
       const f1 = -(pl.distanceWalked + f * partial);
       const f2 = pl.prevCameraYaw + (pl.cameraYaw - pl.prevCameraYaw) * partial;
-      const f3 = pl.prevCameraPitch + (pl.cameraPitch - pl.prevCameraPitch) * partial;
-      mat4.translate(pre, pre, Math.sin(f1 * Math.PI) * f2 * 0.5, -Math.abs(Math.cos(f1 * Math.PI) * f2), 0);
-      mat4.rotateZ(pre, pre, Math.sin(f1 * Math.PI) * f2 * 3 * Math.PI / 180);
-      mat4.rotateX(pre, pre, Math.abs(Math.cos(f1 * Math.PI - 0.2) * f2) * 5 * Math.PI / 180);
-      mat4.rotateX(pre, pre, f3 * Math.PI / 180);
+      const f3 =
+        pl.prevCameraPitch + (pl.cameraPitch - pl.prevCameraPitch) * partial;
+      mat4.translate(
+        pre,
+        pre,
+        Math.sin(f1 * Math.PI) * f2 * 0.5,
+        -Math.abs(Math.cos(f1 * Math.PI) * f2),
+        0,
+      );
+      mat4.rotateZ(pre, pre, (Math.sin(f1 * Math.PI) * f2 * 3 * Math.PI) / 180);
+      mat4.rotateX(
+        pre,
+        pre,
+        (Math.abs(Math.cos(f1 * Math.PI - 0.2) * f2) * 5 * Math.PI) / 180,
+      );
+      mat4.rotateX(pre, pre, (f3 * Math.PI) / 180);
     }
     const look = this.lookVector(partial);
     if (this.thirdPerson > 0 && !sleepView) {
       let dist = 4;
       const dir = this.thirdPerson === 2 ? -1 : 1;
-      const lx = -look[0] * dir, ly = -look[1] * dir, lz = -look[2] * dir;
+      const lx = -look[0] * dir,
+        ly = -look[1] * dir,
+        lz = -look[2] * dir;
       for (let i = 0; i < 8; i++) {
-        const ox = ((i & 1) * 2 - 1) * 0.1, oy = (((i >> 1) & 1) * 2 - 1) * 0.1, oz = (((i >> 2) & 1) * 2 - 1) * 0.1;
-        const hit = this.world.raycast(ex + ox, ey + oy, ez + oz, lx, ly, lz, dist);
+        const ox = ((i & 1) * 2 - 1) * 0.1,
+          oy = (((i >> 1) & 1) * 2 - 1) * 0.1,
+          oz = (((i >> 2) & 1) * 2 - 1) * 0.1;
+        const hit = this.world.raycast(
+          ex + ox,
+          ey + oy,
+          ez + oz,
+          lx,
+          ly,
+          lz,
+          dist,
+        );
         if (hit && hit.dist < dist) dist = hit.dist;
       }
-      ex += lx * dist; ey += ly * dist; ez += lz * dist;
+      ex += lx * dist;
+      ey += ly * dist;
+      ez += lz * dist;
       this._thirdPersonDist = dist;
-      if (this.thirdPerson === 2) { camYaw += 180; camPitch = -camPitch; }
+      if (this.thirdPerson === 2) {
+        camYaw += 180;
+        camPitch = -camPitch;
+      }
     }
     let fov = this.settings.fov;
-    fov *= this.prevFovModifier + (this.fovModifier - this.prevFovModifier) * partial;
+    fov *=
+      this.prevFovModifier +
+      (this.fovModifier - this.prevFovModifier) * partial;
     const underwater = isPointInFluid(this.world, ex, ey, ez);
     const inLava = isPointInFluid(this.world, ex, ey, ez, true);
-    if (underwater || inLava) fov = fov * 60 / 70;
+    if (underwater || inLava) fov = (fov * 60) / 70;
     if (this.dead) fov /= (1 - 500 / (500 + 20)) * 2 + 1;
     // Portal nausea warp
-    const portal = (this.prevPortalTime||0) + ((this.portalTime||0) - (this.prevPortalTime||0)) * partial;
+    const portal =
+      (this.prevPortalTime || 0) +
+      ((this.portalTime || 0) - (this.prevPortalTime || 0)) * partial;
 
-    fov = zoomFov(this,fov);
+    fov = zoomFov(this, fov);
     r.renderDistance = this.settings.renderDistance;
-    r.setCamera(ex, ey, ez, camYaw, camPitch, roll, fov, pre,portalWarp(portal,this.ticks+partial,this.effects.has(9)));
-    const temp = biomeInfo(this.world.getBiome(Math.floor(ex),Math.floor(ez),Math.floor(ey))).temperature;
-    const rain = this.world.prevRain !== undefined ? this.world.prevRain + (this.world.rainStrength - this.world.prevRain) * partial : this.world.rainStrength;
+    r.setCamera(
+      ex,
+      ey,
+      ez,
+      camYaw,
+      camPitch,
+      roll,
+      fov,
+      pre,
+      portalWarp(portal, this.ticks + partial, this.effects.has(9)),
+    );
+    const temp = biomeInfo(
+      this.world.getBiome(Math.floor(ex), Math.floor(ez), Math.floor(ey)),
+    ).temperature;
+    const rain =
+      this.world.prevRain !== undefined
+        ? this.world.prevRain +
+          (this.world.rainStrength - this.world.prevRain) * partial
+        : this.world.rainStrength;
     r.updateEnvironment({
-      worldTime: this.world.timeOfDay, partial, rain, thunder: this.world.thunderStrength * rain, temperature: temp,
-      camPos: [ex, ey, ez], lookDir: look, dimension: this.dimension, underwater, inLava, biomeId:this.world.getBiome(Math.floor(ex),Math.floor(ez),Math.floor(ey)), waterVision:pl.waterVision(), conduitPower:this.effects.has(29),
-      blindness: this.effects.has(15), nightVision: this.effects.has(16) ? 1 : 0, clouds: this.settings.clouds,
-      horizon: String(this.levelType).toLowerCase() === 'flat' ? 0 : 63,
+      worldTime: this.world.timeOfDay,
+      partial,
+      rain,
+      thunder: this.world.thunderStrength * rain,
+      temperature: temp,
+      camPos: [ex, ey, ez],
+      lookDir: look,
+      dimension: this.dimension,
+      underwater,
+      inLava,
+      biomeId: this.world.getBiome(
+        Math.floor(ex),
+        Math.floor(ez),
+        Math.floor(ey),
+      ),
+      waterVision: pl.waterVision(),
+      conduitPower: this.effects.has(29),
+      blindness: this.effects.has(15),
+      nightVision: this.effects.has(16) ? 1 : 0,
+      clouds: this.settings.clouds,
+      horizon: String(this.levelType).toLowerCase() === "flat" ? 0 : 63,
     });
     // Sky light for the world (night vision etc.) is folded into the lightmap
-    this.profiler.start('culling');
+    this.profiler.start("culling");
     r.cull(); // frustum + occlusion + fog culling, before entities so they can use the result
-    this.profiler.endStart('entities');
+    this.profiler.endStart("entities");
     this.entityRenderer.render(partial);
     this.tileRenderer.render(partial);
     this.debugLines.update(partial);
-    this.profiler.endStart('particles');
+    this.profiler.endStart("particles");
     this.particles.render(partial, ex, ey, ez);
     this.weather.render(partial, ex, ey, ez);
     this.interaction.renderSelection(partial);
-    const hand = this.thirdPerson === 0 && !this.hideGui && this.gameMode !== 3 ? this.handRenderer.prepare(partial, fov) : null;
-    this.profiler.endStart('level');
+    const hand =
+      this.thirdPerson === 0 && !this.hideGui && this.gameMode !== 3
+        ? this.handRenderer.prepare(partial, fov)
+        : null;
+    this.profiler.endStart("level");
     // EntityRenderer.loadEntityShader: spectating a creeper, spider or enderman in first person
-    const viewed = this.cameraEntity != null && this.thirdPerson === 0 ? this.entities.get(this.cameraEntity) : null;
-    const post = viewed && this.device.createRenderTarget ? this.postEffects.get(entityShaderName(viewed)) : null;
+    const viewed =
+      this.cameraEntity != null && this.thirdPerson === 0
+        ? this.entities.get(this.cameraEntity)
+        : null;
+    const post =
+      viewed && this.device.createRenderTarget
+        ? this.postEffects.get(entityShaderName(viewed))
+        : null;
     const packPost = !post && this.shaderPack.active ? this.shaderPack : null;
-    this.shaderPack.prepareTerrain(r.camPos,this.eyePosition(partial));
+    this.shaderPack.prepareTerrain(r.camPos, this.eyePosition(partial));
     r.render(hand, post || packPost);
-    if(packPost)packPost.render();
+    if (packPost) packPost.render();
     if (post) post.render(r.lightmap, ((this.ticks + partial) % 20) / 20);
-    this.profiler.endStart('gui');
+    this.profiler.endStart("gui");
     gui.begin();
     this._drawSuperSecret(gui);
-    this.hud.render(gui,partial,{underwater,inLava,portal});
+    this.hud.render(gui, partial, { underwater, inLava, portal });
     this.screens.render(gui, partial);
     if (!this.hideGui) this.hud.renderToast(gui); // GuiToast.drawToast: on top of every screen
     gui.end();
     this.profiler.end();
     this.device.endFrame();
   }
-
 }

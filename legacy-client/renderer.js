@@ -2,10 +2,15 @@ class GameRenderer {
   constructor(canvas) {
     this.canvas = canvas;
     this.scene = new THREE.Scene();
-    this.camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 500);
+    this.camera = new THREE.PerspectiveCamera(
+      75,
+      window.innerWidth / window.innerHeight,
+      0.1,
+      500,
+    );
     this.renderer = new THREE.WebGLRenderer({ canvas, antialias: false });
     this.renderer.setSize(window.innerWidth, window.innerHeight);
-    this.renderer.setClearColor(0x87CEEB);
+    this.renderer.setClearColor(0x87ceeb);
     this.renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
 
     this.chunkGroup = new THREE.Group();
@@ -21,7 +26,7 @@ class GameRenderer {
     this.meshQueue = [];
     this.meshPerFrame = 2;
 
-    window.addEventListener('resize', () => this.onResize());
+    window.addEventListener("resize", () => this.onResize());
   }
 
   setupLighting() {
@@ -34,12 +39,12 @@ class GameRenderer {
   }
 
   setupSky() {
-    this.scene.fog = new THREE.Fog(0x87CEEB, 150, 400);
+    this.scene.fog = new THREE.Fog(0x87ceeb, 150, 400);
 
     const skyGeo = new THREE.SphereGeometry(450, 16, 16);
     const skyMat = new THREE.MeshBasicMaterial({
-      color: 0x87CEEB,
-      side: THREE.BackSide
+      color: 0x87ceeb,
+      side: THREE.BackSide,
     });
     const sky = new THREE.Mesh(skyGeo, skyMat);
     this.scene.add(sky);
@@ -59,7 +64,11 @@ class GameRenderer {
       this.blockHighlight.visible = false;
       return;
     }
-    this.blockHighlight.position.set(target.x + 0.5, target.y + 0.5, target.z + 0.5);
+    this.blockHighlight.position.set(
+      target.x + 0.5,
+      target.y + 0.5,
+      target.z + 0.5,
+    );
     this.blockHighlight.visible = true;
   }
 
@@ -74,7 +83,7 @@ class GameRenderer {
     chunk.dirty = false;
 
     if (chunk.mesh) {
-      chunk.mesh.forEach(m => {
+      chunk.mesh.forEach((m) => {
         this.chunkGroup.remove(m);
         m.geometry.dispose();
         m.material.dispose();
@@ -93,12 +102,60 @@ class GameRenderer {
     const cz = chunk.z * 16;
 
     const faces = [
-      { dir: [0, 1, 0], corners: [[0,1,1],[1,1,1],[1,1,0],[0,1,0]] },   // top
-      { dir: [0, -1, 0], corners: [[0,0,0],[1,0,0],[1,0,1],[0,0,1]] },  // bottom
-      { dir: [0, 0, 1], corners: [[0,0,1],[1,0,1],[1,1,1],[0,1,1]] },   // south
-      { dir: [0, 0, -1], corners: [[1,0,0],[0,0,0],[0,1,0],[1,1,0]] },  // north
-      { dir: [1, 0, 0], corners: [[1,0,1],[1,0,0],[1,1,0],[1,1,1]] },   // east
-      { dir: [-1, 0, 0], corners: [[0,0,0],[0,0,1],[0,1,1],[0,1,0]] },  // west
+      {
+        dir: [0, 1, 0],
+        corners: [
+          [0, 1, 1],
+          [1, 1, 1],
+          [1, 1, 0],
+          [0, 1, 0],
+        ],
+      }, // top
+      {
+        dir: [0, -1, 0],
+        corners: [
+          [0, 0, 0],
+          [1, 0, 0],
+          [1, 0, 1],
+          [0, 0, 1],
+        ],
+      }, // bottom
+      {
+        dir: [0, 0, 1],
+        corners: [
+          [0, 0, 1],
+          [1, 0, 1],
+          [1, 1, 1],
+          [0, 1, 1],
+        ],
+      }, // south
+      {
+        dir: [0, 0, -1],
+        corners: [
+          [1, 0, 0],
+          [0, 0, 0],
+          [0, 1, 0],
+          [1, 1, 0],
+        ],
+      }, // north
+      {
+        dir: [1, 0, 0],
+        corners: [
+          [1, 0, 1],
+          [1, 0, 0],
+          [1, 1, 0],
+          [1, 1, 1],
+        ],
+      }, // east
+      {
+        dir: [-1, 0, 0],
+        corners: [
+          [0, 0, 0],
+          [0, 0, 1],
+          [0, 1, 1],
+          [0, 1, 0],
+        ],
+      }, // west
     ];
 
     const faceShading = [1.0, 0.5, 0.8, 0.8, 0.6, 0.6];
@@ -116,10 +173,11 @@ class GameRenderer {
             const wy = section * 16 + ly;
             const wz = cz + lz;
 
-            const baseColor = BLOCK_COLORS[blockId] || 0xFF00FF;
+            const baseColor = BLOCK_COLORS[blockId] || 0xff00ff;
             let r, g, b;
 
-            const isTransparent = TRANSPARENT_BLOCKS.has(blockId) && blockId !== 0;
+            const isTransparent =
+              TRANSPARENT_BLOCKS.has(blockId) && blockId !== 0;
             const targetPos = isTransparent ? transparentPositions : positions;
             const targetCol = isTransparent ? transparentColors : colors;
             const targetNor = isTransparent ? transparentNormals : normals;
@@ -129,23 +187,37 @@ class GameRenderer {
 
               // Per-face color for grass/mycelium
               let faceColor = baseColor;
-              if (blockId === 2) { // grass
-                if (fi === 0) faceColor = 0x5b8731; // top = green
-                else if (fi === 1) faceColor = 0x866043; // bottom = dirt
+              if (blockId === 2) {
+                // grass
+                if (fi === 0)
+                  faceColor = 0x5b8731; // top = green
+                else if (fi === 1)
+                  faceColor = 0x866043; // bottom = dirt
                 else faceColor = 0x7a6b4e; // sides = dirt-ish with green tint
               }
-              r = ((faceColor >> 16) & 0xFF) / 255;
-              g = ((faceColor >> 8) & 0xFF) / 255;
-              b = (faceColor & 0xFF) / 255;
+              r = ((faceColor >> 16) & 0xff) / 255;
+              g = ((faceColor >> 8) & 0xff) / 255;
+              b = (faceColor & 0xff) / 255;
               const nx = lx + face.dir[0];
               const ny = ly + face.dir[1] + section * 16;
               const nz = lz + face.dir[2];
 
               let neighbor;
-              if (nx >= 0 && nx < 16 && nz >= 0 && nz < 16 && ny >= 0 && ny < 256) {
+              if (
+                nx >= 0 &&
+                nx < 16 &&
+                nz >= 0 &&
+                nz < 16 &&
+                ny >= 0 &&
+                ny < 256
+              ) {
                 neighbor = chunk.getBlock(nx, ny, nz);
               } else {
-                neighbor = world.getBlock(wx + face.dir[0], wy + face.dir[1], wz + face.dir[2]);
+                neighbor = world.getBlock(
+                  wx + face.dir[0],
+                  wy + face.dir[1],
+                  wz + face.dir[2],
+                );
               }
 
               if (neighbor !== 0 && !TRANSPARENT_BLOCKS.has(neighbor)) continue;
@@ -156,12 +228,24 @@ class GameRenderer {
 
               // Two triangles per face
               targetPos.push(
-                c[0][0]+lx, c[0][1]+wy, c[0][2]+lz,
-                c[1][0]+lx, c[1][1]+wy, c[1][2]+lz,
-                c[2][0]+lx, c[2][1]+wy, c[2][2]+lz,
-                c[0][0]+lx, c[0][1]+wy, c[0][2]+lz,
-                c[2][0]+lx, c[2][1]+wy, c[2][2]+lz,
-                c[3][0]+lx, c[3][1]+wy, c[3][2]+lz
+                c[0][0] + lx,
+                c[0][1] + wy,
+                c[0][2] + lz,
+                c[1][0] + lx,
+                c[1][1] + wy,
+                c[1][2] + lz,
+                c[2][0] + lx,
+                c[2][1] + wy,
+                c[2][2] + lz,
+                c[0][0] + lx,
+                c[0][1] + wy,
+                c[0][2] + lz,
+                c[2][0] + lx,
+                c[2][1] + wy,
+                c[2][2] + lz,
+                c[3][0] + lx,
+                c[3][1] + wy,
+                c[3][2] + lz,
               );
 
               for (let v = 0; v < 6; v++) {
@@ -176,9 +260,12 @@ class GameRenderer {
 
     if (positions.length > 0) {
       const geo = new THREE.BufferGeometry();
-      geo.setAttribute('position', new THREE.Float32BufferAttribute(positions, 3));
-      geo.setAttribute('color', new THREE.Float32BufferAttribute(colors, 3));
-      geo.setAttribute('normal', new THREE.Float32BufferAttribute(normals, 3));
+      geo.setAttribute(
+        "position",
+        new THREE.Float32BufferAttribute(positions, 3),
+      );
+      geo.setAttribute("color", new THREE.Float32BufferAttribute(colors, 3));
+      geo.setAttribute("normal", new THREE.Float32BufferAttribute(normals, 3));
 
       const mat = new THREE.MeshLambertMaterial({ vertexColors: true });
       const mesh = new THREE.Mesh(geo, mat);
@@ -189,14 +276,23 @@ class GameRenderer {
 
     if (transparentPositions.length > 0) {
       const geo = new THREE.BufferGeometry();
-      geo.setAttribute('position', new THREE.Float32BufferAttribute(transparentPositions, 3));
-      geo.setAttribute('color', new THREE.Float32BufferAttribute(transparentColors, 3));
-      geo.setAttribute('normal', new THREE.Float32BufferAttribute(transparentNormals, 3));
+      geo.setAttribute(
+        "position",
+        new THREE.Float32BufferAttribute(transparentPositions, 3),
+      );
+      geo.setAttribute(
+        "color",
+        new THREE.Float32BufferAttribute(transparentColors, 3),
+      );
+      geo.setAttribute(
+        "normal",
+        new THREE.Float32BufferAttribute(transparentNormals, 3),
+      );
 
       const mat = new THREE.MeshLambertMaterial({
         vertexColors: true,
         transparent: true,
-        opacity: 0.8
+        opacity: 0.8,
       });
       const mesh = new THREE.Mesh(geo, mat);
       mesh.position.set(cx, 0, cz);
@@ -218,7 +314,7 @@ class GameRenderer {
 
       if (dx > renderDist + 2 || dz > renderDist + 2) {
         if (chunk.mesh) {
-          chunk.mesh.forEach(m => {
+          chunk.mesh.forEach((m) => {
             this.chunkGroup.remove(m);
             m.geometry.dispose();
             m.material.dispose();
@@ -228,7 +324,12 @@ class GameRenderer {
         continue;
       }
 
-      if (chunk.dirty && dx <= renderDist && dz <= renderDist && built < this.meshPerFrame) {
+      if (
+        chunk.dirty &&
+        dx <= renderDist &&
+        dz <= renderDist &&
+        built < this.meshPerFrame
+      ) {
         this.buildChunkMesh(chunk, world);
         built++;
       }
@@ -258,7 +359,7 @@ class GameRenderer {
   }
 
   updatePlayerMesh(uuid, player) {
-    let mesh = this.entityMeshes.get('player_' + uuid);
+    let mesh = this.entityMeshes.get("player_" + uuid);
     if (!mesh) {
       const bodyGeo = new THREE.BoxGeometry(0.6, 1.5, 0.3);
       const headGeo = new THREE.BoxGeometry(0.5, 0.5, 0.5);
@@ -273,7 +374,7 @@ class GameRenderer {
       group.add(body);
       group.add(head);
       this.scene.add(group);
-      this.entityMeshes.set('player_' + uuid, group);
+      this.entityMeshes.set("player_" + uuid, group);
       mesh = group;
     }
     if (player.x !== undefined) {

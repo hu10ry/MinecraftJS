@@ -1,6 +1,8 @@
 // Distances are world blocks. Old saved chunk values are read only for migration.
 export function lodDistance(settings) {
-  const value = settings.lodDistance ?? (settings.lodChunks === undefined ? 128 : settings.lodChunks * 16);
+  const value =
+    settings.lodDistance ??
+    (settings.lodChunks === undefined ? 128 : settings.lodChunks * 16);
   return Number.isFinite(value) ? Math.max(0, value) : 128;
 }
 
@@ -18,6 +20,9 @@ export function sectionLod(settings, camera, cx, sy, cz, previous = false) {
 
 export function poseInterval(settings, distanceSquared) {
   const distance = lodDistance(settings);
-  return distance <= 0 || distanceSquared <= distance * distance ? 1
-    : distanceSquared <= 4 * distance * distance ? 2 : 4;
+  return distance <= 0 || distanceSquared <= distance * distance
+    ? 1
+    : distanceSquared <= 4 * distance * distance
+      ? 2
+      : 4;
 }

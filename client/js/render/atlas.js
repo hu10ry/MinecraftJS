@@ -1,7 +1,7 @@
 // Texture atlas built from decoded block + item textures (pure JS), with .mcmeta animation support.
 
 // Sprites whose frame is chosen by game state instead of time (TextureCompass, TextureClock)
-const MANUAL = new Set(['item/compass', 'item/clock']);
+const MANUAL = new Set(["item/compass", "item/clock"]);
 
 export class Atlas {
   constructor() {
@@ -21,7 +21,10 @@ export class Atlas {
       const w = img.width;
       let h = img.height;
       let frames = 1;
-      if (meta && meta.animation && h > w) { frames = Math.floor(h / w); h = w; }
+      if (meta && meta.animation && h > w) {
+        frames = Math.floor(h / w);
+        h = w;
+      }
       items.push({ name: t.name, img, w, h, frames, meta });
     }
     items.sort((a, b) => b.h - a.h || b.w - a.w || (a.name < b.name ? -1 : 1));
@@ -31,11 +34,22 @@ export class Atlas {
     while (size * size < area * 1.15) size *= 2;
     // Shelf packing; grow if needed
     for (;;) {
-      let x = 0, y = 0, rowH = 0, ok = true;
+      let x = 0,
+        y = 0,
+        rowH = 0,
+        ok = true;
       for (const it of items) {
-        if (x + it.w > size) { x = 0; y += rowH; rowH = 0; }
-        if (y + it.h > size) { ok = false; break; }
-        it.x = x; it.y = y;
+        if (x + it.w > size) {
+          x = 0;
+          y += rowH;
+          rowH = 0;
+        }
+        if (y + it.h > size) {
+          ok = false;
+          break;
+        }
+        it.x = x;
+        it.y = y;
         x += it.w;
         rowH = Math.max(rowH, it.h);
       }
@@ -48,35 +62,71 @@ export class Atlas {
     this.entries.clear();
     this.animations = [];
     for (const it of items) {
-      const src = it.img.data, sw = it.img.width;
+      const src = it.img.data,
+        sw = it.img.width;
       let alpha = false;
       for (let yy = 0; yy < it.h; yy++) {
-        const so = yy * sw * 4, d = ((it.y + yy) * size + it.x) * 4;
+        const so = yy * sw * 4,
+          d = ((it.y + yy) * size + it.x) * 4;
         data.set(src.subarray(so, so + it.w * 4), d);
-        if (!alpha) for (let xx = 0; xx < it.w; xx++) if (src[so + xx * 4 + 3] < 255) { alpha = true; break; }
+        if (!alpha)
+          for (let xx = 0; xx < it.w; xx++)
+            if (src[so + xx * 4 + 3] < 255) {
+              alpha = true;
+              break;
+            }
       }
       const eps = 0.0005 / size;
-      const uv = [it.x / size + eps, it.y / size + eps, (it.x + it.w) / size - eps, (it.y + it.h) / size - eps];
+      const uv = [
+        it.x / size + eps,
+        it.y / size + eps,
+        (it.x + it.w) / size - eps,
+        (it.y + it.h) / size - eps,
+      ];
       const entry = { x: it.x, y: it.y, w: it.w, h: it.h, uv, alpha };
       this.entries.set(it.name, entry);
       if (it.frames > 1) {
         const a = it.meta.animation;
         const frametime = a.frametime || 1;
-        let frames = a.frames ? a.frames.map((f) => (typeof f === 'number' ? { index: f, time: frametime } : { index: f.index, time: f.time || frametime })) : null;
-        if (!frames) frames = Array.from({ length: it.frames }, (_, i) => ({ index: i, time: frametime }));
-        this.animations.push({ entry, full: it.img, frames, interpolate: !!a.interpolate, frame: 0, ticks: 0, manual: MANUAL.has(it.name), name: it.name });
+        let frames = a.frames
+          ? a.frames.map((f) =>
+              typeof f === "number"
+                ? { index: f, time: frametime }
+                : { index: f.index, time: f.time || frametime },
+            )
+          : null;
+        if (!frames)
+          frames = Array.from({ length: it.frames }, (_, i) => ({
+            index: i,
+            time: frametime,
+          }));
+        this.animations.push({
+          entry,
+          full: it.img,
+          frames,
+          interpolate: !!a.interpolate,
+          frame: 0,
+          ticks: 0,
+          manual: MANUAL.has(it.name),
+          name: it.name,
+        });
       }
     }
     this.dirty = null;
   }
 
   uv(name) {
-    const e = this.entries.get(name) || this.entries.get('block/stone');
+    const e = this.entries.get(name) || this.entries.get("block/stone");
     return e ? e.uv : null;
   }
 
-  has(name) { return this.entries.has(name); }
-  hasAlpha(name) { const e = this.entries.get(name); return e ? e.alpha : false; }
+  has(name) {
+    return this.entries.has(name);
+  }
+  hasAlpha(name) {
+    const e = this.entries.get(name);
+    return e ? e.alpha : false;
+  }
 
   // Advance animations by one game tick. Returns the list of changed entries.
   tick() {
@@ -112,7 +162,10 @@ export class Atlas {
     return an.entry;
   }
 
-  frameCount(name) { const an = this.animations.find((a) => a.name === name); return an ? an.frames.length : 0; }
+  frameCount(name) {
+    const an = this.animations.find((a) => a.name === name);
+    return an ? an.frames.length : 0;
+  }
 
   // RGBA pixels of a sub rectangle (for partial texture uploads): an animation's current frame without copying
   // when it has one, else read out of the atlas
@@ -131,20 +184,29 @@ export class Atlas {
   // reusable buffer once and copied from it.
   _writeFrame(an) {
     const e = an.entry;
-    const w = e.w, h = e.h, row = w * 4;
+    const w = e.w,
+      h = e.h,
+      row = w * 4;
     const src = an.full.data;
     const f = an.frames[an.frame];
     const srcOff = f.index * w * h * 4;
     let frame;
     if (an.interpolate && an.ticks > 0) {
       const next = an.frames[(an.frame + 1) % an.frames.length];
-      const mix = an.ticks / f.time, inv = 1 - mix;
+      const mix = an.ticks / f.time,
+        inv = 1 - mix;
       const nextOff = next.index * w * h * 4;
       frame = an.blend || (an.blend = new Uint8Array(w * h * 4));
-      for (let i = 0, n = w * h * 4; i < n; i++) frame[i] = src[srcOff + i] * inv + src[nextOff + i] * mix;
+      for (let i = 0, n = w * h * 4; i < n; i++)
+        frame[i] = src[srcOff + i] * inv + src[nextOff + i] * mix;
     } else frame = src.subarray(srcOff, srcOff + w * h * 4);
-    const dst = this.data, size4 = this.size * 4;
-    for (let yy = 0; yy < h; yy++) dst.set(frame.subarray(yy * row, yy * row + row), (e.y + yy) * size4 + e.x * 4);
+    const dst = this.data,
+      size4 = this.size * 4;
+    for (let yy = 0; yy < h; yy++)
+      dst.set(
+        frame.subarray(yy * row, yy * row + row),
+        (e.y + yy) * size4 + e.x * 4,
+      );
     e.upload = frame;
   }
 
@@ -157,8 +219,18 @@ export class Atlas {
 }
 
 export class AtlasLookup {
-  constructor(table) { this.table = table; }
-  uv(name) { const e = this.table[name] || this.table['block/stone']; return e ? e.uv : null; }
-  hasAlpha(name) { const e = this.table[name]; return e ? e.alpha : false; }
-  has(name) { return !!this.table[name]; }
+  constructor(table) {
+    this.table = table;
+  }
+  uv(name) {
+    const e = this.table[name] || this.table["block/stone"];
+    return e ? e.uv : null;
+  }
+  hasAlpha(name) {
+    const e = this.table[name];
+    return e ? e.alpha : false;
+  }
+  has(name) {
+    return !!this.table[name];
+  }
 }

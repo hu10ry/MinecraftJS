@@ -5,15 +5,15 @@ Updated 2026-10-24. Definitions were checked against each pinned client jar;
 categories, category order, expected pack format and client-jar provenance.
 Normal builds use `client/js/gui/vanilla-layout.js` and require no Java runtime.
 
-| Correction | 1.13.2 | 1.12.2 | 1.8.9 |
-| --- | --- | --- | --- |
-| Crystal/dragon beam texture cutouts | Fixed | Backported | Backported |
-| Video option order from the native jar | Fixed | Verified against its jar | Verified against its jar |
-| Control category order and binding categories | Fixed | Backported | Native localized category ordering retained |
-| Incompatible resource-pack tint and Yes/No selection dialog | Format 4 | Format 3 | Format 1 |
-| GLFW modifier names, e.g. Left Shift | Added | Native LWJGL labels retained | Native LWJGL labels retained |
-| Biome Blend option and actual configurable tint blending | Added | Not a vanilla feature in this version | Not a vanilla feature in this version |
-| Separate block/liquid debug rays and targeted block/fluid/entity headings | Added | Native debug layout retained | Native debug layout retained |
+| Correction                                                                | 1.13.2   | 1.12.2                                | 1.8.9                                       |
+| ------------------------------------------------------------------------- | -------- | ------------------------------------- | ------------------------------------------- |
+| Crystal/dragon beam texture cutouts                                       | Fixed    | Backported                            | Backported                                  |
+| Video option order from the native jar                                    | Fixed    | Verified against its jar              | Verified against its jar                    |
+| Control category order and binding categories                             | Fixed    | Backported                            | Native localized category ordering retained |
+| Incompatible resource-pack tint and Yes/No selection dialog               | Format 4 | Format 3                              | Format 1                                    |
+| GLFW modifier names, e.g. Left Shift                                      | Added    | Native LWJGL labels retained          | Native LWJGL labels retained                |
+| Biome Blend option and actual configurable tint blending                  | Added    | Not a vanilla feature in this version | Not a vanilla feature in this version       |
+| Separate block/liquid debug rays and targeted block/fluid/entity headings | Added    | Native debug layout retained          | Native debug layout retained                |
 
 The beam's geometry already used the jar's tapered octagonal strip and UVs, but
 its opaque draw pass ignored texture alpha. Transparent texels have white RGB,

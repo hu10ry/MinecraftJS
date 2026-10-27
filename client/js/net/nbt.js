@@ -1,24 +1,45 @@
 // Uncompressed big-endian NBT as used inside 1.8 packets.
 // Tags are kept typed ({ t, v }) so they can be written back verbatim;
 // use simplify() for convenient plain-JS access.
-import { decodeUtf8, encodeUtf8 } from '../util/utf8.js';
+import { decodeUtf8, encodeUtf8 } from "../util/utf8.js";
 
 export const TAG = {
-  END: 0, BYTE: 1, SHORT: 2, INT: 3, LONG: 4, FLOAT: 5, DOUBLE: 6,
-  BYTE_ARRAY: 7, STRING: 8, LIST: 9, COMPOUND: 10, INT_ARRAY: 11, LONG_ARRAY: 12,
+  END: 0,
+  BYTE: 1,
+  SHORT: 2,
+  INT: 3,
+  LONG: 4,
+  FLOAT: 5,
+  DOUBLE: 6,
+  BYTE_ARRAY: 7,
+  STRING: 8,
+  LIST: 9,
+  COMPOUND: 10,
+  INT_ARRAY: 11,
+  LONG_ARRAY: 12,
 };
 
 function readPayload(r, t, depth) {
-  if (depth > 512) throw new Error('NBT too deep');
+  if (depth > 512) throw new Error("NBT too deep");
   switch (t) {
-    case TAG.BYTE: return r.i8();
-    case TAG.SHORT: return r.i16();
-    case TAG.INT: return r.i32();
-    case TAG.LONG: return r.i64();
-    case TAG.FLOAT: return r.f32();
-    case TAG.DOUBLE: return r.f64();
-    case TAG.BYTE_ARRAY: { const n = r.i32(); return Int8Array.from(r.bytesN(n)); }
-    case TAG.STRING: return readUtf(r);
+    case TAG.BYTE:
+      return r.i8();
+    case TAG.SHORT:
+      return r.i16();
+    case TAG.INT:
+      return r.i32();
+    case TAG.LONG:
+      return r.i64();
+    case TAG.FLOAT:
+      return r.f32();
+    case TAG.DOUBLE:
+      return r.f64();
+    case TAG.BYTE_ARRAY: {
+      const n = r.i32();
+      return Int8Array.from(r.bytesN(n));
+    }
+    case TAG.STRING:
+      return readUtf(r);
     case TAG.LIST: {
       const et = r.u8();
       const n = r.i32();
@@ -42,13 +63,15 @@ function readPayload(r, t, depth) {
       for (let i = 0; i < n; i++) a[i] = r.i32();
       return a;
     }
-    case TAG.LONG_ARRAY: { // added in 1.12
+    case TAG.LONG_ARRAY: {
+      // added in 1.12
       const n = r.i32();
       const a = new BigInt64Array(n);
       for (let i = 0; i < n; i++) a[i] = r.i64();
       return a;
     }
-    default: throw new Error('Unknown NBT tag ' + t);
+    default:
+      throw new Error("Unknown NBT tag " + t);
   }
 }
 
@@ -75,14 +98,31 @@ function writeUtf(w, s) {
 
 function writePayload(w, t, v) {
   switch (t) {
-    case TAG.BYTE: w.i8(v); break;
-    case TAG.SHORT: w.i16(v); break;
-    case TAG.INT: w.i32(v); break;
-    case TAG.LONG: w.i64(v); break;
-    case TAG.FLOAT: w.f32(v); break;
-    case TAG.DOUBLE: w.f64(v); break;
-    case TAG.BYTE_ARRAY: w.i32(v.length); for (const b of v) w.i8(b); break;
-    case TAG.STRING: writeUtf(w, v); break;
+    case TAG.BYTE:
+      w.i8(v);
+      break;
+    case TAG.SHORT:
+      w.i16(v);
+      break;
+    case TAG.INT:
+      w.i32(v);
+      break;
+    case TAG.LONG:
+      w.i64(v);
+      break;
+    case TAG.FLOAT:
+      w.f32(v);
+      break;
+    case TAG.DOUBLE:
+      w.f64(v);
+      break;
+    case TAG.BYTE_ARRAY:
+      w.i32(v.length);
+      for (const b of v) w.i8(b);
+      break;
+    case TAG.STRING:
+      writeUtf(w, v);
+      break;
     case TAG.LIST:
       w.u8(v.items.length ? v.et : 0);
       w.i32(v.items.length);
@@ -96,16 +136,23 @@ function writePayload(w, t, v) {
       }
       w.u8(0);
       break;
-    case TAG.INT_ARRAY: w.i32(v.length); for (const x of v) w.i32(x); break;
-    case TAG.LONG_ARRAY: w.i32(v.length); for (const x of v) w.i64(x); break;
-    default: throw new Error('Unknown NBT tag ' + t);
+    case TAG.INT_ARRAY:
+      w.i32(v.length);
+      for (const x of v) w.i32(x);
+      break;
+    case TAG.LONG_ARRAY:
+      w.i32(v.length);
+      for (const x of v) w.i64(x);
+      break;
+    default:
+      throw new Error("Unknown NBT tag " + t);
   }
 }
 
 export function writeNbtRoot(w, root) {
   if (!root) return w.u8(0);
   w.u8(root.t);
-  writeUtf(w, root.name || '');
+  writeUtf(w, root.name || "");
   writePayload(w, root.t, root.v);
   return w;
 }

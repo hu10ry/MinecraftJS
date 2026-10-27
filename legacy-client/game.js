@@ -31,71 +31,90 @@ class Game {
   }
 
   setupUI() {
-    document.getElementById('connect-btn').addEventListener('click', () => this.connect());
-    document.getElementById('resume-btn').addEventListener('click', () => {
+    document
+      .getElementById("connect-btn")
+      .addEventListener("click", () => this.connect());
+    document.getElementById("resume-btn").addEventListener("click", () => {
       this.controls.togglePause(false);
-      document.getElementById('game-canvas').requestPointerLock();
+      document.getElementById("game-canvas").requestPointerLock();
     });
-    document.getElementById('disconnect-btn').addEventListener('click', () => this.disconnect());
+    document
+      .getElementById("disconnect-btn")
+      .addEventListener("click", () => this.disconnect());
 
-    document.getElementById('username').addEventListener('keydown', (e) => {
-      if (e.key === 'Enter') this.connect();
+    document.getElementById("username").addEventListener("keydown", (e) => {
+      if (e.key === "Enter") this.connect();
     });
   }
 
   connect() {
-    const username = document.getElementById('username').value || 'WebPlayer';
-    const host = document.getElementById('server-host').value || 'localhost';
-    const port = parseInt(document.getElementById('server-port').value) || 25565;
+    const username = document.getElementById("username").value || "WebPlayer";
+    const host = document.getElementById("server-host").value || "localhost";
+    const port =
+      parseInt(document.getElementById("server-port").value) || 25565;
 
-    document.getElementById('login-status').textContent = 'Connecting...';
+    document.getElementById("login-status").textContent = "Connecting...";
 
     const wsUrl = `ws://${window.location.host}`;
     this.ws = new WebSocket(wsUrl);
-    this.ws.binaryType = 'arraybuffer';
+    this.ws.binaryType = "arraybuffer";
 
     this.ws.onopen = () => {
-      this.ws.send(JSON.stringify({
-        type: 'connect',
-        host,
-        port,
-        username
-      }));
+      this.ws.send(
+        JSON.stringify({
+          type: "connect",
+          host,
+          port,
+          username,
+        }),
+      );
     };
 
     this.ws.onmessage = (e) => {
       // Play-state packets arrive as raw binary: varint packet id + body
-      if (typeof e.data !== 'string') {
+      if (typeof e.data !== "string") {
         const bytes = new Uint8Array(e.data);
-        let id = 0, shift = 0, i = 0, b;
-        do { b = bytes[i++]; id |= (b & 0x7F) << shift; shift += 7; } while (b & 0x80);
-        this.handleMessage({ type: 'packet', state: 3, id, data: bytes.subarray(i) });
+        let id = 0,
+          shift = 0,
+          i = 0,
+          b;
+        do {
+          b = bytes[i++];
+          id |= (b & 0x7f) << shift;
+          shift += 7;
+        } while (b & 0x80);
+        this.handleMessage({
+          type: "packet",
+          state: 3,
+          id,
+          data: bytes.subarray(i),
+        });
         return;
       }
       try {
         const msg = JSON.parse(e.data);
         this.handleMessage(msg);
       } catch (err) {
-        console.error('Message parse error:', err);
+        console.error("Message parse error:", err);
       }
     };
 
     this.ws.onclose = () => {
-      document.getElementById('login-status').textContent = 'Disconnected';
+      document.getElementById("login-status").textContent = "Disconnected";
       this.connected = false;
     };
 
     this.ws.onerror = (err) => {
-      document.getElementById('login-status').textContent = 'Connection failed';
-      console.error('WebSocket error:', err);
+      document.getElementById("login-status").textContent = "Connection failed";
+      console.error("WebSocket error:", err);
     };
   }
 
   disconnect() {
     if (this.ws) this.ws.close();
     this.connected = false;
-    document.getElementById('game-screen').style.display = 'none';
-    document.getElementById('login-screen').style.display = 'flex';
+    document.getElementById("game-screen").style.display = "none";
+    document.getElementById("login-screen").style.display = "flex";
     document.exitPointerLock();
   }
 
@@ -103,14 +122,14 @@ class Game {
     if (this.gameStarted) return;
     this.gameStarted = true;
 
-    document.getElementById('login-screen').style.display = 'none';
-    document.getElementById('game-screen').style.display = 'block';
+    document.getElementById("login-screen").style.display = "none";
+    document.getElementById("game-screen").style.display = "block";
 
-    const overlay = document.getElementById('loading-overlay');
-    if (overlay) overlay.style.display = 'flex';
-    this.updateLoadingProgress('Joining world...', 25);
+    const overlay = document.getElementById("loading-overlay");
+    if (overlay) overlay.style.display = "flex";
+    this.updateLoadingProgress("Joining world...", 25);
 
-    const canvas = document.getElementById('game-canvas');
+    const canvas = document.getElementById("game-canvas");
     this.renderer = new GameRenderer(canvas);
     this.controls = new PlayerControls(this.renderer.camera, canvas);
 
@@ -121,69 +140,73 @@ class Game {
 
     this.connected = true;
     this.sendClientSettings();
-    this.sendPluginMessage('MC|Brand', 'vanilla');
+    this.sendPluginMessage("MC|Brand", "vanilla");
     this.gameLoop();
   }
 
   updateLoadingProgress(text, pct) {
-    const detailEl = document.getElementById('loading-detail');
+    const detailEl = document.getElementById("loading-detail");
     if (detailEl && text) detailEl.textContent = text;
-    const barEl = document.getElementById('loading-progress-bar');
-    if (barEl && pct !== undefined) barEl.style.width = Math.min(100, Math.max(0, pct)) + '%';
+    const barEl = document.getElementById("loading-progress-bar");
+    if (barEl && pct !== undefined)
+      barEl.style.width = Math.min(100, Math.max(0, pct)) + "%";
   }
 
   hideLoadingOverlay() {
-    const overlay = document.getElementById('loading-overlay');
-    if (overlay && overlay.style.display !== 'none') {
-      overlay.style.transition = 'opacity 0.4s ease';
-      overlay.style.opacity = '0';
+    const overlay = document.getElementById("loading-overlay");
+    if (overlay && overlay.style.display !== "none") {
+      overlay.style.transition = "opacity 0.4s ease";
+      overlay.style.opacity = "0";
       setTimeout(() => {
-        overlay.style.display = 'none';
-        overlay.style.opacity = '1';
+        overlay.style.display = "none";
+        overlay.style.opacity = "1";
       }, 400);
     }
   }
 
   handleMessage(msg) {
-    if (msg.type === 'status') {
-      const statusEl = document.getElementById('login-status');
+    if (msg.type === "status") {
+      const statusEl = document.getElementById("login-status");
       if (statusEl) statusEl.textContent = msg.message;
       this.updateLoadingProgress(msg.message);
       return;
     }
 
-    if (msg.type === 'error') {
-      const statusEl = document.getElementById('login-status');
-      if (statusEl) statusEl.textContent = 'Error: ' + msg.message;
-      this.addChat('Error: ' + msg.message, '#ff5555');
+    if (msg.type === "error") {
+      const statusEl = document.getElementById("login-status");
+      if (statusEl) statusEl.textContent = "Error: " + msg.message;
+      this.addChat("Error: " + msg.message, "#ff5555");
       return;
     }
 
-    if (msg.type === 'disconnected') {
-      const statusEl = document.getElementById('login-status');
-      if (statusEl) statusEl.textContent = 'Disconnected from server.';
-      this.addChat('Disconnected from server', '#ff5555');
+    if (msg.type === "disconnected") {
+      const statusEl = document.getElementById("login-status");
+      if (statusEl) statusEl.textContent = "Disconnected from server.";
+      this.addChat("Disconnected from server", "#ff5555");
       return;
     }
 
-    if (msg.type === 'kicked') {
+    if (msg.type === "kicked") {
       const reason = this.parseChatJson(msg.reason);
-      const statusEl = document.getElementById('login-status');
-      if (statusEl) statusEl.textContent = 'Kicked: ' + reason;
-      this.addChat('Kicked: ' + reason, '#ff5555');
+      const statusEl = document.getElementById("login-status");
+      if (statusEl) statusEl.textContent = "Kicked: " + reason;
+      this.addChat("Kicked: " + reason, "#ff5555");
       return;
     }
 
-    if (msg.type === 'login_success') {
-      console.log('Login success event:', msg);
+    if (msg.type === "login_success") {
+      console.log("Login success event:", msg);
       this.playerUuid = msg.uuid;
       this.playerName = msg.username;
-      this.updateLoadingProgress(`Logged in as ${msg.username}! Entering world...`, 30);
+      this.updateLoadingProgress(
+        `Logged in as ${msg.username}! Entering world...`,
+        30,
+      );
       this.startGame();
       return;
     }
 
-    if (msg.type !== 'packet') return;
+    if (msg.type !== "packet") return;
 
     const buf = new PacketBuffer(msg.data);
 
@@ -203,7 +226,7 @@ class Game {
       this.handlePlayPacket(msg.id, buf);
     } catch (e) {
       // Catch any unexpected packet parse issue gracefully
-      console.warn('Packet parse error for 0x' + msg.id.toString(16), e);
+      console.warn("Packet parse error for 0x" + msg.id.toString(16), e);
     }
   }
 
@@ -461,7 +484,10 @@ class Game {
 
   handleKeepAlive(buf) {
     const keepAliveId = buf.readVarInt();
-    this.sendPacket(ClientPackets.KEEP_ALIVE, new PacketWriter().writeVarInt(keepAliveId));
+    this.sendPacket(
+      ClientPackets.KEEP_ALIVE,
+      new PacketWriter().writeVarInt(keepAliveId),
+    );
   }
 
   handleJoinGame(buf) {
@@ -473,13 +499,21 @@ class Game {
     const levelType = buf.readString();
     const reducedDebug = buf.readBoolean();
 
-    this.updateLoadingProgress('Joined server! Loading terrain...', 40);
-    this.addChat(`Joined game (Mode: ${['Survival','Creative','Adventure','Spectator'][this.gameMode]})`, '#55ff55');
-    console.log('Joined game. Entity ID:', this.entityId, 'Dimension:', this.dimension);
+    this.updateLoadingProgress("Joined server! Loading terrain...", 40);
+    this.addChat(
+      `Joined game (Mode: ${["Survival", "Creative", "Adventure", "Spectator"][this.gameMode]})`,
+      "#55ff55",
+    );
+    console.log(
+      "Joined game. Entity ID:",
+      this.entityId,
+      "Dimension:",
+      this.dimension,
+    );
 
     // Send Client Settings (0x15) and MC|Brand (0x17)
     this.sendClientSettings();
-    this.sendPluginMessage('MC|Brand', 'vanilla');
+    this.sendPluginMessage("MC|Brand", "vanilla");
   }
 
   handleChatMessage(buf) {
@@ -499,14 +533,14 @@ class Game {
   }
 
   extractChatText(obj) {
-    if (typeof obj === 'string') return obj;
-    let text = obj.text || '';
+    if (typeof obj === "string") return obj;
+    let text = obj.text || "";
     if (obj.translate) {
       text = obj.translate;
       if (obj.with) {
         obj.with.forEach((w, i) => {
-          text = text.replace(`%${i+1}$s`, this.extractChatText(w));
-          text = text.replace('%s', this.extractChatText(w));
+          text = text.replace(`%${i + 1}$s`, this.extractChatText(w));
+          text = text.replace("%s", this.extractChatText(w));
         });
       }
     }
@@ -531,9 +565,12 @@ class Game {
     this.updateHealthDisplay();
 
     if (this.health <= 0) {
-      this.addChat('You died!', '#ff5555');
+      this.addChat("You died!", "#ff5555");
       setTimeout(() => {
-        this.sendPacket(ClientPackets.CLIENT_STATUS, new PacketWriter().writeVarInt(0));
+        this.sendPacket(
+          ClientPackets.CLIENT_STATUS,
+          new PacketWriter().writeVarInt(0),
+        );
       }, 2000);
     }
   }
@@ -557,11 +594,11 @@ class Game {
     if (flags & 0x04) this.controls.position.z += z;
     else this.controls.position.z = z;
 
-    if (flags & 0x08) this.controls.yaw += (-yaw * Math.PI / 180);
-    else this.controls.yaw = -yaw * Math.PI / 180;
+    if (flags & 0x08) this.controls.yaw += (-yaw * Math.PI) / 180;
+    else this.controls.yaw = (-yaw * Math.PI) / 180;
 
-    if (flags & 0x10) this.controls.pitch += (-pitch * Math.PI / 180);
-    else this.controls.pitch = -pitch * Math.PI / 180;
+    if (flags & 0x10) this.controls.pitch += (-pitch * Math.PI) / 180;
+    else this.controls.pitch = (-pitch * Math.PI) / 180;
 
     this.controls.velocity.set(0, 0, 0);
     this.controls.onGround = true;
@@ -576,8 +613,13 @@ class Game {
       .writeBoolean(true);
     this.sendPacket(ClientPackets.PLAYER_POSITION_AND_LOOK, writer);
 
-    this.updateLoadingProgress('Spawn position received! Preparing world...', 70);
-    console.log(`Teleported to ${this.controls.position.x.toFixed(1)}, ${this.controls.position.y.toFixed(1)}, ${this.controls.position.z.toFixed(1)}`);
+    this.updateLoadingProgress(
+      "Spawn position received! Preparing world...",
+      70,
+    );
+    console.log(
+      `Teleported to ${this.controls.position.x.toFixed(1)}, ${this.controls.position.y.toFixed(1)}, ${this.controls.position.z.toFixed(1)}`,
+    );
   }
 
   handleChunkData(buf) {
@@ -604,7 +646,10 @@ class Game {
   onChunkReceived() {
     const count = this.world.chunks.size;
     const pct = Math.min(95, 50 + count * 2);
-    this.updateLoadingProgress(`Loading terrain (${count} chunks ready)...`, pct);
+    this.updateLoadingProgress(
+      `Loading terrain (${count} chunks ready)...`,
+      pct,
+    );
 
     if (count >= 10) {
       this.hideLoadingOverlay();
@@ -626,10 +671,22 @@ class Game {
     // Also dirty neighbors if on chunk edge
     const lx = ((pos.x % 16) + 16) % 16;
     const lz = ((pos.z % 16) + 16) % 16;
-    if (lx === 0) { const n = this.world.getChunk(cx-1, cz); if (n) n.dirty = true; }
-    if (lx === 15) { const n = this.world.getChunk(cx+1, cz); if (n) n.dirty = true; }
-    if (lz === 0) { const n = this.world.getChunk(cx, cz-1); if (n) n.dirty = true; }
-    if (lz === 15) { const n = this.world.getChunk(cx, cz+1); if (n) n.dirty = true; }
+    if (lx === 0) {
+      const n = this.world.getChunk(cx - 1, cz);
+      if (n) n.dirty = true;
+    }
+    if (lx === 15) {
+      const n = this.world.getChunk(cx + 1, cz);
+      if (n) n.dirty = true;
+    }
+    if (lz === 0) {
+      const n = this.world.getChunk(cx, cz - 1);
+      if (n) n.dirty = true;
+    }
+    if (lz === 15) {
+      const n = this.world.getChunk(cx, cz + 1);
+      if (n) n.dirty = true;
+    }
   }
 
   handleMultiBlockChange(buf) {
@@ -640,9 +697,9 @@ class Game {
       const record = buf.readUShort();
       const blockState = buf.readVarInt();
       const blockId = blockState >> 4;
-      const x = (record >> 12) & 0xF;
-      const z = (record >> 8) & 0xF;
-      const y = record & 0xFF;
+      const x = (record >> 12) & 0xf;
+      const z = (record >> 8) & 0xf;
+      const y = record & 0xff;
       this.world.setBlock(chunkX * 16 + x, y, chunkZ * 16 + z, blockId);
     }
     const chunk = this.world.getChunk(chunkX, chunkZ);
@@ -651,7 +708,7 @@ class Game {
 
   handleSpawnPosition(buf) {
     const pos = buf.readPosition();
-    console.log('Spawn position:', pos);
+    console.log("Spawn position:", pos);
   }
 
   handleSetExperience(buf) {
@@ -677,11 +734,13 @@ class Game {
     const pitch = buf.readAngle();
     const currentItem = buf.readShort();
 
-    const entity = { x, y, z, yaw, pitch, type: 'player', uuid };
+    const entity = { x, y, z, yaw, pitch, type: "player", uuid };
     this.world.entities.set(eid, entity);
     this.renderer.updatePlayerMesh(uuid, entity);
 
-    try { buf.readMetadata(); } catch(e) {}
+    try {
+      buf.readMetadata();
+    } catch (e) {}
   }
 
   handleSpawnMob(buf) {
@@ -697,11 +756,13 @@ class Game {
     const velY = buf.readShort();
     const velZ = buf.readShort();
 
-    const entity = { x, y, z, yaw, pitch, type: 'mob', mobType: type };
+    const entity = { x, y, z, yaw, pitch, type: "mob", mobType: type };
     this.world.entities.set(eid, entity);
     this.renderer.updateEntityMesh(eid, entity);
 
-    try { buf.readMetadata(); } catch(e) {}
+    try {
+      buf.readMetadata();
+    } catch (e) {}
   }
 
   handleSpawnObject(buf) {
@@ -714,7 +775,7 @@ class Game {
     const yaw = buf.readAngle();
     const data = buf.readInt();
 
-    const entity = { x, y, z, yaw, pitch, type: 'object', objectType: type };
+    const entity = { x, y, z, yaw, pitch, type: "object", objectType: type };
     this.world.entities.set(eid, entity);
   }
 
@@ -730,7 +791,7 @@ class Game {
       entity.x += dx;
       entity.y += dy;
       entity.z += dz;
-      if (entity.type === 'player') {
+      if (entity.type === "player") {
         this.renderer.updatePlayerMesh(entity.uuid, entity);
       } else {
         this.renderer.updateEntityMesh(eid, entity);
@@ -754,7 +815,7 @@ class Game {
       entity.z += dz;
       entity.yaw = yaw;
       entity.pitch = pitch;
-      if (entity.type === 'player') {
+      if (entity.type === "player") {
         this.renderer.updatePlayerMesh(entity.uuid, entity);
       } else {
         this.renderer.updateEntityMesh(eid, entity);
@@ -778,7 +839,7 @@ class Game {
       entity.z = z;
       entity.yaw = yaw;
       entity.pitch = pitch;
-      if (entity.type === 'player') {
+      if (entity.type === "player") {
         this.renderer.updatePlayerMesh(entity.uuid, entity);
       } else {
         this.renderer.updateEntityMesh(eid, entity);
@@ -791,8 +852,8 @@ class Game {
     for (let i = 0; i < count; i++) {
       const eid = buf.readVarInt();
       const entity = this.world.entities.get(eid);
-      if (entity && entity.type === 'player') {
-        this.renderer.removeEntityMesh('player_' + entity.uuid);
+      if (entity && entity.type === "player") {
+        this.renderer.removeEntityMesh("player_" + entity.uuid);
       } else {
         this.renderer.removeEntityMesh(eid);
       }
@@ -809,7 +870,7 @@ class Game {
     // Clear world on dimension change
     for (const [key, chunk] of this.world.chunks) {
       if (chunk.mesh) {
-        chunk.mesh.forEach(m => {
+        chunk.mesh.forEach((m) => {
           this.renderer.chunkGroup.remove(m);
           m.geometry.dispose();
           m.material.dispose();
@@ -817,7 +878,7 @@ class Game {
       }
     }
     this.world.chunks.clear();
-    this.addChat('Respawning...', '#55ff55');
+    this.addChat("Respawning...", "#55ff55");
   }
 
   handleChangeGameState(buf) {
@@ -836,7 +897,7 @@ class Game {
   handleDisconnect(buf) {
     const reason = buf.readString();
     const text = this.parseChatJson(reason);
-    this.addChat('Disconnected: ' + text, '#ff5555');
+    this.addChat("Disconnected: " + text, "#ff5555");
     this.disconnect();
   }
 
@@ -844,14 +905,20 @@ class Game {
     const windowId = buf.readUByte();
     const count = buf.readShort();
     for (let i = 0; i < count; i++) {
-      try { buf.readSlot(); } catch(e) { break; }
+      try {
+        buf.readSlot();
+      } catch (e) {
+        break;
+      }
     }
   }
 
   handleSetSlot(buf) {
     const windowId = buf.readByte();
     const slot = buf.readShort();
-    try { buf.readSlot(); } catch(e) {}
+    try {
+      buf.readSlot();
+    } catch (e) {}
   }
 
   handleConfirmTransaction(buf) {
@@ -871,7 +938,7 @@ class Game {
 
   sendPluginMessage(channel, data) {
     const writer = new PacketWriter().writeString(channel);
-    if (typeof data === 'string') {
+    if (typeof data === "string") {
       writer.writeString(data);
     } else if (data instanceof Uint8Array) {
       writer.writeBytes(data);
@@ -882,18 +949,20 @@ class Game {
   sendPacket(id, writer) {
     if (!this.ws || this.ws.readyState !== WebSocket.OPEN) return;
     // Proxy expects raw binary: varint packet id + body (it handles framing/compression)
-    const payload = new PacketWriter().writeVarInt(id).writeBytes(writer.build()).build();
+    const payload = new PacketWriter()
+      .writeVarInt(id)
+      .writeBytes(writer.build())
+      .build();
     this.ws.send(payload);
   }
 
   sendClientSettings() {
     const writer = new PacketWriter()
-      .writeString('en_US')
+      .writeString("en_US")
       .writeByte(8) // view distance
       .writeByte(0) // chat mode
       .writeBoolean(true) // chat colors
-      .writeByte(0x7F) // skin parts (all) - unsigned byte in 1.8
-      ;
+      .writeByte(0x7f); // skin parts (all) - unsigned byte in 1.8
     this.sendPacket(ClientPackets.CLIENT_SETTINGS, writer);
   }
 
@@ -915,11 +984,13 @@ class Game {
     const pitch = this.controls.getPitchDegrees();
     const onGround = this.controls.onGround;
 
-    const posChanged = Math.abs(x - this.lastSentX) > 0.01 ||
-                       Math.abs(y - this.lastSentY) > 0.01 ||
-                       Math.abs(z - this.lastSentZ) > 0.01;
-    const lookChanged = Math.abs(yaw - this.lastSentYaw) > 0.1 ||
-                        Math.abs(pitch - this.lastSentPitch) > 0.1;
+    const posChanged =
+      Math.abs(x - this.lastSentX) > 0.01 ||
+      Math.abs(y - this.lastSentY) > 0.01 ||
+      Math.abs(z - this.lastSentZ) > 0.01;
+    const lookChanged =
+      Math.abs(yaw - this.lastSentYaw) > 0.1 ||
+      Math.abs(pitch - this.lastSentPitch) > 0.1;
 
     if (posChanged || lookChanged) {
       const writer = new PacketWriter()
@@ -977,17 +1048,22 @@ class Game {
     // Determine face from adjacent block relative to target
     const adj = target.adjacent;
     let face = 0;
-    if (adj.y > pos.y) face = 1;      // top
-    else if (adj.y < pos.y) face = 0;  // bottom
-    else if (adj.z > pos.z) face = 3;  // south
-    else if (adj.z < pos.z) face = 2;  // north
-    else if (adj.x > pos.x) face = 5;  // east
-    else if (adj.x < pos.x) face = 4;  // west
+    if (adj.y > pos.y)
+      face = 1; // top
+    else if (adj.y < pos.y)
+      face = 0; // bottom
+    else if (adj.z > pos.z)
+      face = 3; // south
+    else if (adj.z < pos.z)
+      face = 2; // north
+    else if (adj.x > pos.x)
+      face = 5; // east
+    else if (adj.x < pos.x) face = 4; // west
 
     const writer = new PacketWriter()
       .writePosition(pos.x, pos.y, pos.z)
       .writeByte(face)
-      .writeShort(-1)    // held item: -1 = empty slot
+      .writeShort(-1) // held item: -1 = empty slot
       .writeByte(8)
       .writeByte(8)
       .writeByte(8);
@@ -997,9 +1073,9 @@ class Game {
   // UI Updates
 
   addChat(text, color) {
-    const container = document.getElementById('chat-messages');
-    const line = document.createElement('div');
-    line.className = 'chat-line';
+    const container = document.getElementById("chat-messages");
+    const line = document.createElement("div");
+    line.className = "chat-line";
     line.textContent = text;
     if (color) line.style.color = color;
     container.appendChild(line);
@@ -1009,7 +1085,7 @@ class Game {
 
     // Fade out after 10 seconds
     setTimeout(() => {
-      line.classList.add('fading');
+      line.classList.add("fading");
       setTimeout(() => {
         if (line.parentNode) line.parentNode.removeChild(line);
       }, 1000);
@@ -1022,25 +1098,27 @@ class Game {
   }
 
   updateHealthDisplay() {
-    const healthPct = Math.max(0, this.health / 20 * 100);
-    const hungerPct = Math.max(0, this.food / 20 * 100);
-    document.getElementById('health-fill').style.width = healthPct + '%';
-    document.getElementById('hunger-fill').style.width = hungerPct + '%';
-    document.getElementById('health-text').textContent = `${Math.ceil(this.health)}/20`;
-    document.getElementById('hunger-text').textContent = `${this.food}/20`;
+    const healthPct = Math.max(0, (this.health / 20) * 100);
+    const hungerPct = Math.max(0, (this.food / 20) * 100);
+    document.getElementById("health-fill").style.width = healthPct + "%";
+    document.getElementById("hunger-fill").style.width = hungerPct + "%";
+    document.getElementById("health-text").textContent =
+      `${Math.ceil(this.health)}/20`;
+    document.getElementById("hunger-text").textContent = `${this.food}/20`;
   }
 
   updateXPDisplay() {
-    document.getElementById('xp-fill').style.width = (this.xpProgress * 100) + '%';
-    document.getElementById('xp-level').textContent = this.xpLevel;
+    document.getElementById("xp-fill").style.width =
+      this.xpProgress * 100 + "%";
+    document.getElementById("xp-level").textContent = this.xpLevel;
   }
 
   updateDebugInfo() {
-    if (document.getElementById('debug-info').style.display === 'none') return;
+    if (document.getElementById("debug-info").style.display === "none") return;
     const pos = this.controls.position;
-    document.getElementById('position').textContent =
+    document.getElementById("position").textContent =
       `Pos: ${pos.x.toFixed(1)}, ${pos.y.toFixed(1)}, ${pos.z.toFixed(1)}`;
-    document.getElementById('chunk-info').textContent =
+    document.getElementById("chunk-info").textContent =
       `Chunks: ${this.world.chunks.size}`;
   }
 
@@ -1056,7 +1134,7 @@ class Game {
     this.fpsTime += dt;
     if (this.fpsTime >= 1) {
       this.fps = Math.round(this.fpsFrames / this.fpsTime);
-      document.getElementById('fps').textContent = `FPS: ${this.fps}`;
+      document.getElementById("fps").textContent = `FPS: ${this.fps}`;
       this.fpsFrames = 0;
       this.fpsTime = 0;
     }
@@ -1077,7 +1155,11 @@ class Game {
 
     // Update world rendering
     if (this.renderer) {
-      this.renderer.updateChunks(this.world, this.controls.position.x, this.controls.position.z);
+      this.renderer.updateChunks(
+        this.world,
+        this.controls.position.x,
+        this.controls.position.z,
+      );
 
       // Update block highlight
       const target = this.controls.getRayTarget(this.world, 5);

@@ -1,7 +1,13 @@
 // WebGPU implementation of the graphics device contract (see device.js).
-import { DEFAULT_PARAMS, PIPELINE_FORMAT, quadIndices, buildMips, vertexLayout } from './device.js';
+import {
+  DEFAULT_PARAMS,
+  PIPELINE_FORMAT,
+  quadIndices,
+  buildMips,
+  vertexLayout,
+} from "./device.js";
 
-const HEADER = /* wgsl */`
+const HEADER = /* wgsl */ `
 struct Globals { view: mat4x4f, proj: mat4x4f, fog: vec4f, fogColor: vec4f };
 struct Draw { model: mat4x4f, p: array<vec4f, 4> };
 @group(0) @binding(0) var<uniform> G: Globals;
@@ -248,11 +254,26 @@ fn fetchAux(c: vec2f) -> vec4f {
 };
 
 const BLENDS = {
-  alpha: { color: { srcFactor: 'src-alpha', dstFactor: 'one-minus-src-alpha' }, alpha: { srcFactor: 'one', dstFactor: 'one-minus-src-alpha' } },
-  add: { color: { srcFactor: 'src-alpha', dstFactor: 'one' }, alpha: { srcFactor: 'one', dstFactor: 'one' } },
-  invert: { color: { srcFactor: 'one-minus-dst', dstFactor: 'one-minus-src' }, alpha: { srcFactor: 'one', dstFactor: 'one' } },
-  darken: { color: { srcFactor: 'zero', dstFactor: 'one-minus-src' }, alpha: { srcFactor: 'zero', dstFactor: 'one' } },
-  multiply: { color: { srcFactor: 'dst', dstFactor: 'src' }, alpha: { srcFactor: 'zero', dstFactor: 'one' } },
+  alpha: {
+    color: { srcFactor: "src-alpha", dstFactor: "one-minus-src-alpha" },
+    alpha: { srcFactor: "one", dstFactor: "one-minus-src-alpha" },
+  },
+  add: {
+    color: { srcFactor: "src-alpha", dstFactor: "one" },
+    alpha: { srcFactor: "one", dstFactor: "one" },
+  },
+  invert: {
+    color: { srcFactor: "one-minus-dst", dstFactor: "one-minus-src" },
+    alpha: { srcFactor: "one", dstFactor: "one" },
+  },
+  darken: {
+    color: { srcFactor: "zero", dstFactor: "one-minus-src" },
+    alpha: { srcFactor: "zero", dstFactor: "one" },
+  },
+  multiply: {
+    color: { srcFactor: "dst", dstFactor: "src" },
+    alpha: { srcFactor: "zero", dstFactor: "one" },
+  },
 };
 
 const DRAW_STRIDE = 256;
@@ -260,41 +281,82 @@ const GLOBAL_STRIDE = 256;
 
 export class WebGPUDevice {
   static async create(canvas) {
-    if(globalThis.isSecureContext===false)throw new Error('WebGPU requires HTTPS or localhost; this page uses an insecure connection');
-    if (typeof navigator === 'undefined' || !navigator.gpu) throw new Error('This browser does not expose WebGPU');
+    if (globalThis.isSecureContext === false)
+      throw new Error(
+        "WebGPU requires HTTPS or localhost; this page uses an insecure connection",
+      );
+    if (typeof navigator === "undefined" || !navigator.gpu)
+      throw new Error("This browser does not expose WebGPU");
     const adapter = await navigator.gpu.requestAdapter();
-    if (!adapter) throw new Error('No WebGPU adapter');
+    if (!adapter) throw new Error("No WebGPU adapter");
     const device = await adapter.requestDevice();
     const d = new WebGPUDevice(canvas, device);
     const ai = adapter.info || {};
-    d.info = { vendor: ai.vendor || 'unknown', renderer: [ai.architecture, ai.device, ai.description].filter(Boolean).join(' ') || 'WebGPU adapter', version: 'WebGPU' };
+    d.info = {
+      vendor: ai.vendor || "unknown",
+      renderer:
+        [ai.architecture, ai.device, ai.description]
+          .filter(Boolean)
+          .join(" ") || "WebGPU adapter",
+      version: "WebGPU",
+    };
     return d;
   }
 
   constructor(canvas, device) {
-    this.name = 'WebGPU';
+    this.name = "WebGPU";
     this.canvas = canvas;
     this.device = device;
-    this.ctx = canvas.getContext('webgpu');
+    this.ctx = canvas.getContext("webgpu");
     this.format = navigator.gpu.getPreferredCanvasFormat();
-    this.ctx.configure({ device, format: this.format, alphaMode: 'opaque', usage: GPUTextureUsage.RENDER_ATTACHMENT | GPUTextureUsage.COPY_SRC });
+    this.ctx.configure({
+      device,
+      format: this.format,
+      alphaMode: "opaque",
+      usage: GPUTextureUsage.RENDER_ATTACHMENT | GPUTextureUsage.COPY_SRC,
+    });
     this.width = canvas.width;
     this.height = canvas.height;
     this.modules = {};
-    for (const [n, src] of Object.entries(SHADERS)) this.modules[n] = device.createShaderModule({ code: HEADER + src });
-    this.bgl0 = device.createBindGroupLayout({ entries: [
-      { binding: 0, visibility: GPUShaderStage.VERTEX | GPUShaderStage.FRAGMENT, buffer: { type: 'uniform', hasDynamicOffset: true } },
-      { binding: 1, visibility: GPUShaderStage.FRAGMENT | GPUShaderStage.VERTEX, texture: {} },
-      { binding: 2, visibility: GPUShaderStage.FRAGMENT | GPUShaderStage.VERTEX, sampler: {} },
-    ] });
-    this.bgl1 = device.createBindGroupLayout({ entries: [
-      { binding: 0, visibility: GPUShaderStage.VERTEX | GPUShaderStage.FRAGMENT, buffer: { type: 'uniform', hasDynamicOffset: true } },
-    ] });
-    this.bgl2 = device.createBindGroupLayout({ entries: [
-      { binding: 0, visibility: GPUShaderStage.FRAGMENT, texture: {} },
-      { binding: 1, visibility: GPUShaderStage.FRAGMENT, sampler: {} },
-    ] });
-    this.layout = device.createPipelineLayout({ bindGroupLayouts: [this.bgl0, this.bgl1, this.bgl2] });
+    for (const [n, src] of Object.entries(SHADERS))
+      this.modules[n] = device.createShaderModule({ code: HEADER + src });
+    this.bgl0 = device.createBindGroupLayout({
+      entries: [
+        {
+          binding: 0,
+          visibility: GPUShaderStage.VERTEX | GPUShaderStage.FRAGMENT,
+          buffer: { type: "uniform", hasDynamicOffset: true },
+        },
+        {
+          binding: 1,
+          visibility: GPUShaderStage.FRAGMENT | GPUShaderStage.VERTEX,
+          texture: {},
+        },
+        {
+          binding: 2,
+          visibility: GPUShaderStage.FRAGMENT | GPUShaderStage.VERTEX,
+          sampler: {},
+        },
+      ],
+    });
+    this.bgl1 = device.createBindGroupLayout({
+      entries: [
+        {
+          binding: 0,
+          visibility: GPUShaderStage.VERTEX | GPUShaderStage.FRAGMENT,
+          buffer: { type: "uniform", hasDynamicOffset: true },
+        },
+      ],
+    });
+    this.bgl2 = device.createBindGroupLayout({
+      entries: [
+        { binding: 0, visibility: GPUShaderStage.FRAGMENT, texture: {} },
+        { binding: 1, visibility: GPUShaderStage.FRAGMENT, sampler: {} },
+      ],
+    });
+    this.layout = device.createPipelineLayout({
+      bindGroupLayouts: [this.bgl0, this.bgl1, this.bgl2],
+    });
     this.pipelines = new Map();
     this.samplers = new Map();
     this.drawCapacity = 4096;
@@ -302,7 +364,11 @@ export class WebGPUDevice {
     this._allocUniforms();
     this.quadCapacity = 0;
     this._ensureQuads(1 << 16);
-    this.white = this.createTexture({ width: 1, height: 1, data: new Uint8Array([255, 255, 255, 255]) });
+    this.white = this.createTexture({
+      width: 1,
+      height: 1,
+      data: new Uint8Array([255, 255, 255, 255]),
+    });
     this.lightmap = this.white;
     this.globalsData = new Float32Array(GLOBAL_STRIDE / 4);
     this.globalsData[35] = 0;
@@ -313,17 +379,32 @@ export class WebGPUDevice {
 
   _allocUniforms() {
     const d = this.device;
-    this.drawBuf = d.createBuffer({ size: this.drawCapacity * DRAW_STRIDE, usage: GPUBufferUsage.UNIFORM | GPUBufferUsage.COPY_DST });
-    this.drawData = new Float32Array(this.drawCapacity * DRAW_STRIDE / 4);
-    this.globalBuf = d.createBuffer({ size: this.globalCapacity * GLOBAL_STRIDE, usage: GPUBufferUsage.UNIFORM | GPUBufferUsage.COPY_DST });
-    this.globalData = new Float32Array(this.globalCapacity * GLOBAL_STRIDE / 4);
-    this.bg1 = d.createBindGroup({ layout: this.bgl1, entries: [{ binding: 0, resource: { buffer: this.drawBuf, size: 128 } }] });
+    this.drawBuf = d.createBuffer({
+      size: this.drawCapacity * DRAW_STRIDE,
+      usage: GPUBufferUsage.UNIFORM | GPUBufferUsage.COPY_DST,
+    });
+    this.drawData = new Float32Array((this.drawCapacity * DRAW_STRIDE) / 4);
+    this.globalBuf = d.createBuffer({
+      size: this.globalCapacity * GLOBAL_STRIDE,
+      usage: GPUBufferUsage.UNIFORM | GPUBufferUsage.COPY_DST,
+    });
+    this.globalData = new Float32Array(
+      (this.globalCapacity * GLOBAL_STRIDE) / 4,
+    );
+    this.bg1 = d.createBindGroup({
+      layout: this.bgl1,
+      entries: [{ binding: 0, resource: { buffer: this.drawBuf, size: 128 } }],
+    });
     this.bg0Cache = new Map();
   }
 
   _makeDepth() {
     if (this.depthTex) this.depthTex.destroy();
-    this.depthTex = this.device.createTexture({ size: [Math.max(1, this.width), Math.max(1, this.height)], format: 'depth24plus', usage: GPUTextureUsage.RENDER_ATTACHMENT });
+    this.depthTex = this.device.createTexture({
+      size: [Math.max(1, this.width), Math.max(1, this.height)],
+      format: "depth24plus",
+      usage: GPUTextureUsage.RENDER_ATTACHMENT,
+    });
     this.depthView = this.depthTex.createView();
   }
 
@@ -332,15 +413,21 @@ export class WebGPUDevice {
     let cap = Math.max(this.quadCapacity * 2, 1024);
     while (cap < quads) cap *= 2;
     const idx = quadIndices(cap);
-    if (this.quadBuffer) this.deferredDestroy && this.deferredDestroy.push(this.quadBuffer);
-    this.quadBuffer = this.device.createBuffer({ size: idx.byteLength, usage: GPUBufferUsage.INDEX | GPUBufferUsage.COPY_DST });
+    if (this.quadBuffer)
+      this.deferredDestroy && this.deferredDestroy.push(this.quadBuffer);
+    this.quadBuffer = this.device.createBuffer({
+      size: idx.byteLength,
+      usage: GPUBufferUsage.INDEX | GPUBufferUsage.COPY_DST,
+    });
     this.device.queue.writeBuffer(this.quadBuffer, 0, idx);
     this.quadCapacity = cap;
   }
 
   resize(w, h) {
-    this.canvas.width = w; this.canvas.height = h;
-    this.width = w; this.height = h;
+    this.canvas.width = w;
+    this.canvas.height = h;
+    this.width = w;
+    this.height = h;
     this._makeDepth();
   }
 
@@ -348,9 +435,15 @@ export class WebGPUDevice {
     const key = filter + wrap + mip;
     let s = this.samplers.get(key);
     if (!s) {
-      const f = filter === 'nearest' ? 'nearest' : 'linear';
-      const w = wrap === 'repeat' ? 'repeat' : 'clamp-to-edge';
-      s = this.device.createSampler({ magFilter: f, minFilter: f, mipmapFilter: mip ? 'linear' : 'nearest', addressModeU: w, addressModeV: w });
+      const f = filter === "nearest" ? "nearest" : "linear";
+      const w = wrap === "repeat" ? "repeat" : "clamp-to-edge";
+      s = this.device.createSampler({
+        magFilter: f,
+        minFilter: f,
+        mipmapFilter: mip ? "linear" : "nearest",
+        addressModeU: w,
+        addressModeV: w,
+      });
       this.samplers.set(key, s);
     }
     return s;
@@ -360,33 +453,99 @@ export class WebGPUDevice {
 
   createTexture(o) {
     const mipLevels = o.mipmaps === true ? 4 : Math.max(0, o.mipmaps | 0);
-    const levels = mipLevels > 0 ? Math.min(1 + mipLevels, 1 + Math.floor(Math.log2(Math.max(o.width, o.height)))) : 1;
-    const tex = this.device.createTexture({ size: [o.width, o.height], format: 'rgba8unorm', mipLevelCount: levels,
-      usage: GPUTextureUsage.TEXTURE_BINDING | GPUTextureUsage.COPY_DST });
-    const t = { gpu: tex, width: o.width, height: o.height, mipmaps: levels > 1, levels, filter: o.filter || 'nearest', wrap: o.wrap || 'clamp' };
-    t.bg = this.device.createBindGroup({ layout: this.bgl2, entries: [
-      { binding: 0, resource: tex.createView() }, { binding: 1, resource: this._sampler(t.filter, t.wrap, t.mipmaps) }] });
+    const levels =
+      mipLevels > 0
+        ? Math.min(
+            1 + mipLevels,
+            1 + Math.floor(Math.log2(Math.max(o.width, o.height))),
+          )
+        : 1;
+    const tex = this.device.createTexture({
+      size: [o.width, o.height],
+      format: "rgba8unorm",
+      mipLevelCount: levels,
+      usage: GPUTextureUsage.TEXTURE_BINDING | GPUTextureUsage.COPY_DST,
+    });
+    const t = {
+      gpu: tex,
+      width: o.width,
+      height: o.height,
+      mipmaps: levels > 1,
+      levels,
+      filter: o.filter || "nearest",
+      wrap: o.wrap || "clamp",
+    };
+    t.bg = this.device.createBindGroup({
+      layout: this.bgl2,
+      entries: [
+        { binding: 0, resource: tex.createView() },
+        { binding: 1, resource: this._sampler(t.filter, t.wrap, t.mipmaps) },
+      ],
+    });
     if (o.data) this.updateTexture(t, o.data);
     return t;
   }
 
   updateTexture(t, data, x = 0, y = 0, w = t.width, h = t.height) {
-    const u8 = data instanceof Uint8Array ? data : new Uint8Array(data.buffer, data.byteOffset, data.byteLength);
-    this.device.queue.writeTexture({ texture: t.gpu, origin: [x, y] }, u8, { bytesPerRow: w * 4, rowsPerImage: h }, [w, h]);
+    const u8 =
+      data instanceof Uint8Array
+        ? data
+        : new Uint8Array(data.buffer, data.byteOffset, data.byteLength);
+    this.device.queue.writeTexture(
+      { texture: t.gpu, origin: [x, y] },
+      u8,
+      { bytesPerRow: w * 4, rowsPerImage: h },
+      [w, h],
+    );
     if (t.mipmaps && x === 0 && y === 0 && w === t.width && h === t.height) {
       const mips = buildMips(t.width, t.height, u8, t.levels - 1);
-      mips.forEach((m, i) => this.device.queue.writeTexture({ texture: t.gpu, mipLevel: i + 1 }, m.data, { bytesPerRow: m.width * 4, rowsPerImage: m.height }, [m.width, m.height]));
+      mips.forEach((m, i) =>
+        this.device.queue.writeTexture(
+          { texture: t.gpu, mipLevel: i + 1 },
+          m.data,
+          { bytesPerRow: m.width * 4, rowsPerImage: m.height },
+          [m.width, m.height],
+        ),
+      );
     }
   }
 
-  destroyTexture(t) { if (t && t.gpu) this.deferredDestroy.push(t.gpu); }
+  destroyTexture(t) {
+    if (t && t.gpu) this.deferredDestroy.push(t.gpu);
+  }
 
   // Offscreen colour + depth target; the returned object is also a normal (linear, clamped) texture
   createRenderTarget(w, h) {
-    const tex = this.device.createTexture({ size: [w, h], format: 'rgba8unorm', usage: GPUTextureUsage.TEXTURE_BINDING | GPUTextureUsage.RENDER_ATTACHMENT | GPUTextureUsage.COPY_DST });
-    const t = { gpu: tex, width: w, height: h, mipmaps: false, levels: 1, filter: 'linear', wrap: 'clamp', view: tex.createView() };
-    t.bg = this.device.createBindGroup({ layout: this.bgl2, entries: [{ binding: 0, resource: t.view }, { binding: 1, resource: this._sampler('linear', 'clamp', false) }] });
-    t.depthTex = this.device.createTexture({ size: [w, h], format: 'depth24plus', usage: GPUTextureUsage.RENDER_ATTACHMENT });
+    const tex = this.device.createTexture({
+      size: [w, h],
+      format: "rgba8unorm",
+      usage:
+        GPUTextureUsage.TEXTURE_BINDING |
+        GPUTextureUsage.RENDER_ATTACHMENT |
+        GPUTextureUsage.COPY_DST,
+    });
+    const t = {
+      gpu: tex,
+      width: w,
+      height: h,
+      mipmaps: false,
+      levels: 1,
+      filter: "linear",
+      wrap: "clamp",
+      view: tex.createView(),
+    };
+    t.bg = this.device.createBindGroup({
+      layout: this.bgl2,
+      entries: [
+        { binding: 0, resource: t.view },
+        { binding: 1, resource: this._sampler("linear", "clamp", false) },
+      ],
+    });
+    t.depthTex = this.device.createTexture({
+      size: [w, h],
+      format: "depth24plus",
+      usage: GPUTextureUsage.RENDER_ATTACHMENT,
+    });
     t.depthView = t.depthTex.createView();
     return t;
   }
@@ -396,16 +555,36 @@ export class WebGPUDevice {
     this.target = t || null;
     if (!this.encoder) return;
     this.scissor = null;
-    this._beginPass(clear ? { r: clear[0], g: clear[1], b: clear[2], a: clear[3] === undefined ? 1 : clear[3] } : null, !!clear);
+    this._beginPass(
+      clear
+        ? {
+            r: clear[0],
+            g: clear[1],
+            b: clear[2],
+            a: clear[3] === undefined ? 1 : clear[3],
+          }
+        : null,
+      !!clear,
+    );
   }
 
   // True while the GPU is more than a frame behind (used to pace uncapped frame rates)
-  busy() { return (this.inflight || 0) >= 2; }
+  busy() {
+    return (this.inflight || 0) >= 2;
+  }
 
   // ---------------------------------------------------------------- meshes
 
   createMesh(format, vertices, opts = {}) {
-    const m = { format, vbuf: null, vsize: 0, ibuf: null, vertexCount: 0, indexCount: 0, quads: !!opts.quads };
+    const m = {
+      format,
+      vbuf: null,
+      vsize: 0,
+      ibuf: null,
+      vertexCount: 0,
+      indexCount: 0,
+      quads: !!opts.quads,
+    };
     this.updateMesh(m, vertices, opts);
     return m;
   }
@@ -415,17 +594,33 @@ export class WebGPUDevice {
     const bytes = Math.max(16, (vertices.byteLength + 3) & ~3);
     if (!m.vbuf || m.vsize < bytes) {
       if (m.vbuf) this.deferredDestroy.push(m.vbuf);
-      m.vbuf = d.createBuffer({ size: bytes, usage: GPUBufferUsage.VERTEX | GPUBufferUsage.COPY_DST });
+      m.vbuf = d.createBuffer({
+        size: bytes,
+        usage: GPUBufferUsage.VERTEX | GPUBufferUsage.COPY_DST,
+      });
       m.vsize = bytes;
     }
-    if (vertices.byteLength) d.queue.writeBuffer(m.vbuf, 0, vertices.buffer, vertices.byteOffset, vertices.byteLength);
+    if (vertices.byteLength)
+      d.queue.writeBuffer(
+        m.vbuf,
+        0,
+        vertices.buffer,
+        vertices.byteOffset,
+        vertices.byteLength,
+      );
     m.vertexCount = vertices.byteLength / vertexLayout(m.format).byteStride;
     m.byteLength = vertices.byteLength;
     if (opts.quads !== undefined) m.quads = !!opts.quads;
     if (opts.indices) {
-      const idx = opts.indices instanceof Uint32Array ? opts.indices : new Uint32Array(opts.indices);
+      const idx =
+        opts.indices instanceof Uint32Array
+          ? opts.indices
+          : new Uint32Array(opts.indices);
       if (m.ibuf) this.deferredDestroy.push(m.ibuf);
-      m.ibuf = d.createBuffer({ size: Math.max(16, (idx.byteLength + 3) & ~3), usage: GPUBufferUsage.INDEX | GPUBufferUsage.COPY_DST });
+      m.ibuf = d.createBuffer({
+        size: Math.max(16, (idx.byteLength + 3) & ~3),
+        usage: GPUBufferUsage.INDEX | GPUBufferUsage.COPY_DST,
+      });
       d.queue.writeBuffer(m.ibuf, 0, idx);
       m.indexCount = idx.length;
       m.quads = false;
@@ -444,31 +639,70 @@ export class WebGPUDevice {
   // ---------------------------------------------------------------- pipelines
 
   _pipeline(name, s, primitive) {
-    const fmtOut = this.target ? 'rgba8unorm' : this.format;
-    const key = fmtOut + name + '|' + (s.blend || 'none') + (s.depthTest === false ? 0 : 1) + (s.depthWrite === false ? 0 : 1) + (s.cull ? 1 : 0) + (s.polygonOffset ? 1 : 0) + (s.depthFunc === 'equal' ? 'e' : '') + (s.colorWrite === false ? 'n' : '') + primitive;
+    const fmtOut = this.target ? "rgba8unorm" : this.format;
+    const key =
+      fmtOut +
+      name +
+      "|" +
+      (s.blend || "none") +
+      (s.depthTest === false ? 0 : 1) +
+      (s.depthWrite === false ? 0 : 1) +
+      (s.cull ? 1 : 0) +
+      (s.polygonOffset ? 1 : 0) +
+      (s.depthFunc === "equal" ? "e" : "") +
+      (s.colorWrite === false ? "n" : "") +
+      primitive;
     let p = this.pipelines.get(key);
     if (p) return p;
     const fmt = PIPELINE_FORMAT[name];
     const mod = this.modules[name];
     const target = { format: fmtOut };
     if (s.colorWrite === false) target.writeMask = 0;
-    if (s.blend && s.blend !== 'none') target.blend = BLENDS[s.blend] || BLENDS.alpha;
-    const tri = primitive !== 'lines';
+    if (s.blend && s.blend !== "none")
+      target.blend = BLENDS[s.blend] || BLENDS.alpha;
+    const tri = primitive !== "lines";
     p = this.device.createRenderPipeline({
       layout: this.layout,
       vertex: {
-        module: mod, entryPoint: 'vs',
-        buffers: [(() => {
-          const L = vertexLayout(fmt);
-          const fmtName = (a) => (a.type === 'unorm16' ? 'unorm16x' : a.type === 'unorm8' ? 'unorm8x' : 'float32x') + a.size;
-          return { arrayStride: L.byteStride, attributes: L.attrs.map((a, i) => ({ shaderLocation: i, offset: a.byteOffset, format: fmtName(a) })) };
-        })()],
+        module: mod,
+        entryPoint: "vs",
+        buffers: [
+          (() => {
+            const L = vertexLayout(fmt);
+            const fmtName = (a) =>
+              (a.type === "unorm16"
+                ? "unorm16x"
+                : a.type === "unorm8"
+                  ? "unorm8x"
+                  : "float32x") + a.size;
+            return {
+              arrayStride: L.byteStride,
+              attributes: L.attrs.map((a, i) => ({
+                shaderLocation: i,
+                offset: a.byteOffset,
+                format: fmtName(a),
+              })),
+            };
+          })(),
+        ],
       },
-      fragment: { module: mod, entryPoint: 'fs', targets: [target] },
-      primitive: { topology: tri ? 'triangle-list' : 'line-list', cullMode: s.cull && tri ? 'back' : 'none', frontFace: 'ccw' },
+      fragment: { module: mod, entryPoint: "fs", targets: [target] },
+      primitive: {
+        topology: tri ? "triangle-list" : "line-list",
+        cullMode: s.cull && tri ? "back" : "none",
+        frontFace: "ccw",
+      },
       depthStencil: {
-        format: 'depth24plus', depthWriteEnabled: s.depthWrite !== false, depthCompare: s.depthTest === false ? 'always' : s.depthFunc === 'equal' ? 'equal' : 'less-equal',
-        depthBias: s.polygonOffset && tri ? -1 : 0, depthBiasSlopeScale: s.polygonOffset && tri ? -1 : 0,
+        format: "depth24plus",
+        depthWriteEnabled: s.depthWrite !== false,
+        depthCompare:
+          s.depthTest === false
+            ? "always"
+            : s.depthFunc === "equal"
+              ? "equal"
+              : "less-equal",
+        depthBias: s.polygonOffset && tri ? -1 : 0,
+        depthBiasSlopeScale: s.polygonOffset && tri ? -1 : 0,
       },
     });
     this.pipelines.set(key, p);
@@ -491,26 +725,47 @@ export class WebGPUDevice {
   _beginPass(clearColor, clearDepth) {
     if (this.pass) this.pass.end();
     this.pass = this.encoder.beginRenderPass({
-      colorAttachments: [{ view: this.target ? this.target.view : this.colorView, loadOp: clearColor ? 'clear' : 'load', clearValue: clearColor || undefined, storeOp: 'store' }],
-      depthStencilAttachment: { view: this.target ? this.target.depthView : this.depthView, depthLoadOp: clearDepth ? 'clear' : 'load', depthClearValue: 1, depthStoreOp: 'store' },
+      colorAttachments: [
+        {
+          view: this.target ? this.target.view : this.colorView,
+          loadOp: clearColor ? "clear" : "load",
+          clearValue: clearColor || undefined,
+          storeOp: "store",
+        },
+      ],
+      depthStencilAttachment: {
+        view: this.target ? this.target.depthView : this.depthView,
+        depthLoadOp: clearDepth ? "clear" : "load",
+        depthClearValue: 1,
+        depthStoreOp: "store",
+      },
     });
     if (this.scissor) this._applyScissor();
   }
 
-  clearDepth() { this._beginPass(null, true); }
+  clearDepth() {
+    this._beginPass(null, true);
+  }
 
   _pushGlobals() {
     if (this.globalCount >= this.globalCapacity) return;
-    this.globalData.set(this.globalsData, this.globalCount * GLOBAL_STRIDE / 4);
+    this.globalData.set(
+      this.globalsData,
+      (this.globalCount * GLOBAL_STRIDE) / 4,
+    );
     this.curGlobalOffset = this.globalCount * GLOBAL_STRIDE;
     this.globalCount++;
     const lm = this.lightmap;
     let bg = this.bg0Cache.get(lm);
     if (!bg) {
-      bg = this.device.createBindGroup({ layout: this.bgl0, entries: [
-        { binding: 0, resource: { buffer: this.globalBuf, size: 160 } },
-        { binding: 1, resource: lm.gpu.createView() },
-        { binding: 2, resource: this._sampler('linear', 'clamp', false) }] });
+      bg = this.device.createBindGroup({
+        layout: this.bgl0,
+        entries: [
+          { binding: 0, resource: { buffer: this.globalBuf, size: 160 } },
+          { binding: 1, resource: lm.gpu.createView() },
+          { binding: 2, resource: this._sampler("linear", "clamp", false) },
+        ],
+      });
       this.bg0Cache.set(lm, bg);
     }
     this.curBg0 = bg;
@@ -524,7 +779,11 @@ export class WebGPUDevice {
     if (g.fogEnd !== undefined) G[33] = g.fogEnd;
     if (g.fogDensity !== undefined) G[34] = g.fogDensity;
     if (g.fogMode !== undefined) G[35] = g.fogMode;
-    if (g.fogColor) { G[36] = g.fogColor[0]; G[37] = g.fogColor[1]; G[38] = g.fogColor[2]; }
+    if (g.fogColor) {
+      G[36] = g.fogColor[0];
+      G[37] = g.fogColor[1];
+      G[38] = g.fogColor[2];
+    }
     if (g.lightmap) this.lightmap = g.lightmap;
     if (this.encoder) this._pushGlobals();
   }
@@ -536,10 +795,16 @@ export class WebGPUDevice {
 
   _applyScissor() {
     const r = this.scissor;
-    const tw = this.target ? this.target.width : this.width, th = this.target ? this.target.height : this.height;
-    if (!r) { this.pass.setScissorRect(0, 0, tw, th); return; }
-    const x = Math.max(0, Math.floor(r[0])), y = Math.max(0, Math.floor(r[1]));
-    const w = Math.max(0, Math.min(tw - x, Math.ceil(r[2]))), h = Math.max(0, Math.min(th - y, Math.ceil(r[3])));
+    const tw = this.target ? this.target.width : this.width,
+      th = this.target ? this.target.height : this.height;
+    if (!r) {
+      this.pass.setScissorRect(0, 0, tw, th);
+      return;
+    }
+    const x = Math.max(0, Math.floor(r[0])),
+      y = Math.max(0, Math.floor(r[1]));
+    const w = Math.max(0, Math.min(tw - x, Math.ceil(r[2]))),
+      h = Math.max(0, Math.min(th - y, Math.ceil(r[3])));
     this.pass.setScissorRect(x, y, w, h);
   }
 
@@ -549,18 +814,24 @@ export class WebGPUDevice {
     if (this.drawCount >= this.drawCapacity) return; // grows at end of frame
     const off = this.drawCount * DRAW_STRIDE;
     this.drawData.set(d.model || IDENTITY, off / 4);
-    this.drawData.set(d.params || DEFAULT_PARAMS[d.pipeline] || ZERO16, off / 4 + 16);
+    this.drawData.set(
+      d.params || DEFAULT_PARAMS[d.pipeline] || ZERO16,
+      off / 4 + 16,
+    );
     this.drawCount++;
-    const prim = d.primitive === 'lines' ? 'lines' : 'triangles';
+    const prim = d.primitive === "lines" ? "lines" : "triangles";
     const pass = this.pass;
     pass.setPipeline(this._pipeline(d.pipeline, d.state || {}, prim));
     pass.setBindGroup(0, this.curBg0, [this.curGlobalOffset]);
     pass.setBindGroup(1, this.bg1, [off]);
-    const t0 = (d.textures && d.textures[0] && d.textures[0].bg) ? d.textures[0] : this.white;
+    const t0 =
+      d.textures && d.textures[0] && d.textures[0].bg
+        ? d.textures[0]
+        : this.white;
     pass.setBindGroup(2, t0.bg);
     pass.setVertexBuffer(0, m.vbuf);
     if (m.quads || m.ibuf) {
-      pass.setIndexBuffer(m.quads ? this.quadBuffer : m.ibuf, 'uint32');
+      pass.setIndexBuffer(m.quads ? this.quadBuffer : m.ibuf, "uint32");
       const count = d.count !== undefined ? d.count : m.indexCount;
       if (count > 0) pass.drawIndexed(count, 1, d.first || 0, 0, 0);
     } else {
@@ -574,24 +845,58 @@ export class WebGPUDevice {
     this.pass.end();
     this.pass = null;
     const q = this.device.queue;
-    if (this.drawCount) q.writeBuffer(this.drawBuf, 0, this.drawData.buffer, 0, this.drawCount * DRAW_STRIDE);
-    if (this.globalCount) q.writeBuffer(this.globalBuf, 0, this.globalData.buffer, 0, this.globalCount * GLOBAL_STRIDE);
+    if (this.drawCount)
+      q.writeBuffer(
+        this.drawBuf,
+        0,
+        this.drawData.buffer,
+        0,
+        this.drawCount * DRAW_STRIDE,
+      );
+    if (this.globalCount)
+      q.writeBuffer(
+        this.globalBuf,
+        0,
+        this.globalData.buffer,
+        0,
+        this.globalCount * GLOBAL_STRIDE,
+      );
     let readback = null;
     if (this.captureWaiters.length) {
-      const bpr = Math.ceil(this.width * 4 / 256) * 256;
-      readback = { buf: this.device.createBuffer({ size: bpr * this.height, usage: GPUBufferUsage.COPY_DST | GPUBufferUsage.MAP_READ }), bpr, w: this.width, h: this.height, waiters: this.captureWaiters.splice(0) };
-      this.encoder.copyTextureToBuffer({ texture: this.colorTex }, { buffer: readback.buf, bytesPerRow: bpr }, [this.width, this.height]);
+      const bpr = Math.ceil((this.width * 4) / 256) * 256;
+      readback = {
+        buf: this.device.createBuffer({
+          size: bpr * this.height,
+          usage: GPUBufferUsage.COPY_DST | GPUBufferUsage.MAP_READ,
+        }),
+        bpr,
+        w: this.width,
+        h: this.height,
+        waiters: this.captureWaiters.splice(0),
+      };
+      this.encoder.copyTextureToBuffer(
+        { texture: this.colorTex },
+        { buffer: readback.buf, bytesPerRow: bpr },
+        [this.width, this.height],
+      );
     }
     q.submit([this.encoder.finish()]);
     this.encoder = null;
     this.target = null;
     this.inflight = (this.inflight || 0) + 1;
-    q.onSubmittedWorkDone().then(() => { this.inflight--; });
+    q.onSubmittedWorkDone().then(() => {
+      this.inflight--;
+    });
     const dead = this.deferredDestroy.splice(0);
-    q.onSubmittedWorkDone().then(() => { for (const b of dead) b.destroy(); });
+    q.onSubmittedWorkDone().then(() => {
+      for (const b of dead) b.destroy();
+    });
     if (readback) this._finishReadback(readback);
     // Grow uniform rings for the next frame if this frame overflowed
-    if (this.drawCount >= this.drawCapacity || this.globalCount >= this.globalCapacity) {
+    if (
+      this.drawCount >= this.drawCapacity ||
+      this.globalCount >= this.globalCapacity
+    ) {
       this.deferredDestroy.push(this.drawBuf, this.globalBuf);
       if (this.drawCount >= this.drawCapacity) this.drawCapacity *= 2;
       if (this.globalCount >= this.globalCapacity) this.globalCapacity *= 2;
@@ -603,11 +908,15 @@ export class WebGPUDevice {
     await r.buf.mapAsync(GPUMapMode.READ);
     const src = new Uint8Array(r.buf.getMappedRange());
     const out = new Uint8Array(r.w * r.h * 4);
-    const bgra = this.format.startsWith('bgra');
+    const bgra = this.format.startsWith("bgra");
     for (let y = 0; y < r.h; y++) {
       for (let x = 0; x < r.w; x++) {
-        const s = y * r.bpr + x * 4, o = (y * r.w + x) * 4;
-        out[o] = src[s + (bgra ? 2 : 0)]; out[o + 1] = src[s + 1]; out[o + 2] = src[s + (bgra ? 0 : 2)]; out[o + 3] = 255;
+        const s = y * r.bpr + x * 4,
+          o = (y * r.w + x) * 4;
+        out[o] = src[s + (bgra ? 2 : 0)];
+        out[o + 1] = src[s + 1];
+        out[o + 2] = src[s + (bgra ? 0 : 2)];
+        out[o + 3] = 255;
       }
     }
     r.buf.unmap();
@@ -615,8 +924,12 @@ export class WebGPUDevice {
     for (const w of r.waiters) w({ width: r.w, height: r.h, data: out });
   }
 
-  capture() { return new Promise((res) => this.captureWaiters.push(res)); }
+  capture() {
+    return new Promise((res) => this.captureWaiters.push(res));
+  }
 }
 
-const IDENTITY = new Float32Array([1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1]);
+const IDENTITY = new Float32Array([
+  1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1,
+]);
 const ZERO16 = new Float32Array(16);

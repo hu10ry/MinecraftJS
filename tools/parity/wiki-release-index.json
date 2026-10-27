@@ -1649,13 +1649,7 @@
           "topic": "Splashes"
         }
       ],
-      "bugIds": [
-        "MC-50550",
-        "MC-79632",
-        "MC-80478",
-        "MC-80479",
-        "MC-80480"
-      ],
+      "bugIds": ["MC-50550", "MC-79632", "MC-80478", "MC-80479", "MC-80480"],
       "acceptance": "not-certified"
     },
     {
@@ -1671,9 +1665,7 @@
           "topic": "Dispensers"
         }
       ],
-      "bugIds": [
-        "MC-75630"
-      ],
+      "bugIds": ["MC-75630"],
       "acceptance": "not-certified"
     },
     {
@@ -3412,13 +3404,7 @@
           "topic": "Warnings"
         }
       ],
-      "bugIds": [
-        "MC-92057",
-        "MC-94670",
-        "MC-95574",
-        "MC-100116",
-        "MC-100313"
-      ],
+      "bugIds": ["MC-92057", "MC-94670", "MC-95574", "MC-100116", "MC-100313"],
       "acceptance": "not-certified"
     },
     {
@@ -4905,12 +4891,7 @@
           "topic": "Splashes"
         }
       ],
-      "bugIds": [
-        "MC-86016",
-        "MC-117087",
-        "MC-119840",
-        "MC-119011"
-      ],
+      "bugIds": ["MC-86016", "MC-117087", "MC-119840", "MC-119011"],
       "acceptance": "not-certified"
     },
     {

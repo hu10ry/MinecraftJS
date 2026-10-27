@@ -2567,10 +2567,7 @@
       "status": "server-owned",
       "observation": "Burning-arrow ignition is decided by server block state updates.",
       "acceptance": "Shoot a lit arrow into an unlit campfire; verify flames, light, smoke and state after rejoin.",
-      "evidence": [
-        "client/js/game/game.js",
-        "client/js/render/particles.js"
-      ]
+      "evidence": ["client/js/game/game.js", "client/js/render/particles.js"]
     },
     {
       "id": "patch-1.14.2-lighting-and-world-diagnostics",
@@ -2593,9 +2590,7 @@
       "status": "unverified",
       "observation": "Server chunk metrics differ between integrated and remote servers; inherited F3 is not certified.",
       "acceptance": "Compare native F3 chunk lines in multiplayer and avoid inventing unavailable server counts.",
-      "evidence": [
-        "client/js/gui/hud.js"
-      ]
+      "evidence": ["client/js/gui/hud.js"]
     },
     {
       "id": "patch-1.14.2-raids-and-parrot-spawning",
@@ -2605,9 +2600,7 @@
       "status": "server-owned",
       "observation": "Loaded-chunk raid spawning, larger bell search radius and grass-block parrot spawn checks are server-owned.",
       "acceptance": "Trigger raids at chunk edges and locate parrots on grass blocks.",
-      "evidence": [
-        "client/js/game/entities.js"
-      ]
+      "evidence": ["client/js/game/entities.js"]
     },
     {
       "id": "patch-1.14.3-crafting-repair-restoration",
@@ -2617,9 +2610,7 @@
       "status": "partial",
       "observation": "Target restores crafting repair; do not implement base-1.14 removal.",
       "acceptance": "Combine damaged items in a crafting grid and compare result/consumption with native 1.14.4.",
-      "evidence": [
-        "client/js/game/crafting.js"
-      ]
+      "evidence": ["client/js/game/crafting.js"]
     },
     {
       "id": "patch-1.14.3-enchanting-reversion",
@@ -2629,10 +2620,7 @@
       "status": "partial",
       "observation": "Protection enchantment exclusivity is restored; crossbow registration and numeric clues still need fixing.",
       "acceptance": "Compare enchanting and anvil combinations including crossbow enchantments.",
-      "evidence": [
-        "client/js/game/items.js",
-        "client/data/enchantments.json"
-      ]
+      "evidence": ["client/js/game/items.js", "client/data/enchantments.json"]
     },
     {
       "id": "patch-1.14.3-pane-bar-attachments",
@@ -2642,10 +2630,7 @@
       "status": "unverified",
       "observation": "Native shapes exist; full torch/lantern/plate placement prediction has not been verified.",
       "acceptance": "Place torches/lanterns/pressure plates on panes/bars and hang lanterns below them.",
-      "evidence": [
-        "client/js/game/interaction.js",
-        "client/js/world/blocks.js"
-      ]
+      "evidence": ["client/js/game/interaction.js", "client/js/world/blocks.js"]
     },
     {
       "id": "patch-1.14.3-advancements-patrols-village-ai",
@@ -2668,9 +2653,7 @@
       "status": "partial",
       "observation": "Native food-use classification permits eating stew. The isolated vanilla server supplies target effect semantics; all flower/bowl combinations still need live checks.",
       "acceptance": "Eat poppy stew and verify Night Vision rather than Speed, correct duration and bowl return.",
-      "evidence": [
-        "client/js/game/items.js"
-      ]
+      "evidence": ["client/js/game/items.js"]
     },
     {
       "id": "patch-1.14.4-first-person-camera-offset",
@@ -2680,9 +2663,7 @@
       "status": "partial",
       "observation": "The obsolete first-person -0.1 pivot translation is removed; near-wall/FOV comparisons remain unverified.",
       "acceptance": "Compare first-person camera/raycast origin against native 1.14.4 near walls and at different FOVs.",
-      "evidence": [
-        "client/js/game/game.js"
-      ]
+      "evidence": ["client/js/game/game.js"]
     },
     {
       "id": "patch-1.14.4-pillager-texture",
@@ -2692,9 +2673,7 @@
       "status": "partial",
       "observation": "Native pillager texture is used; exact pose/UV comparison remains unverified.",
       "acceptance": "Compare front/back and crossbow aiming with native 1.14.4.",
-      "evidence": [
-        "client/js/render/entity-renderer.js"
-      ]
+      "evidence": ["client/js/render/entity-renderer.js"]
     },
     {
       "id": "patch-1.14.4-chunk-streaming",
@@ -2718,9 +2697,7 @@
       "status": "server-owned",
       "observation": "debug report, reload/forceload permission changes and function-permission-level are server responsibilities.",
       "acceptance": "Complete and execute those commands at appropriate permissions; verify feedback.",
-      "evidence": [
-        "client/js/gui/screens/chat.js"
-      ]
+      "evidence": ["client/js/gui/screens/chat.js"]
     },
     {
       "id": "patch-1.14.4-villagers-spawning-pathfinding",
@@ -2743,9 +2720,7 @@
       "status": "not-applicable",
       "observation": "Realms is disabled in this client; removal of its Player Activity button is outside implemented scope.",
       "acceptance": "Revisit if Realms support is added.",
-      "evidence": [
-        "client/js/gui/screens/menus.js"
-      ]
+      "evidence": ["client/js/gui/screens/menus.js"]
     }
   ]
 }

@@ -5,18 +5,9 @@
       "input": "/give Steve minecraft:sand 2",
       "cursor": 28,
       "ranges": [
-        [
-          6,
-          11
-        ],
-        [
-          12,
-          26
-        ],
-        [
-          27,
-          28
-        ]
+        [6, 11],
+        [12, 26],
+        [27, 28]
       ],
       "unread": false
     },
@@ -24,40 +15,23 @@
       "input": "/give Steve minecraft:sand nope",
       "cursor": 27,
       "ranges": [
-        [
-          6,
-          11
-        ],
-        [
-          12,
-          26
-        ]
+        [6, 11],
+        [12, 26]
       ],
       "unread": true
     },
     {
       "input": "/give Steve minecraft:not_an_item",
       "cursor": 12,
-      "ranges": [
-        [
-          6,
-          11
-        ]
-      ],
+      "ranges": [[6, 11]],
       "unread": true
     },
     {
       "input": "/tp Steve ~ ~ ~",
       "cursor": 15,
       "ranges": [
-        [
-          4,
-          9
-        ],
-        [
-          10,
-          15
-        ]
+        [4, 9],
+        [10, 15]
       ],
       "unread": false
     },
@@ -65,26 +39,15 @@
       "input": "/tp Steve ^ ^ ^",
       "cursor": 15,
       "ranges": [
-        [
-          4,
-          9
-        ],
-        [
-          10,
-          15
-        ]
+        [4, 9],
+        [10, 15]
       ],
       "unread": false
     },
     {
       "input": "/gamemode creative Steve",
       "cursor": 24,
-      "ranges": [
-        [
-          19,
-          24
-        ]
-      ],
+      "ranges": [[19, 24]],
       "unread": false
     },
     {
@@ -103,22 +66,10 @@
       "input": "/execute as @a run give @s minecraft:sand 3",
       "cursor": 43,
       "ranges": [
-        [
-          12,
-          14
-        ],
-        [
-          24,
-          26
-        ],
-        [
-          27,
-          41
-        ],
-        [
-          42,
-          43
-        ]
+        [12, 14],
+        [24, 26],
+        [27, 41],
+        [42, 43]
       ],
       "unread": false
     },
@@ -126,18 +77,9 @@
       "input": "/scoreboard players set Alex test 12",
       "cursor": 36,
       "ranges": [
-        [
-          24,
-          28
-        ],
-        [
-          29,
-          33
-        ],
-        [
-          34,
-          36
-        ]
+        [24, 28],
+        [29, 33],
+        [34, 36]
       ],
       "unread": false
     },
@@ -145,14 +87,8 @@
       "input": "/scoreboard players set Alex test nope",
       "cursor": 34,
       "ranges": [
-        [
-          24,
-          28
-        ],
-        [
-          29,
-          33
-        ]
+        [24, 28],
+        [29, 33]
       ],
       "unread": true
     },
@@ -160,62 +96,35 @@
       "input": "/setblock ~ ~ ~ minecraft:oak_stairs[facing=east]",
       "cursor": 49,
       "ranges": [
-        [
-          10,
-          15
-        ],
-        [
-          16,
-          49
-        ]
+        [10, 15],
+        [16, 49]
       ],
       "unread": false
     },
     {
       "input": "/setblock ~ ~ ~ minecraft:oak_stairs[facing=invalid]",
       "cursor": 16,
-      "ranges": [
-        [
-          10,
-          15
-        ]
-      ],
+      "ranges": [[10, 15]],
       "unread": true
     },
     {
       "input": "/say hello world",
       "cursor": 16,
-      "ranges": [
-        [
-          5,
-          16
-        ]
-      ],
+      "ranges": [[5, 16]],
       "unread": false
     },
     {
       "input": "/say it's fine",
       "cursor": 14,
-      "ranges": [
-        [
-          5,
-          14
-        ]
-      ],
+      "ranges": [[5, 14]],
       "unread": false
     },
     {
       "input": "/give Steve minecraft:sand 0",
       "cursor": 27,
       "ranges": [
-        [
-          6,
-          11
-        ],
-        [
-          12,
-          26
-        ]
+        [6, 11],
+        [12, 26]
       ],
       "unread": true
     },
@@ -229,14 +138,8 @@
       "input": "/give @e[type=minecraft:player] minecraft:sand",
       "cursor": 46,
       "ranges": [
-        [
-          6,
-          31
-        ],
-        [
-          32,
-          46
-        ]
+        [6, 31],
+        [32, 46]
       ],
       "unread": false
     },
@@ -244,14 +147,8 @@
       "input": "/team add test \"red team\"",
       "cursor": 26,
       "ranges": [
-        [
-          10,
-          14
-        ],
-        [
-          15,
-          26
-        ]
+        [10, 14],
+        [15, 26]
       ],
       "unread": false
     },
@@ -259,26 +156,11 @@
       "input": "/effect give Steve minecraft:speed 30 1 true",
       "cursor": 44,
       "ranges": [
-        [
-          13,
-          18
-        ],
-        [
-          19,
-          34
-        ],
-        [
-          35,
-          37
-        ],
-        [
-          38,
-          39
-        ],
-        [
-          40,
-          44
-        ]
+        [13, 18],
+        [19, 34],
+        [35, 37],
+        [38, 39],
+        [40, 44]
       ],
       "unread": false
     }

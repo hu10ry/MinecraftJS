@@ -1,6 +1,12 @@
-import {FINAL_UNIFORMS,shaderFrameUniforms} from '../render/shader-frame.js';
+import { FINAL_UNIFORMS, shaderFrameUniforms } from "../render/shader-frame.js";
 // WebGL 2 implementation of the graphics device contract (see device.js).
-import { DEFAULT_PARAMS, PIPELINE_FORMAT, quadIndices, buildMips, vertexLayout } from './device.js';
+import {
+  DEFAULT_PARAMS,
+  PIPELINE_FORMAT,
+  quadIndices,
+  buildMips,
+  vertexLayout,
+} from "./device.js";
 
 const HEADER = `#version 300 es
 precision highp float;
@@ -260,15 +266,28 @@ void main() {
 
 export class WebGL2Device {
   constructor(canvas, opts = {}) {
-    const gl = canvas.getContext('webgl2', { antialias: false, alpha: false, preserveDrawingBuffer: !!opts.preserveDrawingBuffer, powerPreference: 'high-performance' });
-    if (!gl) throw new Error('WebGL 2 is not available');
-    this.name = 'WebGL 2';
+    const gl = canvas.getContext("webgl2", {
+      antialias: false,
+      alpha: false,
+      preserveDrawingBuffer: !!opts.preserveDrawingBuffer,
+      powerPreference: "high-performance",
+    });
+    if (!gl) throw new Error("WebGL 2 is not available");
+    this.name = "WebGL 2";
     this.rtOriginBottom = true; // render targets are sampled bottom-up
     // GL_VENDOR / GL_RENDERER / GL_VERSION for the debug screen (unmasked when the browser allows it)
-    const dbg = gl.getExtension('WEBGL_debug_renderer_info');
+    const dbg = gl.getExtension("WEBGL_debug_renderer_info");
     this.info = {
-      vendor: String(dbg ? gl.getParameter(dbg.UNMASKED_VENDOR_WEBGL) : gl.getParameter(gl.VENDOR)),
-      renderer: String(dbg ? gl.getParameter(dbg.UNMASKED_RENDERER_WEBGL) : gl.getParameter(gl.RENDERER)),
+      vendor: String(
+        dbg
+          ? gl.getParameter(dbg.UNMASKED_VENDOR_WEBGL)
+          : gl.getParameter(gl.VENDOR),
+      ),
+      renderer: String(
+        dbg
+          ? gl.getParameter(dbg.UNMASKED_RENDERER_WEBGL)
+          : gl.getParameter(gl.RENDERER),
+      ),
       version: String(gl.getParameter(gl.VERSION)),
     };
     this.gl = gl;
@@ -276,19 +295,30 @@ export class WebGL2Device {
     this.width = canvas.width;
     this.height = canvas.height;
     // draw state cache (must exist before any texture / mesh is created)
-    this.curState = '';
+    this.curState = "";
     this.curStateObj = null;
     this.curProgram = null;
     this.curVao = null;
     this.boundTex = [null, null];
     this.programs = {};
-    for (const [name, src] of Object.entries(SHADERS)) this.programs[name] = this._program(name, src);
+    for (const [name, src] of Object.entries(SHADERS))
+      this.programs[name] = this._program(name, src);
     this.quadBuffer = gl.createBuffer();
     this.quadCapacity = 0;
     this.quadGen = 0;
     this._ensureQuads(1 << 16);
-    this.white = this.createTexture({ width: 1, height: 1, data: new Uint8Array([255, 255, 255, 255]) });
-    this.globals = { view: new Float32Array(16), proj: new Float32Array(16), fog: new Float32Array([0, 1, 0, 2]), fogColor: new Float32Array(3), lightmap: this.white };
+    this.white = this.createTexture({
+      width: 1,
+      height: 1,
+      data: new Uint8Array([255, 255, 255, 255]),
+    });
+    this.globals = {
+      view: new Float32Array(16),
+      proj: new Float32Array(16),
+      fog: new Float32Array([0, 1, 0, 2]),
+      fogColor: new Float32Array(3),
+      lightmap: this.white,
+    };
     gl.frontFace(gl.CCW);
     gl.cullFace(gl.BACK);
     gl.depthFunc(gl.LEQUAL);
@@ -300,27 +330,43 @@ export class WebGL2Device {
       const s = gl.createShader(type);
       gl.shaderSource(s, HEADER + text);
       gl.compileShader(s);
-      if (!gl.getShaderParameter(s, gl.COMPILE_STATUS)) throw new Error(`Shader ${name}: ` + gl.getShaderInfoLog(s));
+      if (!gl.getShaderParameter(s, gl.COMPILE_STATUS))
+        throw new Error(`Shader ${name}: ` + gl.getShaderInfoLog(s));
       return s;
     };
     const p = gl.createProgram();
     gl.attachShader(p, compile(gl.VERTEX_SHADER, src.vs));
     gl.attachShader(p, compile(gl.FRAGMENT_SHADER, src.fs));
     gl.linkProgram(p);
-    if (!gl.getProgramParameter(p, gl.LINK_STATUS)) throw new Error(`Program ${name}: ` + gl.getProgramInfoLog(p));
+    if (!gl.getProgramParameter(p, gl.LINK_STATUS))
+      throw new Error(`Program ${name}: ` + gl.getProgramInfoLog(p));
     const u = (n) => gl.getUniformLocation(p, n);
     return {
-      p, uView: u('uView'), uProj: u('uProj'), uModel: u('uModel'), uP: u('uP'), uFog: u('uFog'), uFogColor: u('uFogColor'),
-      uTex0: u('uTex0'), uLightmap: u('uLightmap'), globalsVersion: -1,
-      lastModel: new Float32Array(16).fill(NaN), lastParams: new Float32Array(16).fill(NaN),
+      p,
+      uView: u("uView"),
+      uProj: u("uProj"),
+      uModel: u("uModel"),
+      uP: u("uP"),
+      uFog: u("uFog"),
+      uFogColor: u("uFogColor"),
+      uTex0: u("uTex0"),
+      uLightmap: u("uLightmap"),
+      globalsVersion: -1,
+      lastModel: new Float32Array(16).fill(NaN),
+      lastParams: new Float32Array(16).fill(NaN),
     };
   }
 
   // Optional terrain position hook. Reuses the existing terrain program/format and its unused position.w.
-  createTerrainAnimation(source,lookup,lighting=''){
-    const ids=this.createTexture({...lookup||{width:1,height:1,data:new Uint8Array(4)},filter:'nearest'});let program;const programs={};
-    try{
-      const declaration=`
+  createTerrainAnimation(source, lookup, lighting = "") {
+    const ids = this.createTexture({
+      ...(lookup || { width: 1, height: 1, data: new Uint8Array(4) }),
+      filter: "nearest",
+    });
+    let program;
+    const programs = {};
+    try {
+      const declaration = `
 ${source}
 uniform sampler2D uWaveIds;
 vec3 mcjsWave(vec3 p){
@@ -333,50 +379,226 @@ vec3 mcjsWave(vec3 p){
  return p+WavingBlocks(world-cameraPosition,category,(packed&32768)!=0?1.0:0.0)-(world-cameraPosition);
 }
 `;
-      const vs=source?SHADERS.terrain.vs.replace('void main() {',declaration+'void main() {').replace('  vec4 mv =','  p=mcjsWave(p);\n  vec4 mv ='):SHADERS.terrain.vs;
-      program=this._program('pack terrain animation',{vs,fs:lighting?lighting+SHADERS.terrain.fs.replace('lightmap(vLight)','mcjsPackLight(vLight)'):SHADERS.terrain.fs});
-      const gl=this.gl;programs.terrain=program;
-      if(lighting)for(const name of ['entity','lit']){
-        const shader=SHADERS[name],old=name==='entity'?'lightmap(uP[2].xy)':'lightmap(vLight)';
-        programs[name]=this._program('pack '+name+' lighting',{vs:shader.vs,fs:lighting+shader.fs.replace(old,name==='entity'?'mcjsPackLight(uP[2].xy)':'mcjsPackLight(vLight)')});
-      }
-      for(const p of Object.values(programs))p.uLighting=['Ambient','Direct','Block','Minimum','Dimension'].map(n=>gl.getUniformLocation(p.p,'uPack'+n));
-      return {program,programs,ids,frame:null,uIds:gl.getUniformLocation(program.p,'uWaveIds'),uFrame:gl.getUniformLocation(program.p,'uWaveFrame'),uCamera:gl.getUniformLocation(program.p,'cameraPosition'),uEye:gl.getUniformLocation(program.p,'relativeEyePosition'),destroy:()=>{if(this.terrainAnimation?.program===program)this.terrainAnimation=null;for(const p of Object.values(programs))gl.deleteProgram(p.p);this.destroyTexture(ids);}};
-    }catch(e){for(const p of Object.values(programs))this.gl.deleteProgram(p.p);this.destroyTexture(ids);throw e;}
+      const vs = source
+        ? SHADERS.terrain.vs
+            .replace("void main() {", declaration + "void main() {")
+            .replace("  vec4 mv =", "  p=mcjsWave(p);\n  vec4 mv =")
+        : SHADERS.terrain.vs;
+      program = this._program("pack terrain animation", {
+        vs,
+        fs: lighting
+          ? lighting +
+            SHADERS.terrain.fs.replace(
+              "lightmap(vLight)",
+              "mcjsPackLight(vLight)",
+            )
+          : SHADERS.terrain.fs,
+      });
+      const gl = this.gl;
+      programs.terrain = program;
+      if (lighting)
+        for (const name of ["entity", "lit"]) {
+          const shader = SHADERS[name],
+            old = name === "entity" ? "lightmap(uP[2].xy)" : "lightmap(vLight)";
+          programs[name] = this._program("pack " + name + " lighting", {
+            vs: shader.vs,
+            fs:
+              lighting +
+              shader.fs.replace(
+                old,
+                name === "entity"
+                  ? "mcjsPackLight(uP[2].xy)"
+                  : "mcjsPackLight(vLight)",
+              ),
+          });
+        }
+      for (const p of Object.values(programs))
+        p.uLighting = [
+          "Ambient",
+          "Direct",
+          "Block",
+          "Minimum",
+          "Dimension",
+        ].map((n) => gl.getUniformLocation(p.p, "uPack" + n));
+      return {
+        program,
+        programs,
+        ids,
+        frame: null,
+        uIds: gl.getUniformLocation(program.p, "uWaveIds"),
+        uFrame: gl.getUniformLocation(program.p, "uWaveFrame"),
+        uCamera: gl.getUniformLocation(program.p, "cameraPosition"),
+        uEye: gl.getUniformLocation(program.p, "relativeEyePosition"),
+        destroy: () => {
+          if (this.terrainAnimation?.program === program)
+            this.terrainAnimation = null;
+          for (const p of Object.values(programs)) gl.deleteProgram(p.p);
+          this.destroyTexture(ids);
+        },
+      };
+    } catch (e) {
+      for (const p of Object.values(programs)) this.gl.deleteProgram(p.p);
+      this.destroyTexture(ids);
+      throw e;
+    }
   }
 
-  setTerrainAnimation(animation,frame){this.terrainAnimation=animation;if(animation)animation.frame=frame;}
+  setTerrainAnimation(animation, frame) {
+    this.terrainAnimation = animation;
+    if (animation) animation.frame = frame;
+  }
 
   // Isolated GLSL ES final pass; regular scene pipelines and vertex formats stay intact.
-  createFinalShaderPass(fragment,vertex,resources={}){
-    const gl=this.gl,shaders=[];let program,noise;
-    const compile=(type,source)=>{const shader=gl.createShader(type);shaders.push(shader);gl.shaderSource(shader,source);gl.compileShader(shader);if(!gl.getShaderParameter(shader,gl.COMPILE_STATUS))throw Error('Shader pack: '+gl.getShaderInfoLog(shader));return shader;};
-    try{
-      program=gl.createProgram();
-      gl.attachShader(program,compile(gl.VERTEX_SHADER,vertex||`#version 300 es
+  createFinalShaderPass(fragment, vertex, resources = {}) {
+    const gl = this.gl,
+      shaders = [];
+    let program, noise;
+    const compile = (type, source) => {
+      const shader = gl.createShader(type);
+      shaders.push(shader);
+      gl.shaderSource(shader, source);
+      gl.compileShader(shader);
+      if (!gl.getShaderParameter(shader, gl.COMPILE_STATUS))
+        throw Error("Shader pack: " + gl.getShaderInfoLog(shader));
+      return shader;
+    };
+    try {
+      program = gl.createProgram();
+      gl.attachShader(
+        program,
+        compile(
+          gl.VERTEX_SHADER,
+          vertex ||
+            `#version 300 es
       out vec2 texCoord;out vec2 texcoord;
-      void main(){vec2 p=vec2(float((gl_VertexID<<1)&2),float(gl_VertexID&2));texCoord=p;texcoord=p;gl_Position=vec4(p*2.0-1.0,0.0,1.0);}`));
-      gl.attachShader(program,compile(gl.FRAGMENT_SHADER,fragment));gl.linkProgram(program);
-      if(!gl.getProgramParameter(program,gl.LINK_STATUS))throw Error('Shader pack: '+gl.getProgramInfoLog(program));
-      const uniforms=[];const supported=FINAL_UNIFORMS;
-      for(let i=0;i<gl.getProgramParameter(program,gl.ACTIVE_UNIFORMS);i++){
-        const u=gl.getActiveUniform(program,i);if(u.size!==1)throw Error('Final-pass uniform arrays are unsupported: '+u.name);
-        if(u.type===gl.SAMPLER_2D){if(!['colortex0','colortex1','colortex4','noisetex','gcolor','composite'].includes(u.name))throw Error('Final pass needs an unavailable scene buffer: '+u.name);}
-        else if(!supported.has(u.name)||![gl.FLOAT,gl.INT,gl.BOOL,gl.INT_VEC2,gl.FLOAT_VEC2,gl.FLOAT_VEC3,gl.FLOAT_MAT4].includes(u.type))throw Error('Unsupported final-pass uniform: '+u.name);
-        uniforms.push({name:u.name,type:u.type,location:gl.getUniformLocation(program,u.name)});
+      void main(){vec2 p=vec2(float((gl_VertexID<<1)&2),float(gl_VertexID&2));texCoord=p;texcoord=p;gl_Position=vec4(p*2.0-1.0,0.0,1.0);}`,
+        ),
+      );
+      gl.attachShader(program, compile(gl.FRAGMENT_SHADER, fragment));
+      gl.linkProgram(program);
+      if (!gl.getProgramParameter(program, gl.LINK_STATUS))
+        throw Error("Shader pack: " + gl.getProgramInfoLog(program));
+      const uniforms = [];
+      const supported = FINAL_UNIFORMS;
+      for (
+        let i = 0;
+        i < gl.getProgramParameter(program, gl.ACTIVE_UNIFORMS);
+        i++
+      ) {
+        const u = gl.getActiveUniform(program, i);
+        if (u.size !== 1)
+          throw Error("Final-pass uniform arrays are unsupported: " + u.name);
+        if (u.type === gl.SAMPLER_2D) {
+          if (
+            ![
+              "colortex0",
+              "colortex1",
+              "colortex4",
+              "noisetex",
+              "gcolor",
+              "composite",
+            ].includes(u.name)
+          )
+            throw Error(
+              "Final pass needs an unavailable scene buffer: " + u.name,
+            );
+        } else if (
+          !supported.has(u.name) ||
+          ![
+            gl.FLOAT,
+            gl.INT,
+            gl.BOOL,
+            gl.INT_VEC2,
+            gl.FLOAT_VEC2,
+            gl.FLOAT_VEC3,
+            gl.FLOAT_MAT4,
+          ].includes(u.type)
+        )
+          throw Error("Unsupported final-pass uniform: " + u.name);
+        uniforms.push({
+          name: u.name,
+          type: u.type,
+          location: gl.getUniformLocation(program, u.name),
+        });
       }
-      if(uniforms.some(u=>u.name==='noisetex')){if(!resources.noise)throw Error('Final pass needs its pack noise texture');noise=this.createTexture({...resources.noise,filter:'linear',wrap:'repeat'});}
-      const vao=gl.createVertexArray(),defaults=shaderFrameUniforms({});
-      return {destroy:()=>{gl.deleteProgram(program);gl.deleteVertexArray(vao);if(noise)this.destroyTexture(noise);},draw:(scene,frame)=>{
-        gl.useProgram(program);gl.bindVertexArray(vao);gl.disable(gl.DEPTH_TEST);gl.depthMask(false);gl.disable(gl.CULL_FACE);gl.disable(gl.BLEND);gl.disable(gl.SCISSOR_TEST);gl.colorMask(true,true,true,true);gl.activeTexture(gl.TEXTURE0);gl.bindTexture(gl.TEXTURE_2D,scene.tex);
-        if(noise){gl.activeTexture(gl.TEXTURE1);gl.bindTexture(gl.TEXTURE_2D,noise.tex);gl.activeTexture(gl.TEXTURE0);}
-        const values={viewWidth:this.width,viewHeight:this.height,aspectRatio:this.width/this.height,frameTimeCounter:frame.time,frameTime:frame.delta,worldTime:frame.worldTime,frameCounter:frame.frame,isEyeInWater:frame.underwater?1:0,screenBrightness:frame.gamma,rainStrength:frame.rain||0};
-        for(const u of uniforms){const v=u.type===gl.SAMPLER_2D?(u.name==='noisetex'?1:0):(frame.uniforms?.[u.name]??values[u.name]??defaults[u.name]);if(u.type===gl.FLOAT)gl.uniform1f(u.location,v);else if(u.type===gl.INT_VEC2)gl.uniform2iv(u.location,v);else if(u.type===gl.FLOAT_VEC2)gl.uniform2fv(u.location,v);else if(u.type===gl.FLOAT_VEC3)gl.uniform3fv(u.location,v);else if(u.type===gl.FLOAT_MAT4)gl.uniformMatrix4fv(u.location,false,v);else gl.uniform1i(u.location,v);}
-        gl.drawArrays(gl.TRIANGLES,0,3);
-        this.curProgram=null;this.curVao=null;this.curState='';this.curStateObj=null;this.boundTex[0]=null;this.boundTex[1]=null;
-      }};
-    }catch(e){if(program)gl.deleteProgram(program);if(noise)this.destroyTexture(noise);throw e;}
-    finally{for(const shader of shaders)gl.deleteShader(shader);}
+      if (uniforms.some((u) => u.name === "noisetex")) {
+        if (!resources.noise)
+          throw Error("Final pass needs its pack noise texture");
+        noise = this.createTexture({
+          ...resources.noise,
+          filter: "linear",
+          wrap: "repeat",
+        });
+      }
+      const vao = gl.createVertexArray(),
+        defaults = shaderFrameUniforms({});
+      return {
+        destroy: () => {
+          gl.deleteProgram(program);
+          gl.deleteVertexArray(vao);
+          if (noise) this.destroyTexture(noise);
+        },
+        draw: (scene, frame) => {
+          gl.useProgram(program);
+          gl.bindVertexArray(vao);
+          gl.disable(gl.DEPTH_TEST);
+          gl.depthMask(false);
+          gl.disable(gl.CULL_FACE);
+          gl.disable(gl.BLEND);
+          gl.disable(gl.SCISSOR_TEST);
+          gl.colorMask(true, true, true, true);
+          gl.activeTexture(gl.TEXTURE0);
+          gl.bindTexture(gl.TEXTURE_2D, scene.tex);
+          if (noise) {
+            gl.activeTexture(gl.TEXTURE1);
+            gl.bindTexture(gl.TEXTURE_2D, noise.tex);
+            gl.activeTexture(gl.TEXTURE0);
+          }
+          const values = {
+            viewWidth: this.width,
+            viewHeight: this.height,
+            aspectRatio: this.width / this.height,
+            frameTimeCounter: frame.time,
+            frameTime: frame.delta,
+            worldTime: frame.worldTime,
+            frameCounter: frame.frame,
+            isEyeInWater: frame.underwater ? 1 : 0,
+            screenBrightness: frame.gamma,
+            rainStrength: frame.rain || 0,
+          };
+          for (const u of uniforms) {
+            const v =
+              u.type === gl.SAMPLER_2D
+                ? u.name === "noisetex"
+                  ? 1
+                  : 0
+                : (frame.uniforms?.[u.name] ??
+                  values[u.name] ??
+                  defaults[u.name]);
+            if (u.type === gl.FLOAT) gl.uniform1f(u.location, v);
+            else if (u.type === gl.INT_VEC2) gl.uniform2iv(u.location, v);
+            else if (u.type === gl.FLOAT_VEC2) gl.uniform2fv(u.location, v);
+            else if (u.type === gl.FLOAT_VEC3) gl.uniform3fv(u.location, v);
+            else if (u.type === gl.FLOAT_MAT4)
+              gl.uniformMatrix4fv(u.location, false, v);
+            else gl.uniform1i(u.location, v);
+          }
+          gl.drawArrays(gl.TRIANGLES, 0, 3);
+          this.curProgram = null;
+          this.curVao = null;
+          this.curState = "";
+          this.curStateObj = null;
+          this.boundTex[0] = null;
+          this.boundTex[1] = null;
+        },
+      };
+    } catch (e) {
+      if (program) gl.deleteProgram(program);
+      if (noise) this.destroyTexture(noise);
+      throw e;
+    } finally {
+      for (const shader of shaders) gl.deleteShader(shader);
+    }
   }
 
   _ensureQuads(quads) {
@@ -384,7 +606,8 @@ vec3 mcjsWave(vec3 p){
     const gl = this.gl;
     let cap = Math.max(this.quadCapacity * 2, 1024);
     while (cap < quads) cap *= 2;
-    gl.bindVertexArray(null); this.curVao = null;
+    gl.bindVertexArray(null);
+    this.curVao = null;
     gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, this.quadBuffer);
     gl.bufferData(gl.ELEMENT_ARRAY_BUFFER, quadIndices(cap), gl.STATIC_DRAW);
     this.quadCapacity = cap;
@@ -392,8 +615,10 @@ vec3 mcjsWave(vec3 p){
   }
 
   resize(w, h) {
-    this.canvas.width = w; this.canvas.height = h;
-    this.width = w; this.height = h;
+    this.canvas.width = w;
+    this.canvas.height = h;
+    this.width = w;
+    this.height = h;
   }
 
   // ---------------------------------------------------------------- textures
@@ -401,33 +626,82 @@ vec3 mcjsWave(vec3 p){
   createTexture(o) {
     const gl = this.gl;
     const mipLevels = o.mipmaps === true ? 4 : Math.max(0, o.mipmaps | 0);
-    const t = { tex: gl.createTexture(), width: o.width, height: o.height, mipmaps: mipLevels > 0, mipLevels, filter: o.filter || 'nearest', wrap: o.wrap || 'clamp' };
+    const t = {
+      tex: gl.createTexture(),
+      width: o.width,
+      height: o.height,
+      mipmaps: mipLevels > 0,
+      mipLevels,
+      filter: o.filter || "nearest",
+      wrap: o.wrap || "clamp",
+    };
     gl.bindTexture(gl.TEXTURE_2D, t.tex);
     this.boundTex[0] = null;
     gl.pixelStorei(gl.UNPACK_ALIGNMENT, 1);
-    gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, o.width, o.height, 0, gl.RGBA, gl.UNSIGNED_BYTE, o.data ? toU8(o.data) : null);
-    const near = t.filter === 'nearest';
-    gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, near ? gl.NEAREST : gl.LINEAR);
-    gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, t.mipmaps ? (near ? gl.NEAREST_MIPMAP_LINEAR : gl.LINEAR_MIPMAP_LINEAR) : (near ? gl.NEAREST : gl.LINEAR));
-    const wrap = t.wrap === 'repeat' ? gl.REPEAT : gl.CLAMP_TO_EDGE;
+    gl.texImage2D(
+      gl.TEXTURE_2D,
+      0,
+      gl.RGBA,
+      o.width,
+      o.height,
+      0,
+      gl.RGBA,
+      gl.UNSIGNED_BYTE,
+      o.data ? toU8(o.data) : null,
+    );
+    const near = t.filter === "nearest";
+    gl.texParameteri(
+      gl.TEXTURE_2D,
+      gl.TEXTURE_MAG_FILTER,
+      near ? gl.NEAREST : gl.LINEAR,
+    );
+    gl.texParameteri(
+      gl.TEXTURE_2D,
+      gl.TEXTURE_MIN_FILTER,
+      t.mipmaps
+        ? near
+          ? gl.NEAREST_MIPMAP_LINEAR
+          : gl.LINEAR_MIPMAP_LINEAR
+        : near
+          ? gl.NEAREST
+          : gl.LINEAR,
+    );
+    const wrap = t.wrap === "repeat" ? gl.REPEAT : gl.CLAMP_TO_EDGE;
     gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, wrap);
     gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, wrap);
     if (t.mipmaps && o.data) this._uploadMips(t, o.data);
-    else if (t.mipmaps) gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAX_LEVEL, 0);
+    else if (t.mipmaps)
+      gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAX_LEVEL, 0);
     return t;
   }
 
   // Offscreen colour + depth target; the returned object is also a normal (linear, clamped) texture
   createRenderTarget(w, h) {
     const gl = this.gl;
-    const t = this.createTexture({ width: w, height: h, filter: 'linear', wrap: 'clamp' });
+    const t = this.createTexture({
+      width: w,
+      height: h,
+      filter: "linear",
+      wrap: "clamp",
+    });
     t.fbo = gl.createFramebuffer();
     t.depth = gl.createRenderbuffer();
     gl.bindRenderbuffer(gl.RENDERBUFFER, t.depth);
     gl.renderbufferStorage(gl.RENDERBUFFER, gl.DEPTH_COMPONENT24, w, h);
     gl.bindFramebuffer(gl.FRAMEBUFFER, t.fbo);
-    gl.framebufferTexture2D(gl.FRAMEBUFFER, gl.COLOR_ATTACHMENT0, gl.TEXTURE_2D, t.tex, 0);
-    gl.framebufferRenderbuffer(gl.FRAMEBUFFER, gl.DEPTH_ATTACHMENT, gl.RENDERBUFFER, t.depth);
+    gl.framebufferTexture2D(
+      gl.FRAMEBUFFER,
+      gl.COLOR_ATTACHMENT0,
+      gl.TEXTURE_2D,
+      t.tex,
+      0,
+    );
+    gl.framebufferRenderbuffer(
+      gl.FRAMEBUFFER,
+      gl.DEPTH_ATTACHMENT,
+      gl.RENDERBUFFER,
+      t.depth,
+    );
     gl.bindFramebuffer(gl.FRAMEBUFFER, this.target ? this.target.fbo : null);
     return t;
   }
@@ -440,10 +714,15 @@ vec3 mcjsWave(vec3 p){
     gl.viewport(0, 0, t ? t.width : this.width, t ? t.height : this.height);
     gl.disable(gl.SCISSOR_TEST);
     if (clear) {
-      gl.clearColor(clear[0], clear[1], clear[2], clear[3] === undefined ? 1 : clear[3]);
+      gl.clearColor(
+        clear[0],
+        clear[1],
+        clear[2],
+        clear[3] === undefined ? 1 : clear[3],
+      );
       gl.depthMask(true);
       gl.colorMask(true, true, true, true);
-      this.curState = '';
+      this.curState = "";
       this.curStateObj = null;
       gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
     }
@@ -451,7 +730,8 @@ vec3 mcjsWave(vec3 p){
 
   // True while the GPU is more than a frame behind (used to pace uncapped frame rates)
   busy() {
-    const gl = this.gl, f = this.fences || (this.fences = []);
+    const gl = this.gl,
+      f = this.fences || (this.fences = []);
     while (f.length) {
       const st = gl.clientWaitSync(f[0], 0, 0);
       if (st !== gl.ALREADY_SIGNALED && st !== gl.CONDITION_SATISFIED) break;
@@ -464,7 +744,19 @@ vec3 mcjsWave(vec3 p){
     const gl = this.gl;
     const mips = buildMips(t.width, t.height, toU8(data), t.mipLevels);
     gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAX_LEVEL, mips.length);
-    mips.forEach((m, i) => gl.texImage2D(gl.TEXTURE_2D, i + 1, gl.RGBA, m.width, m.height, 0, gl.RGBA, gl.UNSIGNED_BYTE, m.data));
+    mips.forEach((m, i) =>
+      gl.texImage2D(
+        gl.TEXTURE_2D,
+        i + 1,
+        gl.RGBA,
+        m.width,
+        m.height,
+        0,
+        gl.RGBA,
+        gl.UNSIGNED_BYTE,
+        m.data,
+      ),
+    );
   }
 
   updateTexture(t, data, x = 0, y = 0, w = t.width, h = t.height) {
@@ -472,45 +764,95 @@ vec3 mcjsWave(vec3 p){
     gl.bindTexture(gl.TEXTURE_2D, t.tex);
     this.boundTex[0] = null;
     gl.pixelStorei(gl.UNPACK_ALIGNMENT, 1);
-    gl.texSubImage2D(gl.TEXTURE_2D, 0, x, y, w, h, gl.RGBA, gl.UNSIGNED_BYTE, toU8(data));
-    if (t.mipmaps && x === 0 && y === 0 && w === t.width && h === t.height) this._uploadMips(t, data);
+    gl.texSubImage2D(
+      gl.TEXTURE_2D,
+      0,
+      x,
+      y,
+      w,
+      h,
+      gl.RGBA,
+      gl.UNSIGNED_BYTE,
+      toU8(data),
+    );
+    if (t.mipmaps && x === 0 && y === 0 && w === t.width && h === t.height)
+      this._uploadMips(t, data);
   }
 
-  destroyTexture(t) { if (t && t.tex) this.gl.deleteTexture(t.tex); }
+  destroyTexture(t) {
+    if (t && t.tex) this.gl.deleteTexture(t.tex);
+  }
 
   // ---------------------------------------------------------------- meshes
 
   createMesh(format, vertices, opts = {}) {
     const gl = this.gl;
-    const m = { format, vao: gl.createVertexArray(), vbo: gl.createBuffer(), ibo: null, vertexCount: 0, indexCount: 0, quads: !!opts.quads, dynamic: !!opts.dynamic, quadGen: -1 };
-    gl.bindVertexArray(m.vao); this.curVao = m.vao;
+    const m = {
+      format,
+      vao: gl.createVertexArray(),
+      vbo: gl.createBuffer(),
+      ibo: null,
+      vertexCount: 0,
+      indexCount: 0,
+      quads: !!opts.quads,
+      dynamic: !!opts.dynamic,
+      quadGen: -1,
+    };
+    gl.bindVertexArray(m.vao);
+    this.curVao = m.vao;
     gl.bindBuffer(gl.ARRAY_BUFFER, m.vbo);
     const L = vertexLayout(format);
     m.byteStride = L.byteStride;
     L.attrs.forEach((a, i) => {
       gl.enableVertexAttribArray(i);
-      const type = a.type === 'unorm16' ? gl.UNSIGNED_SHORT : a.type === 'unorm8' ? gl.UNSIGNED_BYTE : gl.FLOAT;
-      gl.vertexAttribPointer(i, a.size, type, a.type !== 'f32', L.byteStride, a.byteOffset);
+      const type =
+        a.type === "unorm16"
+          ? gl.UNSIGNED_SHORT
+          : a.type === "unorm8"
+            ? gl.UNSIGNED_BYTE
+            : gl.FLOAT;
+      gl.vertexAttribPointer(
+        i,
+        a.size,
+        type,
+        a.type !== "f32",
+        L.byteStride,
+        a.byteOffset,
+      );
     });
-    gl.bindVertexArray(null); this.curVao = null;
+    gl.bindVertexArray(null);
+    this.curVao = null;
     this.updateMesh(m, vertices, opts);
     return m;
   }
 
   updateMesh(m, vertices, opts = {}) {
     const gl = this.gl;
-    gl.bindVertexArray(null); this.curVao = null;
+    gl.bindVertexArray(null);
+    this.curVao = null;
     gl.bindBuffer(gl.ARRAY_BUFFER, m.vbo);
-    gl.bufferData(gl.ARRAY_BUFFER, vertices, m.dynamic ? gl.DYNAMIC_DRAW : gl.STATIC_DRAW);
+    gl.bufferData(
+      gl.ARRAY_BUFFER,
+      vertices,
+      m.dynamic ? gl.DYNAMIC_DRAW : gl.STATIC_DRAW,
+    );
     m.vertexCount = vertices.byteLength / m.byteStride;
     m.byteLength = vertices.byteLength;
     if (opts.quads !== undefined) m.quads = !!opts.quads;
     if (opts.indices) {
       if (!m.ibo) m.ibo = gl.createBuffer();
-      gl.bindVertexArray(m.vao); this.curVao = m.vao;
+      gl.bindVertexArray(m.vao);
+      this.curVao = m.vao;
       gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, m.ibo);
-      gl.bufferData(gl.ELEMENT_ARRAY_BUFFER, opts.indices instanceof Uint32Array ? opts.indices : new Uint32Array(opts.indices), gl.STATIC_DRAW);
-      gl.bindVertexArray(null); this.curVao = null;
+      gl.bufferData(
+        gl.ELEMENT_ARRAY_BUFFER,
+        opts.indices instanceof Uint32Array
+          ? opts.indices
+          : new Uint32Array(opts.indices),
+        gl.STATIC_DRAW,
+      );
+      gl.bindVertexArray(null);
+      this.curVao = null;
       m.indexCount = opts.indices.length;
       m.quads = false;
     } else if (m.quads) {
@@ -531,13 +873,16 @@ vec3 mcjsWave(vec3 p){
 
   beginFrame(clear) {
     const gl = this.gl;
-    if (this.target) { this.target = null; gl.bindFramebuffer(gl.FRAMEBUFFER, null); }
+    if (this.target) {
+      this.target = null;
+      gl.bindFramebuffer(gl.FRAMEBUFFER, null);
+    }
     gl.viewport(0, 0, this.width, this.height);
     gl.disable(gl.SCISSOR_TEST);
     gl.clearColor(clear[0], clear[1], clear[2], 1);
     gl.depthMask(true);
     gl.colorMask(true, true, true, true);
-    this.curState = '';
+    this.curState = "";
     this.curStateObj = null;
     gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
   }
@@ -545,7 +890,7 @@ vec3 mcjsWave(vec3 p){
   clearDepth() {
     const gl = this.gl;
     gl.depthMask(true);
-    this.curState = '';
+    this.curState = "";
     gl.clear(gl.DEPTH_BUFFER_BIT);
   }
 
@@ -564,49 +909,97 @@ vec3 mcjsWave(vec3 p){
 
   setScissor(r) {
     const gl = this.gl;
-    if (!r) { gl.disable(gl.SCISSOR_TEST); return; }
+    if (!r) {
+      gl.disable(gl.SCISSOR_TEST);
+      return;
+    }
     gl.enable(gl.SCISSOR_TEST);
     const th = this.target ? this.target.height : this.height;
-    gl.scissor(Math.floor(r[0]), Math.floor(th - r[1] - r[3]), Math.ceil(r[2]), Math.ceil(r[3]));
+    gl.scissor(
+      Math.floor(r[0]),
+      Math.floor(th - r[1] - r[3]),
+      Math.ceil(r[2]),
+      Math.ceil(r[3]),
+    );
   }
 
   _applyState(s) {
     if (s === this.curStateObj) return;
     this.curStateObj = s;
-    const key = (s.blend || 'none') + (s.depthTest === false ? 0 : 1) + (s.depthWrite === false ? 0 : 1) + (s.cull ? 1 : 0) + (s.polygonOffset ? 1 : 0) + (s.depthFunc === 'equal' ? 'e' : '') + (s.colorWrite === false ? 'n' : '');
+    const key =
+      (s.blend || "none") +
+      (s.depthTest === false ? 0 : 1) +
+      (s.depthWrite === false ? 0 : 1) +
+      (s.cull ? 1 : 0) +
+      (s.polygonOffset ? 1 : 0) +
+      (s.depthFunc === "equal" ? "e" : "") +
+      (s.colorWrite === false ? "n" : "");
     if (key === this.curState) return;
     this.curState = key;
     const gl = this.gl;
-    const b = s.blend || 'none';
-    if (b === 'none') gl.disable(gl.BLEND);
+    const b = s.blend || "none";
+    if (b === "none") gl.disable(gl.BLEND);
     else {
       gl.enable(gl.BLEND);
       switch (b) {
-        case 'alpha': gl.blendFuncSeparate(gl.SRC_ALPHA, gl.ONE_MINUS_SRC_ALPHA, gl.ONE, gl.ONE_MINUS_SRC_ALPHA); break;
-        case 'add': gl.blendFunc(gl.SRC_ALPHA, gl.ONE); break;
-        case 'invert': gl.blendFunc(gl.ONE_MINUS_DST_COLOR, gl.ONE_MINUS_SRC_COLOR); break;
-        case 'darken': gl.blendFunc(gl.ZERO, gl.ONE_MINUS_SRC_COLOR); break;
-        case 'multiply': gl.blendFunc(gl.DST_COLOR, gl.SRC_COLOR); break;
-        default: gl.blendFunc(gl.SRC_ALPHA, gl.ONE_MINUS_SRC_ALPHA);
+        case "alpha":
+          gl.blendFuncSeparate(
+            gl.SRC_ALPHA,
+            gl.ONE_MINUS_SRC_ALPHA,
+            gl.ONE,
+            gl.ONE_MINUS_SRC_ALPHA,
+          );
+          break;
+        case "add":
+          gl.blendFunc(gl.SRC_ALPHA, gl.ONE);
+          break;
+        case "invert":
+          gl.blendFunc(gl.ONE_MINUS_DST_COLOR, gl.ONE_MINUS_SRC_COLOR);
+          break;
+        case "darken":
+          gl.blendFunc(gl.ZERO, gl.ONE_MINUS_SRC_COLOR);
+          break;
+        case "multiply":
+          gl.blendFunc(gl.DST_COLOR, gl.SRC_COLOR);
+          break;
+        default:
+          gl.blendFunc(gl.SRC_ALPHA, gl.ONE_MINUS_SRC_ALPHA);
       }
     }
-    if (s.depthTest === false) gl.disable(gl.DEPTH_TEST); else gl.enable(gl.DEPTH_TEST);
+    if (s.depthTest === false) gl.disable(gl.DEPTH_TEST);
+    else gl.enable(gl.DEPTH_TEST);
     gl.depthMask(s.depthWrite !== false);
-    gl.depthFunc(s.depthFunc === 'equal' ? gl.EQUAL : gl.LEQUAL);
+    gl.depthFunc(s.depthFunc === "equal" ? gl.EQUAL : gl.LEQUAL);
     const cw = s.colorWrite !== false;
     gl.colorMask(cw, cw, cw, cw);
-    if (s.cull) gl.enable(gl.CULL_FACE); else gl.disable(gl.CULL_FACE);
-    if (s.polygonOffset) { gl.enable(gl.POLYGON_OFFSET_FILL); gl.polygonOffset(-1, -1); } else gl.disable(gl.POLYGON_OFFSET_FILL);
+    if (s.cull) gl.enable(gl.CULL_FACE);
+    else gl.disable(gl.CULL_FACE);
+    if (s.polygonOffset) {
+      gl.enable(gl.POLYGON_OFFSET_FILL);
+      gl.polygonOffset(-1, -1);
+    } else gl.disable(gl.POLYGON_OFFSET_FILL);
   }
 
   draw(d) {
     const gl = this.gl;
     const m = d.mesh;
     if (!m || !m.vertexCount) return;
-    const pack=this.terrainAnimation,params=d.params||DEFAULT_PARAMS[d.pipeline]||ZERO16;
-    const animation=pack&&(d.pipeline==='terrain'||pack.programs?.[d.pipeline]&&(d.pipeline!=='entity'||params[11]<1.5))?pack:null;
-    const prog = animation ? animation.programs?.[d.pipeline]||animation.program : this.programs[d.pipeline];
-    if (this.curProgram !== prog) { gl.useProgram(prog.p); this.curProgram = prog; }
+    const pack = this.terrainAnimation,
+      params = d.params || DEFAULT_PARAMS[d.pipeline] || ZERO16;
+    const animation =
+      pack &&
+      (d.pipeline === "terrain" ||
+        (pack.programs?.[d.pipeline] &&
+          (d.pipeline !== "entity" || params[11] < 1.5)))
+        ? pack
+        : null;
+    const prog = animation
+      ? animation.programs?.[d.pipeline] || animation.program
+      : this.programs[d.pipeline];
+    if (this.curProgram !== prog) {
+      gl.useProgram(prog.p);
+      this.curProgram = prog;
+    }
     if (prog.globalsVersion !== this.globalsVersion) {
       const G = this.globals;
       gl.uniformMatrix4fv(prog.uView, false, G.view);
@@ -619,29 +1012,70 @@ vec3 mcjsWave(vec3 p){
     }
     // Skip uniform uploads / binds that would not change anything (draw state caching)
     const model = d.model || IDENTITY;
-    if (!same16(prog.lastModel, model)) { gl.uniformMatrix4fv(prog.uModel, false, model); prog.lastModel.set(model); }
-    if (!same16(prog.lastParams, params)) { gl.uniform4fv(prog.uP, params); prog.lastParams.set(params); }
+    if (!same16(prog.lastModel, model)) {
+      gl.uniformMatrix4fv(prog.uModel, false, model);
+      prog.lastModel.set(model);
+    }
+    if (!same16(prog.lastParams, params)) {
+      gl.uniform4fv(prog.uP, params);
+      prog.lastParams.set(params);
+    }
     const t0 = ((d.textures && d.textures[0]) || this.white).tex;
-    if (this.boundTex[0] !== t0) { gl.activeTexture(gl.TEXTURE0); gl.bindTexture(gl.TEXTURE_2D, t0); this.boundTex[0] = t0; }
+    if (this.boundTex[0] !== t0) {
+      gl.activeTexture(gl.TEXTURE0);
+      gl.bindTexture(gl.TEXTURE_2D, t0);
+      this.boundTex[0] = t0;
+    }
     const lm = (this.globals.lightmap || this.white).tex;
-    if (this.boundTex[1] !== lm) { gl.activeTexture(gl.TEXTURE1); gl.bindTexture(gl.TEXTURE_2D, lm); gl.activeTexture(gl.TEXTURE0); this.boundTex[1] = lm; }
-    if(animation){
-      const f=animation.frame,c=f.camera,e=f.eye;
-      if(f.lighting){const l=f.lighting;for(const [i,key]of ['ambient','direct','block','minimum'].entries())gl.uniform3fv(prog.uLighting[i],l[key]);gl.uniform1f(prog.uLighting[4],l.dimension);}
-      if(d.pipeline==='terrain'){gl.uniform1i(animation.uIds,2);gl.activeTexture(gl.TEXTURE2);gl.bindTexture(gl.TEXTURE_2D,animation.ids.tex);gl.activeTexture(gl.TEXTURE0);
-      gl.uniform4f(animation.uFrame,f.time,f.worldTime,0,0);gl.uniform3fv(animation.uCamera,c);gl.uniform3f(animation.uEye,c[0]-e[0],c[1]-e[1],c[2]-e[2]);}
+    if (this.boundTex[1] !== lm) {
+      gl.activeTexture(gl.TEXTURE1);
+      gl.bindTexture(gl.TEXTURE_2D, lm);
+      gl.activeTexture(gl.TEXTURE0);
+      this.boundTex[1] = lm;
+    }
+    if (animation) {
+      const f = animation.frame,
+        c = f.camera,
+        e = f.eye;
+      if (f.lighting) {
+        const l = f.lighting;
+        for (const [i, key] of [
+          "ambient",
+          "direct",
+          "block",
+          "minimum",
+        ].entries())
+          gl.uniform3fv(prog.uLighting[i], l[key]);
+        gl.uniform1f(prog.uLighting[4], l.dimension);
+      }
+      if (d.pipeline === "terrain") {
+        gl.uniform1i(animation.uIds, 2);
+        gl.activeTexture(gl.TEXTURE2);
+        gl.bindTexture(gl.TEXTURE_2D, animation.ids.tex);
+        gl.activeTexture(gl.TEXTURE0);
+        gl.uniform4f(animation.uFrame, f.time, f.worldTime, 0, 0);
+        gl.uniform3fv(animation.uCamera, c);
+        gl.uniform3f(animation.uEye, c[0] - e[0], c[1] - e[1], c[2] - e[2]);
+      }
     }
     this._applyState(d.state || EMPTY_STATE);
-    if (this.curVao !== m.vao) { gl.bindVertexArray(m.vao); this.curVao = m.vao; }
-    const mode = d.primitive === 'lines' ? gl.LINES : gl.TRIANGLES;
+    if (this.curVao !== m.vao) {
+      gl.bindVertexArray(m.vao);
+      this.curVao = m.vao;
+    }
+    const mode = d.primitive === "lines" ? gl.LINES : gl.TRIANGLES;
     if (m.quads) {
-      if (m.quadGen !== this.quadGen) { gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, this.quadBuffer); m.quadGen = this.quadGen; }
+      if (m.quadGen !== this.quadGen) {
+        gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, this.quadBuffer);
+        m.quadGen = this.quadGen;
+      }
       const first = d.first || 0;
       const count = d.count !== undefined ? d.count : m.indexCount;
       if (count > 0) gl.drawElements(mode, count, gl.UNSIGNED_INT, first * 4);
     } else if (m.ibo) {
       const count = d.count !== undefined ? d.count : m.indexCount;
-      if (count > 0) gl.drawElements(mode, count, gl.UNSIGNED_INT, (d.first || 0) * 4);
+      if (count > 0)
+        gl.drawElements(mode, count, gl.UNSIGNED_INT, (d.first || 0) * 4);
     } else {
       const count = d.count !== undefined ? d.count : m.vertexCount;
       if (count > 0) gl.drawArrays(mode, d.first || 0, count);
@@ -654,30 +1088,43 @@ vec3 mcjsWave(vec3 p){
       for (const r of this.captureWaiters.splice(0)) r(px);
     }
     const gl = this.gl;
-    (this.fences || (this.fences = [])).push(gl.fenceSync(gl.SYNC_GPU_COMMANDS_COMPLETE, 0));
+    (this.fences || (this.fences = [])).push(
+      gl.fenceSync(gl.SYNC_GPU_COMMANDS_COMPLETE, 0),
+    );
     if (this.fences.length > 8) gl.deleteSync(this.fences.shift());
     gl.flush();
   }
 
-  capture() { return new Promise((res) => { (this.captureWaiters ||= []).push(res); }); }
+  capture() {
+    return new Promise((res) => {
+      (this.captureWaiters ||= []).push(res);
+    });
+  }
 
   _readPixels() {
     const gl = this.gl;
-    const w = this.width, h = this.height;
+    const w = this.width,
+      h = this.height;
     const buf = new Uint8Array(w * h * 4);
     gl.readPixels(0, 0, w, h, gl.RGBA, gl.UNSIGNED_BYTE, buf);
     const out = new Uint8Array(w * h * 4);
-    for (let y = 0; y < h; y++) out.set(buf.subarray((h - 1 - y) * w * 4, (h - y) * w * 4), y * w * 4);
+    for (let y = 0; y < h; y++)
+      out.set(buf.subarray((h - 1 - y) * w * 4, (h - y) * w * 4), y * w * 4);
     return { width: w, height: h, data: out };
   }
 }
 
-const IDENTITY = new Float32Array([1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1]);
+const IDENTITY = new Float32Array([
+  1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1,
+]);
 const ZERO16 = new Float32Array(16);
 const EMPTY_STATE = {};
 function same16(a, b) {
   for (let i = 0; i < 16; i++) if (a[i] !== b[i]) return false;
   return true;
 }
-const toU8 = (d) => (d instanceof Uint8Array ? d : new Uint8Array(d.buffer, d.byteOffset, d.byteLength));
+const toU8 = (d) =>
+  d instanceof Uint8Array
+    ? d
+    : new Uint8Array(d.buffer, d.byteOffset, d.byteLength);
 export { PIPELINE_FORMAT };

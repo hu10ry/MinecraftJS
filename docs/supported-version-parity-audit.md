@@ -30,13 +30,13 @@ data rows and extracted model variants, not a claim of complete native registry
 or runtime behavior coverage. Pre-flattening metadata variants are not individual
 block rows; entity tables can include aliases/non-mob entries.
 
-| Target | Protocol | Block rows | Item rows | Model variants | Parity finding |
-| --- | ---: | ---: | ---: | ---: | --- |
-| 1.8.9 | 47 | 198 | 336 | 52 | Not certified. Baseline multiplayer behavior exists; no exhaustive visual/interaction or wiki-fix acceptance record. |
-| 1.12.2 | 340 | 254 | 410 | 66 | Not certified. Content/UI support exists; every 1.9–1.12 interaction, mob state and patch regression has not been accepted. |
-| 1.13.2 | 404 | 598 | 789 | 83 | Recipe synchronization and NBT queries are now implemented; other aquatic interaction/presentation acceptance remains open. |
-| 1.14.4 | 498 | 676 | 876 | 87 | Partial. Existing detailed topic/patch review has 197 open acceptance topics; its 58 narrow runtime probes pass. |
-| 1.15.2 | 578 | 680 | 883 | 90 | Partial. Bee/honey client behavior exists; broader interaction outcomes, particle fidelity and entity visual acceptance remain open. |
+| Target | Protocol | Block rows | Item rows | Model variants | Parity finding                                                                                                                       |
+| ------ | -------: | ---------: | --------: | -------------: | ------------------------------------------------------------------------------------------------------------------------------------ |
+| 1.8.9  |       47 |        198 |       336 |             52 | Not certified. Baseline multiplayer behavior exists; no exhaustive visual/interaction or wiki-fix acceptance record.                 |
+| 1.12.2 |      340 |        254 |       410 |             66 | Not certified. Content/UI support exists; every 1.9–1.12 interaction, mob state and patch regression has not been accepted.          |
+| 1.13.2 |      404 |        598 |       789 |             83 | Recipe synchronization and NBT queries are now implemented; other aquatic interaction/presentation acceptance remains open.          |
+| 1.14.4 |      498 |        676 |       876 |             87 | Partial. Existing detailed topic/patch review has 197 open acceptance topics; its 58 narrow runtime probes pass.                     |
+| 1.15.2 |      578 |        680 |       883 |             90 | Partial. Bee/honey client behavior exists; broader interaction outcomes, particle fidelity and entity visual acceptance remain open. |
 
 All five pinned client-jar SHA-1s match the wiki's target hashes. Collision shape
 entries cover every local block row. Empty static-host proxy lists, the custom

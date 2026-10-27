@@ -220,9 +220,7 @@
       "missing": [],
       "mismatchedIds": [],
       "extra": [],
-      "allowedOmissions": [
-        "minecraft:air"
-      ]
+      "allowedOmissions": ["minecraft:air"]
     },
     "particles": {
       "native": 58,

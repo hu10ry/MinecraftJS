@@ -1,4 +1,4 @@
-import { WATER_BIOMES } from './water-biomes.js';
+import { WATER_BIOMES } from "./water-biomes.js";
 // Biome colour helpers (ColorizerGrass / ColorizerFoliage + per-biome overrides). Worker-safe.
 
 let biomeTable = [];
@@ -12,7 +12,12 @@ export function initBiomes(biomesJson, grassPixels, foliagePixels) {
   foliageMap = foliagePixels;
 }
 
-export function biomeInfo(id) { return biomeTable[id] || biomeTable[1] || { temperature: 0.8, rainfall: 0.4, name: 'plains' }; }
+export function biomeInfo(id) {
+  return (
+    biomeTable[id] ||
+    biomeTable[1] || { temperature: 0.8, rainfall: 0.4, name: "plains" }
+  );
+}
 
 function sample(map, temp, rain) {
   if (!map) return 0x7fb238;
@@ -20,19 +25,19 @@ function sample(map, temp, rain) {
   rain = Math.min(1, Math.max(0, rain)) * temp;
   const i = ((1 - temp) * 255) | 0;
   const j = ((1 - rain) * 255) | 0;
-  const k = (j << 8 | i) * 4;
+  const k = ((j << 8) | i) * 4;
   return (map[k] << 16) | (map[k + 1] << 8) | map[k + 2];
 }
 
 function tempAt(b, y) {
   let t = b.temperature;
-  if (y > 64) t -= (y - 64) * 0.05 / 30;
+  if (y > 64) t -= ((y - 64) * 0.05) / 30;
   return t;
 }
 
-const isSwamp = (n) => n === 'swamp' || n === 'swamp_hills';
-const isRoofed = (n) => n === 'dark_forest' || n === 'dark_forest_hills';
-const isMesa = (n) => !!n && (n.includes('badlands'));
+const isSwamp = (n) => n === "swamp" || n === "swamp_hills";
+const isRoofed = (n) => n === "dark_forest" || n === "dark_forest_hills";
+const isMesa = (n) => !!n && n.includes("badlands");
 
 export function grassColor(id, y) {
   const b = biomeInfo(id);
@@ -53,15 +58,15 @@ export function foliageColor(id, y) {
 }
 
 export function waterColor(id) {
-  if(WATER_BIOMES[id])return WATER_BIOMES[id][0];
+  if (WATER_BIOMES[id]) return WATER_BIOMES[id][0];
   const b = biomeInfo(id);
   // The 1.13 water sprites are grayscale: their blue comes from biome tint.
-  if (typeof b.waterColor === 'number') return b.waterColor;
+  if (typeof b.waterColor === "number") return b.waterColor;
   return isSwamp(b.name) ? 0x617b64 : 0x3f76e4;
 }
 
 export function biomeRainType(id, y) {
   const b = biomeInfo(id);
-  if (b.precipitation === 'none' || b.rainfall === 0) return 'none';
-  return tempAt(b, y) < 0.15 ? 'snow' : 'rain';
+  if (b.precipitation === "none" || b.rainfall === 0) return "none";
+  return tempAt(b, y) < 0.15 ? "snow" : "rain";
 }

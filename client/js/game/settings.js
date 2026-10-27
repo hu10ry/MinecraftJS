@@ -1,15 +1,44 @@
-import { keyName } from './key-names.js';
+import { keyName } from "./key-names.js";
 // Game options (vanilla defaults), persisted through the platform settings store.
-import { platform } from '../platform/platform.js';
-import { parseAddress } from '../net/address.js';
+import { platform } from "../platform/platform.js";
+import { parseAddress } from "../net/address.js";
 
 export const DEFAULT_KEYS = {
-  forward: 'KeyW', left: 'KeyA', back: 'KeyS', right: 'KeyD', jump: 'Space', sneak: 'ShiftLeft', sprint: 'ControlLeft',
-  inventory: 'KeyE', drop: 'KeyQ', chat: 'KeyT', command: 'Slash', playerlist: 'Tab', pickItem: 'mouse1',
-  attack: 'mouse0', use: 'mouse2', perspective: 'F5', zoom: 'KeyC', smoothCamera: '', screenshot: 'F2', hideGui: 'F1',
-  hotbar1: 'Digit1', hotbar2: 'Digit2', hotbar3: 'Digit3', hotbar4: 'Digit4', hotbar5: 'Digit5',
-  hotbar6: 'Digit6', hotbar7: 'Digit7', hotbar8: 'Digit8', hotbar9: 'Digit9', fullscreen: 'F11', spectatorOutlines: '',
-  swapHands: 'KeyF', advancements: 'KeyL', saveToolbarActivator: 'KeyC', loadToolbarActivator: 'KeyX', // 1.9 - 1.12
+  forward: "KeyW",
+  left: "KeyA",
+  back: "KeyS",
+  right: "KeyD",
+  jump: "Space",
+  sneak: "ShiftLeft",
+  sprint: "ControlLeft",
+  inventory: "KeyE",
+  drop: "KeyQ",
+  chat: "KeyT",
+  command: "Slash",
+  playerlist: "Tab",
+  pickItem: "mouse1",
+  attack: "mouse0",
+  use: "mouse2",
+  perspective: "F5",
+  zoom: "KeyC",
+  smoothCamera: "",
+  screenshot: "F2",
+  hideGui: "F1",
+  hotbar1: "Digit1",
+  hotbar2: "Digit2",
+  hotbar3: "Digit3",
+  hotbar4: "Digit4",
+  hotbar5: "Digit5",
+  hotbar6: "Digit6",
+  hotbar7: "Digit7",
+  hotbar8: "Digit8",
+  hotbar9: "Digit9",
+  fullscreen: "F11",
+  spectatorOutlines: "",
+  swapHands: "KeyF",
+  advancements: "KeyL",
+  saveToolbarActivator: "KeyC",
+  loadToolbarActivator: "KeyX", // 1.9 - 1.12
 };
 
 const DEFAULTS = {
@@ -18,7 +47,7 @@ const DEFAULTS = {
   sensitivity: 0.5,
   mouseWheelSensitivity: 1,
   discreteMouseScroll: false,
-  textBackgroundOpacity: .5,
+  textBackgroundOpacity: 0.5,
   textBackgroundOnlyChat: true,
   invertMouse: false,
   renderDistance: 8,
@@ -45,33 +74,43 @@ const DEFAULTS = {
   chatVisibility: 0, // 0 shown, 1 commands only, 2 hidden
   chatColors: true,
   masterVolume: 1,
-  soundVolumes: { music: 0, record: 1, weather: 1, block: 1, hostile: 1, neutral: 1, player: 1, ambient: 1, voice: 1 },
+  soundVolumes: {
+    music: 0,
+    record: 1,
+    weather: 1,
+    block: 1,
+    hostile: 1,
+    neutral: 1,
+    player: 1,
+    ambient: 1,
+    voice: 1,
+  },
   showSubtitles: false,
   realmsNotifications: true,
   showDebugInfo: false,
   reducedDebugInfo: false,
-  tutorialStep: 'movement', // Tutorial step (tutorial.js); 'none' once done
+  tutorialStep: "movement", // Tutorial step (tutorial.js); 'none' once done
   narrator: 0, // 0 off, 1 all, 2 chat, 3 system (narrator.js)
   advancedItemTooltips: false,
   skinParts: 0x7f,
-  mainHand: 'right',
+  mainHand: "right",
   attackIndicator: 1, // 0 off, 1 crosshair, 2 hotbar (1.9)
-  autoJump: true,     // GameSettings.autoJump (1.11+)
+  autoJump: true, // GameSettings.autoJump (1.11+)
   maxFps: 0,
-  graphicsApi: 'webgl2', // 'webgl2' | 'webgpu' | 'software'
+  graphicsApi: "webgl2", // 'webgl2' | 'webgpu' | 'software'
   superPotato: false, // lower internal resolution, single-pass menu panorama (always on with the CPU rasteriser)
-  skinProxy: '', // Optional HTTP/CORS proxy template for public skin/profile URLs.
+  skinProxy: "", // Optional HTTP/CORS proxy template for public skin/profile URLs.
   resourcePacks: [], // active pack ids, highest priority first
   entityShadows: true,
   lodDistance: 128, // World blocks from the camera; 0 disables terrain and entity LOD.
-  language: 'en_us',
+  language: "en_us",
   forceUnicodeFont: false,
   keys: { ...DEFAULT_KEYS },
-  lastServer: { host: 'localhost', port: 25565 },
-  username: 'WebPlayer',
-  servers: [{ name: 'Local Server', host: 'localhost', port: 25565 }],
+  lastServer: { host: "localhost", port: 25565 },
+  username: "WebPlayer",
+  servers: [{ name: "Local Server", host: "localhost", port: 25565 }],
   proxies: null, // [{ name, url }]; null until first use, then filled from config.json (net/proxies.js)
-  proxy: 0,      // selected proxy
+  proxy: 0, // selected proxy
 };
 
 // config.json "servers": [{ name, address }] (or { name, host, port }) -> settings entries
@@ -79,10 +118,18 @@ function configServers(list) {
   const out = [];
   for (const s of list) {
     if (!s) continue;
-    const text = s.address || (s.host ? (s.port ? `${s.host}:${s.port}` : s.host) : '');
+    const text =
+      s.address || (s.host ? (s.port ? `${s.host}:${s.port}` : s.host) : "");
     const a = parseAddress(text);
-    if (!a) { console.warn('config.json: bad server address', text); continue; }
-    out.push(a.kind === 'eagler' ? { name: String(s.name || text), host: String(text).trim(), port: 0 } : { name: String(s.name || text), host: a.host, port: a.port });
+    if (!a) {
+      console.warn("config.json: bad server address", text);
+      continue;
+    }
+    out.push(
+      a.kind === "eagler"
+        ? { name: String(s.name || text), host: String(text).trim(), port: 0 }
+        : { name: String(s.name || text), host: a.host, port: a.port },
+    );
   }
   return out;
 }
@@ -92,36 +139,66 @@ export class Settings {
   constructor(config = {}) {
     this.config = config;
     let saved = {};
-    try { saved = JSON.parse((platform().loadSetting('minecraftjs.settings') || platform().loadSetting('minekampf.settings')) || '{}'); } catch (e) { saved = {}; }
+    try {
+      saved = JSON.parse(
+        platform().loadSetting("minecraftjs.settings") ||
+          platform().loadSetting("minekampf.settings") ||
+          "{}",
+      );
+    } catch (e) {
+      saved = {};
+    }
     const defaults = JSON.parse(JSON.stringify(DEFAULTS));
-    if (Array.isArray(config.servers)) defaults.servers = configServers(config.servers);
-    if (typeof config.skinProxy === 'string') defaults.skinProxy = config.skinProxy.trim();
+    if (Array.isArray(config.servers))
+      defaults.servers = configServers(config.servers);
+    if (typeof config.skinProxy === "string")
+      defaults.skinProxy = config.skinProxy.trim();
     Object.assign(this, defaults, saved);
-    this.skinProxy = typeof this.skinProxy === 'string' ? this.skinProxy.trim() : '';
-    if (!Object.prototype.hasOwnProperty.call(saved, 'lodDistance') && Number.isFinite(saved.lodChunks)) this.lodDistance = Math.max(0, saved.lodChunks * 16);
-    if (!Number.isFinite(this.lodDistance) || this.lodDistance < 0) this.lodDistance = 128;
+    this.skinProxy =
+      typeof this.skinProxy === "string" ? this.skinProxy.trim() : "";
+    if (
+      !Object.prototype.hasOwnProperty.call(saved, "lodDistance") &&
+      Number.isFinite(saved.lodChunks)
+    )
+      this.lodDistance = Math.max(0, saved.lodChunks * 16);
+    if (!Number.isFinite(this.lodDistance) || this.lodDistance < 0)
+      this.lodDistance = 128;
     delete this.lodChunks;
-    this.biomeBlendRadius = Number.isFinite(this.biomeBlendRadius) ? Math.max(0, Math.min(7, Math.round(this.biomeBlendRadius))) : 2;
+    this.biomeBlendRadius = Number.isFinite(this.biomeBlendRadius)
+      ? Math.max(0, Math.min(7, Math.round(this.biomeBlendRadius)))
+      : 2;
     this.keys = { ...DEFAULT_KEYS, ...(saved.keys || {}) };
-    this.soundVolumes = { ...DEFAULTS.soundVolumes, ...(saved.soundVolumes || {}) };
+    this.soundVolumes = {
+      ...DEFAULTS.soundVolumes,
+      ...(saved.soundVolumes || {}),
+    };
     if (Array.isArray(this.servers)) {
       for (const s of this.servers) delete s._icon;
     }
     // language codes are lowercase since 1.11 (older saves: en_US)
-    if (typeof this.language === 'string') this.language = this.language.toLowerCase();
+    if (typeof this.language === "string")
+      this.language = this.language.toLowerCase();
     // older saves stored these as booleans
-    if (typeof this.clouds === 'boolean') this.clouds = this.clouds ? 2 : 0;
-    if (typeof this.smoothLighting === 'boolean') this.smoothLighting = this.smoothLighting ? 2 : 0;
+    if (typeof this.clouds === "boolean") this.clouds = this.clouds ? 2 : 0;
+    if (typeof this.smoothLighting === "boolean")
+      this.smoothLighting = this.smoothLighting ? 2 : 0;
   }
 
   save() {
     const out = {};
     for (const k of Object.keys(DEFAULTS)) out[k] = this[k];
     if (Array.isArray(this.servers)) {
-      out.servers = this.servers.map((s) => ({ name: s.name, host: s.host, port: s.port, ...(s._iconSrc ? { _iconSrc: s._iconSrc } : {}) }));
+      out.servers = this.servers.map((s) => ({
+        name: s.name,
+        host: s.host,
+        port: s.port,
+        ...(s._iconSrc ? { _iconSrc: s._iconSrc } : {}),
+      }));
     }
-    platform().saveSetting('minecraftjs.settings', JSON.stringify(out));
+    platform().saveSetting("minecraftjs.settings", JSON.stringify(out));
   }
 
-  keyName(code) { return keyName(code); }
+  keyName(code) {
+    return keyName(code);
+  }
 }

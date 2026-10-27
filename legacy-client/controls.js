@@ -37,47 +37,64 @@ class PlayerControls {
   }
 
   setupControls() {
-    this.canvas.addEventListener('click', () => {
+    this.canvas.addEventListener("click", () => {
       if (!this.locked && !this.paused) {
         this.canvas.requestPointerLock();
       }
     });
 
-    document.addEventListener('pointerlockchange', () => {
+    document.addEventListener("pointerlockchange", () => {
       this.locked = document.pointerLockElement === this.canvas;
     });
 
-    document.addEventListener('mousemove', (e) => {
+    document.addEventListener("mousemove", (e) => {
       if (!this.locked) return;
       this.yaw -= e.movementX * this.sensitivity;
       this.pitch -= e.movementY * this.sensitivity;
-      this.pitch = Math.max(-Math.PI / 2 + 0.01, Math.min(Math.PI / 2 - 0.01, this.pitch));
+      this.pitch = Math.max(
+        -Math.PI / 2 + 0.01,
+        Math.min(Math.PI / 2 - 0.01, this.pitch),
+      );
     });
 
-    document.addEventListener('keydown', (e) => {
+    document.addEventListener("keydown", (e) => {
       if (this.chatOpen) return;
 
       switch (e.code) {
-        case 'KeyW': this.moveForward = true; break;
-        case 'KeyS': this.moveBackward = true; break;
-        case 'KeyA': this.moveLeft = true; break;
-        case 'KeyD': this.moveRight = true; break;
-        case 'Space': this.jumping = true; break;
-        case 'ShiftLeft': this.sneaking = true; break;
-        case 'ControlLeft': this.sprinting = true; break;
-        case 'KeyT':
+        case "KeyW":
+          this.moveForward = true;
+          break;
+        case "KeyS":
+          this.moveBackward = true;
+          break;
+        case "KeyA":
+          this.moveLeft = true;
+          break;
+        case "KeyD":
+          this.moveRight = true;
+          break;
+        case "Space":
+          this.jumping = true;
+          break;
+        case "ShiftLeft":
+          this.sneaking = true;
+          break;
+        case "ControlLeft":
+          this.sprinting = true;
+          break;
+        case "KeyT":
           if (this.locked) {
             e.preventDefault();
             this.openChat();
           }
           break;
-        case 'Slash':
+        case "Slash":
           if (this.locked) {
             e.preventDefault();
-            this.openChat('/');
+            this.openChat("/");
           }
           break;
-        case 'Escape':
+        case "Escape":
           if (this.chatOpen) {
             this.closeChat();
           } else if (this.locked) {
@@ -87,38 +104,59 @@ class PlayerControls {
             this.togglePause(false);
           }
           break;
-        case 'F3':
+        case "F3":
           e.preventDefault();
           this.toggleDebug();
           break;
-        case 'Digit1': case 'Digit2': case 'Digit3': case 'Digit4': case 'Digit5':
-        case 'Digit6': case 'Digit7': case 'Digit8': case 'Digit9':
+        case "Digit1":
+        case "Digit2":
+        case "Digit3":
+        case "Digit4":
+        case "Digit5":
+        case "Digit6":
+        case "Digit7":
+        case "Digit8":
+        case "Digit9":
           this.selectSlot(parseInt(e.code.charAt(5)) - 1);
           break;
       }
     });
 
-    document.addEventListener('keyup', (e) => {
+    document.addEventListener("keyup", (e) => {
       switch (e.code) {
-        case 'KeyW': this.moveForward = false; break;
-        case 'KeyS': this.moveBackward = false; break;
-        case 'KeyA': this.moveLeft = false; break;
-        case 'KeyD': this.moveRight = false; break;
-        case 'Space': this.jumping = false; break;
-        case 'ShiftLeft': this.sneaking = false; break;
-        case 'ControlLeft': this.sprinting = false; break;
+        case "KeyW":
+          this.moveForward = false;
+          break;
+        case "KeyS":
+          this.moveBackward = false;
+          break;
+        case "KeyA":
+          this.moveLeft = false;
+          break;
+        case "KeyD":
+          this.moveRight = false;
+          break;
+        case "Space":
+          this.jumping = false;
+          break;
+        case "ShiftLeft":
+          this.sneaking = false;
+          break;
+        case "ControlLeft":
+          this.sprinting = false;
+          break;
       }
     });
 
-    document.addEventListener('mousedown', (e) => {
+    document.addEventListener("mousedown", (e) => {
       if (!this.locked) return;
       if (e.button === 0) this.onLeftClick();
       if (e.button === 2) this.onRightClick();
     });
 
-    this.canvas.addEventListener('contextmenu', (e) => e.preventDefault());
+    this.canvas.addEventListener("contextmenu", (e) => e.preventDefault());
 
-    this.canvas.addEventListener('wheel', (e) => {
+    this.canvas.addEventListener("wheel", (e) => {
       if (!this.locked) return;
       let slot = this.selectedSlot;
       if (e.deltaY > 0) slot++;
@@ -131,41 +169,41 @@ class PlayerControls {
 
   selectSlot(slot) {
     this.selectedSlot = slot;
-    document.querySelectorAll('.hotbar-slot').forEach((el, i) => {
-      el.classList.toggle('selected', i === slot);
+    document.querySelectorAll(".hotbar-slot").forEach((el, i) => {
+      el.classList.toggle("selected", i === slot);
     });
     if (this.onSlotChange) this.onSlotChange(slot);
   }
 
   openChat(prefix) {
     this.chatOpen = true;
-    const input = document.getElementById('chat-input');
-    input.style.display = 'block';
-    input.value = prefix || '';
+    const input = document.getElementById("chat-input");
+    input.style.display = "block";
+    input.value = prefix || "";
     input.focus();
     document.exitPointerLock();
 
     const handler = (e) => {
-      if (e.key === 'Enter') {
+      if (e.key === "Enter") {
         const msg = input.value;
         if (msg.trim() && this.onChatSend) {
           this.onChatSend(msg);
         }
         this.closeChat();
-        input.removeEventListener('keydown', handler);
-      } else if (e.key === 'Escape') {
+        input.removeEventListener("keydown", handler);
+      } else if (e.key === "Escape") {
         this.closeChat();
-        input.removeEventListener('keydown', handler);
+        input.removeEventListener("keydown", handler);
       }
     };
-    input.addEventListener('keydown', handler);
+    input.addEventListener("keydown", handler);
   }
 
   closeChat() {
     this.chatOpen = false;
-    const input = document.getElementById('chat-input');
-    input.style.display = 'none';
-    input.value = '';
+    const input = document.getElementById("chat-input");
+    input.style.display = "none";
+    input.value = "";
     if (!this.paused) {
       this.canvas.requestPointerLock();
     }
@@ -173,12 +211,14 @@ class PlayerControls {
 
   togglePause(show) {
     this.paused = show;
-    document.getElementById('pause-menu').style.display = show ? 'flex' : 'none';
+    document.getElementById("pause-menu").style.display = show
+      ? "flex"
+      : "none";
   }
 
   toggleDebug() {
-    const debug = document.getElementById('debug-info');
-    debug.style.display = debug.style.display === 'none' ? 'block' : 'none';
+    const debug = document.getElementById("debug-info");
+    debug.style.display = debug.style.display === "none" ? "block" : "none";
   }
 
   onLeftClick() {
@@ -203,13 +243,22 @@ class PlayerControls {
       const z = Math.floor(pos.z + dir.z * d);
 
       const block = world.getBlock(x, y, z);
-      if (block !== 0 && block !== 8 && block !== 9 && block !== 10 && block !== 11) {
+      if (
+        block !== 0 &&
+        block !== 8 &&
+        block !== 9 &&
+        block !== 10 &&
+        block !== 11
+      ) {
         return {
           block: { x, y, z, id: block },
-          adjacent: prevX !== undefined ? { x: prevX, y: prevY, z: prevZ } : null
+          adjacent:
+            prevX !== undefined ? { x: prevX, y: prevY, z: prevZ } : null,
         };
       }
-      prevX = x; prevY = y; prevZ = z;
+      prevX = x;
+      prevY = y;
+      prevZ = z;
     }
     return null;
   }
@@ -217,7 +266,11 @@ class PlayerControls {
   update(dt, world) {
     const speed = this.sprinting ? this.sprintSpeed : this.walkSpeed;
 
-    const forward = new THREE.Vector3(-Math.sin(this.yaw), 0, -Math.cos(this.yaw));
+    const forward = new THREE.Vector3(
+      -Math.sin(this.yaw),
+      0,
+      -Math.cos(this.yaw),
+    );
     const right = new THREE.Vector3(Math.cos(this.yaw), 0, -Math.sin(this.yaw));
 
     const moveDir = new THREE.Vector3(0, 0, 0);
@@ -264,11 +317,32 @@ class PlayerControls {
       if (this.velocity.y <= 0) {
         const testFeetY = Math.floor(newPos.y);
         const w = this.playerWidth;
-        const b1 = world.getBlock(Math.floor(newPos.x - w), testFeetY, Math.floor(newPos.z - w));
-        const b2 = world.getBlock(Math.floor(newPos.x + w), testFeetY, Math.floor(newPos.z - w));
-        const b3 = world.getBlock(Math.floor(newPos.x - w), testFeetY, Math.floor(newPos.z + w));
-        const b4 = world.getBlock(Math.floor(newPos.x + w), testFeetY, Math.floor(newPos.z + w));
-        if ((b1 && SOLID_BLOCKS.has(b1)) || (b2 && SOLID_BLOCKS.has(b2)) || (b3 && SOLID_BLOCKS.has(b3)) || (b4 && SOLID_BLOCKS.has(b4))) {
+        const b1 = world.getBlock(
+          Math.floor(newPos.x - w),
+          testFeetY,
+          Math.floor(newPos.z - w),
+        );
+        const b2 = world.getBlock(
+          Math.floor(newPos.x + w),
+          testFeetY,
+          Math.floor(newPos.z - w),
+        );
+        const b3 = world.getBlock(
+          Math.floor(newPos.x - w),
+          testFeetY,
+          Math.floor(newPos.z + w),
+        );
+        const b4 = world.getBlock(
+          Math.floor(newPos.x + w),
+          testFeetY,
+          Math.floor(newPos.z + w),
+        );
+        if (
+          (b1 && SOLID_BLOCKS.has(b1)) ||
+          (b2 && SOLID_BLOCKS.has(b2)) ||
+          (b3 && SOLID_BLOCKS.has(b3)) ||
+          (b4 && SOLID_BLOCKS.has(b4))
+        ) {
           newPos.y = testFeetY + 1;
           this.velocity.y = 0;
           this.onGround = true;
@@ -286,9 +360,18 @@ class PlayerControls {
       }
 
       // X collision
-      const checkX = Math.floor(newPos.x + (this.velocity.x > 0 ? this.playerWidth : -this.playerWidth));
-      for (let cy = Math.floor(newPos.y); cy <= Math.floor(newPos.y + this.playerHeight); cy++) {
-        if (world.getBlock(checkX, cy, pz) !== 0 && SOLID_BLOCKS.has(world.getBlock(checkX, cy, pz))) {
+      const checkX = Math.floor(
+        newPos.x + (this.velocity.x > 0 ? this.playerWidth : -this.playerWidth),
+      );
+      for (
+        let cy = Math.floor(newPos.y);
+        cy <= Math.floor(newPos.y + this.playerHeight);
+        cy++
+      ) {
+        if (
+          world.getBlock(checkX, cy, pz) !== 0 &&
+          SOLID_BLOCKS.has(world.getBlock(checkX, cy, pz))
+        ) {
           newPos.x = this.position.x;
           this.velocity.x = 0;
           break;
@@ -296,9 +379,18 @@ class PlayerControls {
       }
 
       // Z collision
-      const checkZ = Math.floor(newPos.z + (this.velocity.z > 0 ? this.playerWidth : -this.playerWidth));
-      for (let cy = Math.floor(newPos.y); cy <= Math.floor(newPos.y + this.playerHeight); cy++) {
-        if (world.getBlock(px, cy, checkZ) !== 0 && SOLID_BLOCKS.has(world.getBlock(px, cy, checkZ))) {
+      const checkZ = Math.floor(
+        newPos.z + (this.velocity.z > 0 ? this.playerWidth : -this.playerWidth),
+      );
+      for (
+        let cy = Math.floor(newPos.y);
+        cy <= Math.floor(newPos.y + this.playerHeight);
+        cy++
+      ) {
+        if (
+          world.getBlock(px, cy, checkZ) !== 0 &&
+          SOLID_BLOCKS.has(world.getBlock(px, cy, checkZ))
+        ) {
           newPos.z = this.position.z;
           this.velocity.z = 0;
           break;
@@ -309,17 +401,21 @@ class PlayerControls {
     this.position.copy(newPos);
 
     // Update camera
-    this.camera.position.set(this.position.x, this.position.y + this.playerHeight, this.position.z);
+    this.camera.position.set(
+      this.position.x,
+      this.position.y + this.playerHeight,
+      this.position.z,
+    );
 
-    const euler = new THREE.Euler(this.pitch, this.yaw, 0, 'YXZ');
+    const euler = new THREE.Euler(this.pitch, this.yaw, 0, "YXZ");
     this.camera.quaternion.setFromEuler(euler);
   }
 
   getYawDegrees() {
-    return ((-this.yaw * 180 / Math.PI) % 360 + 360) % 360;
+    return ((((-this.yaw * 180) / Math.PI) % 360) + 360) % 360;
   }
 
   getPitchDegrees() {
-    return -this.pitch * 180 / Math.PI;
+    return (-this.pitch * 180) / Math.PI;
   }
 }

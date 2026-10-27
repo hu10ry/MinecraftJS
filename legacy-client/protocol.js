@@ -4,26 +4,33 @@ class PacketBuffer {
       this.buffer = new Uint8Array(data);
     } else if (data instanceof Uint8Array) {
       this.buffer = data;
-    } else if (typeof data === 'string') {
+    } else if (typeof data === "string") {
       const binary = atob(data);
       this.buffer = new Uint8Array(binary.length);
-      for (let i = 0; i < binary.length; i++) this.buffer[i] = binary.charCodeAt(i);
+      for (let i = 0; i < binary.length; i++)
+        this.buffer[i] = binary.charCodeAt(i);
     } else {
       this.buffer = new Uint8Array(0);
     }
     this.offset = 0;
   }
 
-  remaining() { return this.buffer.length - this.offset; }
+  remaining() {
+    return this.buffer.length - this.offset;
+  }
 
   readByte() {
-    if (this.offset >= this.buffer.length) throw new Error('Buffer underflow');
+    if (this.offset >= this.buffer.length) throw new Error("Buffer underflow");
     return this.buffer[this.offset++];
   }
 
-  readUByte() { return this.readByte() & 0xFF; }
+  readUByte() {
+    return this.readByte() & 0xff;
+  }
 
-  readBoolean() { return this.readByte() !== 0; }
+  readBoolean() {
+    return this.readByte() !== 0;
+  }
 
   readShort() {
     const val = (this.buffer[this.offset] << 8) | this.buffer[this.offset + 1];
@@ -38,10 +45,11 @@ class PacketBuffer {
   }
 
   readInt() {
-    const val = (this.buffer[this.offset] << 24) |
-                (this.buffer[this.offset + 1] << 16) |
-                (this.buffer[this.offset + 2] << 8) |
-                this.buffer[this.offset + 3];
+    const val =
+      (this.buffer[this.offset] << 24) |
+      (this.buffer[this.offset + 1] << 16) |
+      (this.buffer[this.offset + 2] << 8) |
+      this.buffer[this.offset + 3];
     this.offset += 4;
     return val;
   }
@@ -53,13 +61,21 @@ class PacketBuffer {
   }
 
   readFloat() {
-    const view = new DataView(this.buffer.buffer, this.buffer.byteOffset + this.offset, 4);
+    const view = new DataView(
+      this.buffer.buffer,
+      this.buffer.byteOffset + this.offset,
+      4,
+    );
     this.offset += 4;
     return view.getFloat32(0, false);
   }
 
   readDouble() {
-    const view = new DataView(this.buffer.buffer, this.buffer.byteOffset + this.offset, 8);
+    const view = new DataView(
+      this.buffer.buffer,
+      this.buffer.byteOffset + this.offset,
+      8,
+    );
     this.offset += 8;
     return view.getFloat64(0, false);
   }
@@ -69,12 +85,12 @@ class PacketBuffer {
     let length = 0;
     let currentByte;
     do {
-      currentByte = this.readByte() & 0xFF;
-      value |= (currentByte & 0x7F) << (length * 7);
+      currentByte = this.readByte() & 0xff;
+      value |= (currentByte & 0x7f) << (length * 7);
       length++;
-      if (length > 5) throw new Error('VarInt too big');
+      if (length > 5) throw new Error("VarInt too big");
     } while ((currentByte & 0x80) !== 0);
-    if (value > 0x7FFFFFFF) value -= 0x100000000;
+    if (value > 0x7fffffff) value -= 0x100000000;
     return value;
   }
 
@@ -88,8 +104,10 @@ class PacketBuffer {
   readUUID() {
     const bytes = this.buffer.slice(this.offset, this.offset + 16);
     this.offset += 16;
-    const hex = Array.from(bytes).map(b => b.toString(16).padStart(2, '0')).join('');
-    return `${hex.slice(0,8)}-${hex.slice(8,12)}-${hex.slice(12,16)}-${hex.slice(16,20)}-${hex.slice(20)}`;
+    const hex = Array.from(bytes)
+      .map((b) => b.toString(16).padStart(2, "0"))
+      .join("");
+    return `${hex.slice(0, 8)}-${hex.slice(8, 12)}-${hex.slice(12, 16)}-${hex.slice(16, 20)}-${hex.slice(20)}`;
   }
 
   readBytes(length) {
@@ -129,15 +147,36 @@ class PacketBuffer {
 
   _skipNBTPayload(tagType) {
     switch (tagType) {
-      case 0: return;
-      case 1: this.offset += 1; return;
-      case 2: this.offset += 2; return;
-      case 3: this.offset += 4; return;
-      case 4: this.offset += 8; return;
-      case 5: this.offset += 4; return;
-      case 6: this.offset += 8; return;
-      case 7: { const len = this.readInt(); this.offset += len; return; }
-      case 8: { const len = this.readUShort(); this.offset += len; return; }
+      case 0:
+        return;
+      case 1:
+        this.offset += 1;
+        return;
+      case 2:
+        this.offset += 2;
+        return;
+      case 3:
+        this.offset += 4;
+        return;
+      case 4:
+        this.offset += 8;
+        return;
+      case 5:
+        this.offset += 4;
+        return;
+      case 6:
+        this.offset += 8;
+        return;
+      case 7: {
+        const len = this.readInt();
+        this.offset += len;
+        return;
+      }
+      case 8: {
+        const len = this.readUShort();
+        this.offset += len;
+        return;
+      }
       case 9: {
         const listType = this.readByte();
         const listLen = this.readInt();
@@ -153,8 +192,13 @@ class PacketBuffer {
           this._skipNBTPayload(t);
         }
       }
-      case 11: { const len = this.readInt(); this.offset += len * 4; return; }
-      default: return;
+      case 11: {
+        const len = this.readInt();
+        this.offset += len * 4;
+        return;
+      }
+      default:
+        return;
     }
   }
 
@@ -164,8 +208,8 @@ class PacketBuffer {
     const low = val[1] >>> 0;
     // x = bits 63..38, y = bits 37..26, z = bits 25..0
     let x = high >> 6;
-    let y = ((high & 0x3F) << 6) | ((low >>> 26) & 0x3F);
-    let z = low & 0x3FFFFFF;
+    let y = ((high & 0x3f) << 6) | ((low >>> 26) & 0x3f);
+    let z = low & 0x3ffffff;
     if (x >= 0x2000000) x -= 0x4000000;
     if (y >= 0x800) y -= 0x1000;
     if (z >= 0x2000000) z -= 0x4000000;
@@ -180,19 +224,44 @@ class PacketBuffer {
     const meta = {};
     while (true) {
       const item = this.readUByte();
-      if (item === 0xFF || item === 127) break;
-      const index = item & 0x1F;
+      if (item === 0xff || item === 127) break;
+      const index = item & 0x1f;
       const type = (item >> 5) & 0x07;
       switch (type) {
-        case 0: meta[index] = this.readByte(); break;
-        case 1: meta[index] = this.readShort(); break;
-        case 2: meta[index] = this.readInt(); break;
-        case 3: meta[index] = this.readFloat(); break;
-        case 4: meta[index] = this.readString(); break;
-        case 5: meta[index] = this.readSlot(); break;
-        case 6: meta[index] = { x: this.readInt(), y: this.readInt(), z: this.readInt() }; break;
-        case 7: meta[index] = { yaw: this.readFloat(), pitch: this.readFloat(), roll: this.readFloat() }; break;
-        default: return meta;
+        case 0:
+          meta[index] = this.readByte();
+          break;
+        case 1:
+          meta[index] = this.readShort();
+          break;
+        case 2:
+          meta[index] = this.readInt();
+          break;
+        case 3:
+          meta[index] = this.readFloat();
+          break;
+        case 4:
+          meta[index] = this.readString();
+          break;
+        case 5:
+          meta[index] = this.readSlot();
+          break;
+        case 6:
+          meta[index] = {
+            x: this.readInt(),
+            y: this.readInt(),
+            z: this.readInt(),
+          };
+          break;
+        case 7:
+          meta[index] = {
+            yaw: this.readFloat(),
+            pitch: this.readFloat(),
+            roll: this.readFloat(),
+          };
+          break;
+        default:
+          return meta;
       }
     }
     return meta;
@@ -205,7 +274,7 @@ class PacketWriter {
   }
 
   writeByte(val) {
-    this.parts.push(new Uint8Array([val & 0xFF]));
+    this.parts.push(new Uint8Array([val & 0xff]));
     return this;
   }
 
@@ -214,7 +283,7 @@ class PacketWriter {
   }
 
   writeShort(val) {
-    this.parts.push(new Uint8Array([(val >> 8) & 0xFF, val & 0xFF]));
+    this.parts.push(new Uint8Array([(val >> 8) & 0xff, val & 0xff]));
     return this;
   }
 
@@ -223,10 +292,14 @@ class PacketWriter {
   }
 
   writeInt(val) {
-    this.parts.push(new Uint8Array([
-      (val >> 24) & 0xFF, (val >> 16) & 0xFF,
-      (val >> 8) & 0xFF, val & 0xFF
-    ]));
+    this.parts.push(
+      new Uint8Array([
+        (val >> 24) & 0xff,
+        (val >> 16) & 0xff,
+        (val >> 8) & 0xff,
+        val & 0xff,
+      ]),
+    );
     return this;
   }
 
@@ -254,11 +327,11 @@ class PacketWriter {
     if (val < 0) val += 0x100000000;
     const bytes = [];
     while (true) {
-      if ((val & ~0x7F) === 0) {
+      if ((val & ~0x7f) === 0) {
         bytes.push(val);
         break;
       }
-      bytes.push((val & 0x7F) | 0x80);
+      bytes.push((val & 0x7f) | 0x80);
       val >>>= 7;
     }
     this.parts.push(new Uint8Array(bytes));
@@ -274,23 +347,26 @@ class PacketWriter {
 
   writePosition(x, y, z) {
     // Position encoded as 64-bit: x(26 bits) | y(12 bits) | z(26 bits)
-    const xBits = ((x & 0x3FFFFFF) >>> 0);
-    const yBits = ((y & 0xFFF) >>> 0);
-    const zBits = ((z & 0x3FFFFFF) >>> 0);
+    const xBits = (x & 0x3ffffff) >>> 0;
+    const yBits = (y & 0xfff) >>> 0;
+    const zBits = (z & 0x3ffffff) >>> 0;
     const high = (xBits << 6) | (yBits >>> 6);
-    const low = ((yBits & 0x3F) << 26) | zBits;
+    const low = ((yBits & 0x3f) << 26) | zBits;
     return this.writeLong(high, low >>> 0);
   }
 
   writeBytes(bytes) {
-    this.parts.push(bytes instanceof Uint8Array ? bytes : new Uint8Array(bytes));
+    this.parts.push(
+      bytes instanceof Uint8Array ? bytes : new Uint8Array(bytes),
+    );
     return this;
   }
 
   toBase64() {
     const merged = this.build();
-    let binary = '';
-    for (let i = 0; i < merged.length; i++) binary += String.fromCharCode(merged[i]);
+    let binary = "";
+    for (let i = 0; i < merged.length; i++)
+      binary += String.fromCharCode(merged[i]);
     return btoa(binary);
   }
 
@@ -319,12 +395,12 @@ const ServerPackets = {
   RESPAWN: 0x07,
   PLAYER_POSITION_AND_LOOK: 0x08,
   HELD_ITEM_CHANGE: 0x09,
-  USE_BED: 0x0A,
-  ANIMATION: 0x0B,
-  SPAWN_PLAYER: 0x0C,
-  COLLECT_ITEM: 0x0D,
-  SPAWN_OBJECT: 0x0E,
-  SPAWN_MOB: 0x0F,
+  USE_BED: 0x0a,
+  ANIMATION: 0x0b,
+  SPAWN_PLAYER: 0x0c,
+  COLLECT_ITEM: 0x0d,
+  SPAWN_OBJECT: 0x0e,
+  SPAWN_MOB: 0x0f,
   SPAWN_PAINTING: 0x10,
   SPAWN_EXPERIENCE_ORB: 0x11,
   ENTITY_VELOCITY: 0x12,
@@ -335,12 +411,12 @@ const ServerPackets = {
   ENTITY_LOOK_AND_RELATIVE_MOVE: 0x17,
   ENTITY_TELEPORT: 0x18,
   ENTITY_HEAD_LOOK: 0x19,
-  ENTITY_STATUS: 0x1A,
-  ATTACH_ENTITY: 0x1B,
-  ENTITY_METADATA: 0x1C,
-  ENTITY_EFFECT: 0x1D,
-  REMOVE_ENTITY_EFFECT: 0x1E,
-  SET_EXPERIENCE: 0x1F,
+  ENTITY_STATUS: 0x1a,
+  ATTACH_ENTITY: 0x1b,
+  ENTITY_METADATA: 0x1c,
+  ENTITY_EFFECT: 0x1d,
+  REMOVE_ENTITY_EFFECT: 0x1e,
+  SET_EXPERIENCE: 0x1f,
   ENTITY_PROPERTIES: 0x20,
   CHUNK_DATA: 0x21,
   MULTI_BLOCK_CHANGE: 0x22,
@@ -351,12 +427,12 @@ const ServerPackets = {
   EXPLOSION: 0x27,
   EFFECT: 0x28,
   SOUND_EFFECT: 0x29,
-  PARTICLE: 0x2A,
-  CHANGE_GAME_STATE: 0x2B,
-  SPAWN_GLOBAL_ENTITY: 0x2C,
-  OPEN_WINDOW: 0x2D,
-  CLOSE_WINDOW: 0x2E,
-  SET_SLOT: 0x2F,
+  PARTICLE: 0x2a,
+  CHANGE_GAME_STATE: 0x2b,
+  SPAWN_GLOBAL_ENTITY: 0x2c,
+  OPEN_WINDOW: 0x2d,
+  CLOSE_WINDOW: 0x2e,
+  SET_SLOT: 0x2f,
   WINDOW_ITEMS: 0x30,
   WINDOW_PROPERTY: 0x31,
   CONFIRM_TRANSACTION: 0x32,
@@ -367,12 +443,12 @@ const ServerPackets = {
   STATISTICS: 0x37,
   PLAYER_LIST_ITEM: 0x38,
   PLAYER_ABILITIES: 0x39,
-  TAB_COMPLETE: 0x3A,
-  SCOREBOARD_OBJECTIVE: 0x3B,
-  UPDATE_SCORE: 0x3C,
-  DISPLAY_SCOREBOARD: 0x3D,
-  TEAMS: 0x3E,
-  PLUGIN_MESSAGE: 0x3F,
+  TAB_COMPLETE: 0x3a,
+  SCOREBOARD_OBJECTIVE: 0x3b,
+  UPDATE_SCORE: 0x3c,
+  DISPLAY_SCOREBOARD: 0x3d,
+  TEAMS: 0x3e,
+  PLUGIN_MESSAGE: 0x3f,
   DISCONNECT: 0x40,
   SERVER_DIFFICULTY: 0x41,
   COMBAT_EVENT: 0x42,
@@ -382,7 +458,7 @@ const ServerPackets = {
   SET_COMPRESSION: 0x46,
   PLAYER_LIST_HEADER_FOOTER: 0x47,
   RESOURCE_PACK_SEND: 0x48,
-  UPDATE_ENTITY_NBT: 0x49
+  UPDATE_ENTITY_NBT: 0x49,
 };
 
 // Serverbound packet IDs (play state)
@@ -397,12 +473,12 @@ const ClientPackets = {
   PLAYER_DIGGING: 0x07,
   PLAYER_BLOCK_PLACEMENT: 0x08,
   HELD_ITEM_CHANGE: 0x09,
-  ANIMATION: 0x0A,
-  ENTITY_ACTION: 0x0B,
-  STEER_VEHICLE: 0x0C,
-  CLOSE_WINDOW: 0x0D,
-  CLICK_WINDOW: 0x0E,
-  CONFIRM_TRANSACTION: 0x0F,
+  ANIMATION: 0x0a,
+  ENTITY_ACTION: 0x0b,
+  STEER_VEHICLE: 0x0c,
+  CLOSE_WINDOW: 0x0d,
+  CLICK_WINDOW: 0x0e,
+  CONFIRM_TRANSACTION: 0x0f,
   CREATIVE_INVENTORY_ACTION: 0x10,
   ENCHANT_ITEM: 0x11,
   UPDATE_SIGN: 0x12,
@@ -412,5 +488,5 @@ const ClientPackets = {
   CLIENT_STATUS: 0x16,
   PLUGIN_MESSAGE: 0x17,
   SPECTATE: 0x18,
-  RESOURCE_PACK_STATUS: 0x19
+  RESOURCE_PACK_STATUS: 0x19,
 };

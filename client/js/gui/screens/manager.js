@@ -7,17 +7,29 @@ export class Screen {
     this.fields = [];
     this.allowsMovement = false;
     this.pausesGame = false;
-    this.background = 'world';
+    this.background = "world";
   }
-  get gui() { return this.game.gui; }
-  get width() { return this.game.gui.width; }
-  get height() { return this.game.gui.height; }
+  get gui() {
+    return this.game.gui;
+  }
+  get width() {
+    return this.game.gui.width;
+  }
+  get height() {
+    return this.game.gui.height;
+  }
   init() {}
-  onResize() { this.buttons = []; this.fields = []; this.init(); }
-  tick() { for (const f of this.fields) f.tick(); }
+  onResize() {
+    this.buttons = [];
+    this.fields = [];
+    this.init();
+  }
+  tick() {
+    for (const f of this.fields) f.tick();
+  }
   render(gui, mx, my, partial) {
-    if (this.background === 'world') gui.worldBackground();
-    else if (this.background === 'dirt') gui.dirtBackground();
+    if (this.background === "world") gui.worldBackground();
+    else if (this.background === "dirt") gui.dirtBackground();
     this.renderContent(gui, mx, my, partial);
     for (const b of this.buttons) b.render(gui, mx, my);
     for (const f of this.fields) f.render(gui);
@@ -25,32 +37,66 @@ export class Screen {
   renderContent() {}
   mouseDown(mx, my, button) {
     if (button === 0) {
-      for (const b of this.buttons) if (b.mouseDown(mx, my, this.game)) return true;
+      for (const b of this.buttons)
+        if (b.mouseDown(mx, my, this.game)) return true;
     }
     let any = false;
     for (const f of this.fields) if (f.mouseDown(mx, my, this.gui)) any = true;
     return any;
   }
-  mouseUp(mx, my, button) { for (const b of this.buttons) if (b.mouseUp) b.mouseUp(); }
+  mouseUp(mx, my, button) {
+    for (const b of this.buttons) if (b.mouseUp) b.mouseUp();
+  }
   mouseMove() {}
   key(e) {
-    if(e.code==='Tab') {
-      const widgets=[...this.fields.filter(w=>w.enabled!==false),...this.buttons.filter(w=>w.visible!==false&&w.enabled!==false),...(this.list?[this.list]:[])];
-      if(!widgets.length)return false;
-      const i=widgets.findIndex(w=>w.focused),next=(i+(e.shift?-1:1)+widgets.length)%widgets.length;
-      widgets.forEach(w=>{w.focused=false;});this.focusedWidget=widgets[next];this.focusedWidget.focused=true;
-      if([1,3].includes(this.game.settings.narrator)){const w=this.focusedWidget,label=w.narration?.()||(typeof w.label==='function'?w.label():w.label)||w.text;this.game.narrator?.say(label);}
+    if (e.code === "Tab") {
+      const widgets = [
+        ...this.fields.filter((w) => w.enabled !== false),
+        ...this.buttons.filter(
+          (w) => w.visible !== false && w.enabled !== false,
+        ),
+        ...(this.list ? [this.list] : []),
+      ];
+      if (!widgets.length) return false;
+      const i = widgets.findIndex((w) => w.focused),
+        next = (i + (e.shift ? -1 : 1) + widgets.length) % widgets.length;
+      widgets.forEach((w) => {
+        w.focused = false;
+      });
+      this.focusedWidget = widgets[next];
+      this.focusedWidget.focused = true;
+      if ([1, 3].includes(this.game.settings.narrator)) {
+        const w = this.focusedWidget,
+          label =
+            w.narration?.() ||
+            (typeof w.label === "function" ? w.label() : w.label) ||
+            w.text;
+        this.game.narrator?.say(label);
+      }
       return true;
     }
     for (const f of this.fields) if (f.key(e)) return true;
-    if(this.focusedWidget&&!this.fields.includes(this.focusedWidget)&&this.focusedWidget.key?.(e,this.game))return true;
-    if (e.code === 'Escape') { this.close(); return true; }
+    if (
+      this.focusedWidget &&
+      !this.fields.includes(this.focusedWidget) &&
+      this.focusedWidget.key?.(e, this.game)
+    )
+      return true;
+    if (e.code === "Escape") {
+      this.close();
+      return true;
+    }
     return false;
   }
   keyUp() {}
-  char(c) { for (const f of this.fields) if (f.char(c)) return true; return false; }
+  char(c) {
+    for (const f of this.fields) if (f.char(c)) return true;
+    return false;
+  }
   wheel() {}
-  close() { this.game.screens.close(); }
+  close() {
+    this.game.screens.close();
+  }
   onClose() {}
 }
 
@@ -59,7 +105,7 @@ export class ScreenManager {
     this.game = game;
     this.current = null;
     this.ignoreUnlock = false;
-    this.lastSize = '';
+    this.lastSize = "";
   }
 
   open(screen) {
@@ -67,9 +113,13 @@ export class ScreenManager {
     if (this.current) this.current.onClose();
     this.current = screen;
     if (screen) {
-      screen.buttons = []; screen.fields = [];
+      screen.buttons = [];
+      screen.fields = [];
       screen.init();
-      if (g.input.locked) { this.ignoreUnlock = true; g.input.unlock(); }
+      if (g.input.locked) {
+        this.ignoreUnlock = true;
+        g.input.unlock();
+      }
     } else if (g.inWorld) {
       g.input.lock();
     }
@@ -93,7 +143,9 @@ export class ScreenManager {
 
   openMainMenu(reason) {
     // Lazily imported to avoid circular deps
-    import('./menus.js').then((m) => this.open(new m.TitleScreen(this.game, reason)));
+    import("./menus.js").then((m) =>
+      this.open(new m.TitleScreen(this.game, reason)),
+    );
   }
 
   _mouse() {
@@ -102,22 +154,40 @@ export class ScreenManager {
     return [inp.rawX / g.scale, inp.rawY / g.scale];
   }
 
-  tick() { if (this.current) this.current.tick(); }
+  tick() {
+    if (this.current) this.current.tick();
+  }
 
   render(gui, partial) {
     const s = this.current;
     if (!s) return;
-    const size = gui.width + 'x' + gui.height;
-    if (size !== this.lastSize) { this.lastSize = size; s.onResize(); }
+    const size = gui.width + "x" + gui.height;
+    if (size !== this.lastSize) {
+      this.lastSize = size;
+      s.onResize();
+    }
     const [mx, my] = this._mouse();
     s.render(gui, mx, my, partial);
   }
 
-  onKey(e) { if (this.current) this.current.key(e); }
-  onKeyUp(e) { if (this.current) this.current.keyUp(e); }
-  onChar(c) { if (this.current) this.current.char(c); }
-  onMove() { if (this.current && this.current.mouseMove) { const [mx, my] = this._mouse(); this.current.mouseMove(mx, my); } }
-  onWheel(d) { if (this.current) this.current.wheel(d); }
+  onKey(e) {
+    if (this.current) this.current.key(e);
+  }
+  onKeyUp(e) {
+    if (this.current) this.current.keyUp(e);
+  }
+  onChar(c) {
+    if (this.current) this.current.char(c);
+  }
+  onMove() {
+    if (this.current && this.current.mouseMove) {
+      const [mx, my] = this._mouse();
+      this.current.mouseMove(mx, my);
+    }
+  }
+  onWheel(d) {
+    if (this.current) this.current.wheel(d);
+  }
   onMouse(e) {
     if (!this.current) return;
     const [mx, my] = this._mouse();

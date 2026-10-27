@@ -710,10 +710,7 @@
           "to": 45
         }
       ],
-      "changed": [
-        "crafting_book_data",
-        "block_place"
-      ]
+      "changed": ["crafting_book_data", "block_place"]
     }
   },
   "sharedTypeChanges": [

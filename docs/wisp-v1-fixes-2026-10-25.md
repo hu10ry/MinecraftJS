@@ -32,5 +32,6 @@ formatting assertion supplements the existing translated-tooltip test. Older
 clients do not use this category tooltip path, so they need no styling patch.
 
 References:
+
 - https://github.com/MercuryWorkshop/wisp-server-python
 - https://github.com/MercuryWorkshop/wisp-js

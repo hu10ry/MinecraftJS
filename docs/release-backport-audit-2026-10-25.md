@@ -7,23 +7,23 @@ and the shared regression suites. No additional missing applicable fix was
 identified in this review. This is a targeted audit of the recent fixes, not a
 claim of complete vanilla parity or an exhaustive audit of the repository's history.
 
-| Area | 1.13.2 | 1.12.2 / 1.8.9 |
-| --- | --- | --- |
-| Inventory NBT ownership/equality, slot limits, authoritative results | Fixed | Adapted fixes present; legacy metadata retained |
-| Visibility and skin invalidation | Fixed | Present |
-| Rain, firework trails, barrier marker lifecycle, camera-distance LOD | Fixed | Present with native particle IDs; no elytra in 1.8.9 |
-| Dragon/crystal/guardian beams, texture cutouts, dragon death effects | Fixed | Present with native metadata |
-| Jar selection bounds, bed sleep camera, portal reload rendering | Fixed | Shared fixes present; native bed colours and portal scanning retained |
-| Controls ordering and resource-pack compatibility confirmation | Fixed | Native layout and pack-format adaptations present |
-| Custom skin/profile proxy, UUID/raw/encoded URL placeholders | Fixed | Present |
-| Explicit empty selection shapes | Fixed | Present; cave/void air stay exclusive to newer versions |
-| Chat history, translation placeholders, hover tooltips, stale block/light updates | Fixed | Present with native chat formats |
-| Falling-block local replacement | Fixed | Present |
-| Path-block light opacity | Fixed | Present in 1.12.2; no path block in 1.8.9 |
-| Creative sword mining guard, model-based breaking overlay | Fixed | Present |
-| Wisp v1 URL paths, early greeting retention, credits and close cleanup | Fixed | Present |
-| Creative search category bold reset | Corrected | Older UI does not use this category path |
-| Turtle eggs, swimming/Riptide, biome water colours, native tags/Brigadier, GLFW labels | Native fixes | Version-specific; not transplanted into older clients |
+| Area                                                                                   | 1.13.2       | 1.12.2 / 1.8.9                                                        |
+| -------------------------------------------------------------------------------------- | ------------ | --------------------------------------------------------------------- |
+| Inventory NBT ownership/equality, slot limits, authoritative results                   | Fixed        | Adapted fixes present; legacy metadata retained                       |
+| Visibility and skin invalidation                                                       | Fixed        | Present                                                               |
+| Rain, firework trails, barrier marker lifecycle, camera-distance LOD                   | Fixed        | Present with native particle IDs; no elytra in 1.8.9                  |
+| Dragon/crystal/guardian beams, texture cutouts, dragon death effects                   | Fixed        | Present with native metadata                                          |
+| Jar selection bounds, bed sleep camera, portal reload rendering                        | Fixed        | Shared fixes present; native bed colours and portal scanning retained |
+| Controls ordering and resource-pack compatibility confirmation                         | Fixed        | Native layout and pack-format adaptations present                     |
+| Custom skin/profile proxy, UUID/raw/encoded URL placeholders                           | Fixed        | Present                                                               |
+| Explicit empty selection shapes                                                        | Fixed        | Present; cave/void air stay exclusive to newer versions               |
+| Chat history, translation placeholders, hover tooltips, stale block/light updates      | Fixed        | Present with native chat formats                                      |
+| Falling-block local replacement                                                        | Fixed        | Present                                                               |
+| Path-block light opacity                                                               | Fixed        | Present in 1.12.2; no path block in 1.8.9                             |
+| Creative sword mining guard, model-based breaking overlay                              | Fixed        | Present                                                               |
+| Wisp v1 URL paths, early greeting retention, credits and close cleanup                 | Fixed        | Present                                                               |
+| Creative search category bold reset                                                    | Corrected    | Older UI does not use this category path                              |
+| Turtle eggs, swimming/Riptide, biome water colours, native tags/Brigadier, GLFW labels | Native fixes | Version-specific; not transplanted into older clients                 |
 
 The `skinProxy` field was already read from site configuration on all three
 versions. This release adds a ready-to-edit configuration example, includes the

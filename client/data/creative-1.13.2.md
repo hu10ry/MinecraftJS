@@ -28,16 +28,16 @@ also verifies the exact generated file formatting. `Dump.java` is the historical
 The independent adapter subclasses the existing `lib/jvm.js` interpreter without
 changing it or importing `lib/modelextract.js`. It executes these pinned jar methods:
 
-| Obfuscated class/method | Extracted behavior |
-| --- | --- |
-| `ary.<clinit>` and `ary$1` … `ary$12` | Tab indices, labels, icon stacks, backgrounds, title/scroll flags, columns, row and right alignment |
-| `ata.r()` | Full item registration order and `Item.Properties` group assignments |
-| `ata.a(ary,ez)`, `arj.a(ary,ez)`, `bcs.a(ary,ez)` | Actual item/block category predicates and population |
-| `atp.a(ary,ez)`, `aul.a(ary,ez)` | Potion variants; tipped arrows omit potion types without effects |
-| `asi.a(ary,ez)`, `awe.h()` and enchantment subclasses | All search book levels, category maximum levels, enchantment category membership and order |
-| `aut.b()`, `aej.m()` | Potion and effect registrations, durations, amplifiers, colors and modifiers |
-| `auc` constructor arguments in `ata.r()` | Native spawn-egg entities and both tint colors |
-| `clh` | Audited GUI tab geometry, search length, selection/merge behavior, tooltip category and saved-toolbar hints |
+| Obfuscated class/method                               | Extracted behavior                                                                                          |
+| ----------------------------------------------------- | ----------------------------------------------------------------------------------------------------------- |
+| `ary.<clinit>` and `ary$1` … `ary$12`                 | Tab indices, labels, icon stacks, backgrounds, title/scroll flags, columns, row and right alignment         |
+| `ata.r()`                                             | Full item registration order and `Item.Properties` group assignments                                        |
+| `ata.a(ary,ez)`, `arj.a(ary,ez)`, `bcs.a(ary,ez)`     | Actual item/block category predicates and population                                                        |
+| `atp.a(ary,ez)`, `aul.a(ary,ez)`                      | Potion variants; tipped arrows omit potion types without effects                                            |
+| `asi.a(ary,ez)`, `awe.h()` and enchantment subclasses | All search book levels, category maximum levels, enchantment category membership and order                  |
+| `aut.b()`, `aej.m()`                                  | Potion and effect registrations, durations, amplifiers, colors and modifiers                                |
+| `auc` constructor arguments in `ata.r()`              | Native spawn-egg entities and both tint colors                                                              |
+| `clh`                                                 | Audited GUI tab geometry, search length, selection/merge behavior, tooltip category and saved-toolbar hints |
 
 Java collections/registries are represented with JS collections in registration order.
 Block/entity/item singleton names come from their jar static initializers. World and
@@ -64,20 +64,20 @@ node tools/creative-dump/inspect.mjs --lang itemGroup.
 
 ## Regenerated counts and icons
 
-| Index | Label | Entries | Icon |
-| ---: | --- | ---: | --- |
-| 0 | buildingBlocks | 239 | bricks |
-| 1 | decorations | 207 | peony |
-| 2 | redstone | 54 | redstone |
-| 3 | transportation | 18 | powered_rail |
-| 4 | hotbar | 0 (dynamic saved toolbars) | bookshelf |
-| 5 | search | 1,034 | compass |
-| 6 | misc | 147 | lava_bucket |
-| 7 | food | 35 | apple |
-| 8 | tools | 35 | iron_axe |
-| 9 | combat | 99 | golden_sword |
-| 10 | brewing | 138 | potion with `Potion: "minecraft:water"` |
-| 11 | inventory | 0 (live inventory) | chest |
+| Index | Label          |                    Entries | Icon                                    |
+| ----: | -------------- | -------------------------: | --------------------------------------- |
+|     0 | buildingBlocks |                        239 | bricks                                  |
+|     1 | decorations    |                        207 | peony                                   |
+|     2 | redstone       |                         54 | redstone                                |
+|     3 | transportation |                         18 | powered_rail                            |
+|     4 | hotbar         | 0 (dynamic saved toolbars) | bookshelf                               |
+|     5 | search         |                      1,034 | compass                                 |
+|     6 | misc           |                        147 | lava_bucket                             |
+|     7 | food           |                         35 | apple                                   |
+|     8 | tools          |                         35 | iron_axe                                |
+|     9 | combat         |                         99 | golden_sword                            |
+|    10 | brewing        |                        138 | potion with `Potion: "minecraft:water"` |
+|    11 | inventory      |         0 (live inventory) | chest                                   |
 
 - **776 distinct native item IDs** appear in search; vanilla excludes 13 registered
   command-only/noncreative items. Search is the registry's `fillItemGroup(SEARCH)`

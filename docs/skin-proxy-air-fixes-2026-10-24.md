@@ -21,7 +21,7 @@ Updated 2026-10-24.
 Example `config.json` entry:
 
 ```json
-{"skinProxy":"https://proxy.example/?url=%R"}
+{ "skinProxy": "https://proxy.example/?url=%R" }
 ```
 
 `%u` inserts the undashed player UUID. `%R` inserts the percent-encoded target

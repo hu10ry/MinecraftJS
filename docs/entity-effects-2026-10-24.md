@@ -3,14 +3,14 @@
 Implemented 2026-10-24 from the pinned vanilla client jars. This is a targeted
 rendering correction, not a claim of complete client parity.
 
-| Effect | 1.13.2 | 1.12.2 | 1.8.9 |
-| --- | --- | --- | --- |
-| Dragon healing crystal beam | Added | Backported | Backported |
-| Crystal beam-target metadata, including respawn beams | Added renderer | Added metadata and renderer | Not a vanilla 1.8 feature |
-| Guardian and elder guardian attack beam | Added renderer and charge timing | Added target metadata and renderer | Added target metadata and renderer |
-| Dragon death skin dissolve, light rays, rising movement and explosion particles | Added | Backported | Backported |
-| Huge-explosion emitter: six bursts per tick for eight ticks | Added | Backported | Backported |
-| Riptide spinning texture shells | Added | Not available in this version | Not available in this version |
+| Effect                                                                          | 1.13.2                           | 1.12.2                             | 1.8.9                              |
+| ------------------------------------------------------------------------------- | -------------------------------- | ---------------------------------- | ---------------------------------- |
+| Dragon healing crystal beam                                                     | Added                            | Backported                         | Backported                         |
+| Crystal beam-target metadata, including respawn beams                           | Added renderer                   | Added metadata and renderer        | Not a vanilla 1.8 feature          |
+| Guardian and elder guardian attack beam                                         | Added renderer and charge timing | Added target metadata and renderer | Added target metadata and renderer |
+| Dragon death skin dissolve, light rays, rising movement and explosion particles | Added                            | Backported                         | Backported                         |
+| Huge-explosion emitter: six bursts per tick for eight ticks                     | Added                            | Backported                         | Backported                         |
+| Riptide spinning texture shells                                                 | Added                            | Not available in this version      | Not available in this version      |
 
 The dragon/crystal beam is an eight-sided taper with scrolling texture
 coordinates, dark at the dragon and bright at the bobbing crystal. The nearest
